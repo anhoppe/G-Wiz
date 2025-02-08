@@ -9,8 +9,16 @@
     mc:Ignorable="d"
     Title="G-Wiz TestApp">
     <Grid>
-        <uicontrol:GraphUiControl x:Name="_uiControl" Nodes="{Binding Nodes}" />
-        <!--<uicontrol:BlankPage1 />-->
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+            
+        <MenuBar Grid.Row="0" VerticalAlignment="Top">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Open" Click="OpenFile_Click"/>
+            </MenuBarItem>
+        </MenuBar>
+        <uicontrol:GraphUiControl Grid.Row="1" x:Name="_uiControl" Nodes="{Binding Nodes}" />
     </Grid>
 </Window>

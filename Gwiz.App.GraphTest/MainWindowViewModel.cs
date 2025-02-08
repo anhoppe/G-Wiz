@@ -1,37 +1,32 @@
-﻿using awiz.Graph.Core;
+﻿using Gwiz.Core.Contract;
+using Gwiz.Core.Serializer;
+using Microsoft.UI.Xaml.Controls;
+using Prism.Commands;
 using System.Collections.Generic;
+using System.Windows.Input;
+using Windows.Storage.Pickers;
+using Windows.Storage;
+using WinRT.Interop;
+using System;
+using System.IO;
+using System.IO.Pipes;
 
 namespace awiz.App.GraphTest
 {
     internal class MainWindowViewModel : Prism.Mvvm.BindableBase
     {
-        public MainWindowViewModel() 
+        public IList<Node> Nodes { get; private set; } = new List<Node>();
+
+        internal async void LoadGraph(StorageFile file)
         {
-            NodeTemplate nt = new NodeTemplate();
-            nt.Grid.AddRow("*");
-            nt.Grid.AddRow("*");
-            
-            Nodes = new List<Node>()
+            YamlSerializer serializer = new();
+            using (var fileStream = await file.OpenStreamForReadAsync())
             {
-                new Node()
-                {
-                    X = 10,
-                    Y = 10,
-                },
-                new Node()
-                {
-                    X = 100,
-                    Y = 30,
-                },
-                new Node()
-                {
-                    X = 50,
-                    Y = 80,
-                },
+                var graph = serializer.Deserialize(fileStream);
+                Nodes = graph.Nodes;
+            }
 
-            };
+            RaisePropertyChanged(nameof(Nodes));
         }
-
-        public IList<Node> Nodes { get; }
     }
 }

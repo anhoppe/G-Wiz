@@ -1,0 +1,9 @@
+Nodes:
+  - X: 10
+    Y: 20
+    Width: 100
+    Height: 100
+  - X: 300
+    Y: 50
+    Width: 100
+    Height: 100

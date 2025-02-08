@@ -1,4 +1,3 @@
-using awiz.Graph.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -12,6 +11,7 @@ using System;
 using Windows.Foundation;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
+using Gwiz.Core.Contract;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -76,11 +76,6 @@ namespace awiz.Graph.UiControl
 
                 _hoveredNode.X = (int)(pointerPosition.X - _mouseToNodeDelta.X);
                 _hoveredNode.Y = (int)(pointerPosition.Y - _mouseToNodeDelta.Y);
-
-                if (_hoveredNode.X > 200)
-                {
-                    int tol = 0;
-                }
 
                 _canvasControl.Invalidate();
             }

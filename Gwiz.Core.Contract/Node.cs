@@ -1,8 +1,8 @@
+using Gwiz.Core.Contract;
 using System.Drawing;
 
-namespace awiz.Graph.Core
+namespace Gwiz.Core.Contract
 {
-
     public class Node
     {
         public int Height { get; set; }
@@ -10,14 +10,11 @@ namespace awiz.Graph.Core
         public int Width { get; set; }
 
         public int X { get; set; }
-        
+
         public int Y { get; set; }
 
-        public Node(/*NodeTemplate nodeTemplate*/)
+        public Node()
         {
-            Width = 100;
-            Height = 100;
-            //_nodeTemplate = nodeTemplate;
         }
     }
 }
