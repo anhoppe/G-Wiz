@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "awiz.App.GraphTest (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "awiz.App.GraphTest (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
