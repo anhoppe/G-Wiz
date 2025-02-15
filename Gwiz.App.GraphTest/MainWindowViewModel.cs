@@ -11,7 +11,7 @@ using System;
 using System.IO;
 using System.IO.Pipes;
 
-namespace awiz.App.GraphTest
+namespace Gwiz.App.GraphTest
 {
     internal class MainWindowViewModel : Prism.Mvvm.BindableBase
     {

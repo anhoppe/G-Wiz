@@ -9,6 +9,18 @@
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="icons\drag-horizontal-variant.svg" />
+    <None Remove="icons\drag-vertical-variant.svg" />
+    <None Remove="icons\resize-bottom-right.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\drag-horizontal-variant.svg" />
+    <EmbeddedResource Include="icons\drag-vertical-variant.svg" />
+    <EmbeddedResource Include="icons\resize-bottom-right.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.2" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
