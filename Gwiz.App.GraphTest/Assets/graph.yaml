@@ -1,9 +1,45 @@
+Templates:
+  - Name: Class
+    BackgroundColor: 255, 100, 100, 0
+    LineColor: 255, 0, 0, 0
+    Resize: HorzVertBoth
+  - Name: Note
+    BackgroundColor: 100, 255, 255, 0
+    LineColor: 255, 0, 0, 0
+    Resize: Both
+  - Name: Frame
+    BackgroundColor: 00, 255, 255, 0
+    LineColor: 255, 0, 0, 255
+    Resize: HorzVert
+  - Name: Hint
+    BackgroundColor: 100, 100, 100, 255
+    LineColor: 255, 0, 0, 0
+  
+    
+
 Nodes:
   - X: 10
     Y: 20
     Width: 100
     Height: 100
+    Template: Class
   - X: 300
     Y: 50
     Width: 100
     Height: 100
+    Template: Class
+  - X: 200
+    Y: 200
+    Width: 200
+    Height: 100
+    Template: Note
+  - X: 400
+    Y: 170
+    Width: 200
+    Height: 100
+    Template: Hint
+  - X: 0
+    Y: 0
+    Width: 600
+    Height: 400
+    Template: Frame

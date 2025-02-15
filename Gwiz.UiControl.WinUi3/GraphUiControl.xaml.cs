@@ -17,6 +17,7 @@ using System.IO;
 using Microsoft.Graphics.Canvas.Svg;
 using System.Numerics;
 using System.Reflection;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -122,6 +123,11 @@ namespace Gwiz.UiControl.WinUi3
             return stream;
         }
 
+        public static Color ConvertColor(System.Drawing.Color color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
         private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
         {
             var drawingSession = args.DrawingSession;
@@ -133,28 +139,24 @@ namespace Gwiz.UiControl.WinUi3
             {
                 foreach (Node node in Nodes)
                 {
-                    var rect = new Rectangle
-                    {
-                        Fill = new SolidColorBrush(Color.FromArgb(100, 0, 255, 0)),
-                        Width = node.Width,
-                        Height = node.Height,
-                        Stroke = new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)),
-                        StrokeThickness = 5,
-                        RadiusX = 5,
-                        RadiusY = 5,
-                    };
-
                     // Draw the node shape
-                    drawingSession.FillRectangle(new Rect(node.X, node.Y, node.Width, node.Height), Color.FromArgb(100, 255, 0, 0));
+                    drawingSession.FillRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.BackgroundColor));
+                    drawingSession.DrawRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.LineColor), 1);
 
                     // Draw the resize all icon
-                    args.DrawingSession.DrawSvg(_resizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
+                    if (node.Template.Resize == Resize.Both || node.Template.Resize == Resize.HorzVertBoth)
+                    {
+                        args.DrawingSession.DrawSvg(_resizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
+                    }
 
-                    // Draw the resize horz icon
-                    args.DrawingSession.DrawSvg(_resizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
+                    if (node.Template.Resize == Resize.HorzVert || node.Template.Resize == Resize.HorzVertBoth)
+                    {
+                        // Draw the resize horz icon
+                        args.DrawingSession.DrawSvg(_resizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
 
-                    // Draw the resize vert icon
-                    args.DrawingSession.DrawSvg(_resizeVert, new Size(IconSize, IconSize), new Vector2(node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75)));
+                        // Draw the resize vert icon
+                        args.DrawingSession.DrawSvg(_resizeVert, new Size(IconSize, IconSize), new Vector2(node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75)));
+                    }                
                 }
             }
         }
@@ -189,14 +191,16 @@ namespace Gwiz.UiControl.WinUi3
 
                     if (_hoveredNode != null)
                     {
-                        // Check if the mouse cursor is over the horz/vert resize icon
-                        if (pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - IconSize &&
+                        // Check if the mouse cursor is over the both resize icon
+                        if ((_hoveredNode.Template.Resize == Resize.Both || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                            pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - IconSize &&
                             pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - IconSize)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
                             _potentialInteractionState = InteractionState.ResizeAll;
                         }
-                        else if (pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(IconSize * 0.75) &&
+                        else if ((_hoveredNode.Template.Resize == Resize.HorzVert || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(IconSize * 0.75) &&
                                  pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - IconSize / 2 &&
                                  pointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + IconSize / 2)
                         {
@@ -204,7 +208,8 @@ namespace Gwiz.UiControl.WinUi3
                             _potentialInteractionState = InteractionState.ResizeHorz;
 
                         }
-                        else if (pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - IconSize / 2 &&
+                        else if ((_hoveredNode.Template.Resize == Resize.HorzVert || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - IconSize / 2 &&
                                  pointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + IconSize / 2 &&
                                  pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(IconSize * 0.75))
                         {
