@@ -1,4 +1,4 @@
-﻿using System;
+﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,7 +9,14 @@ namespace Gwiz.Core.Contract
 {
     public class Template
     {
+        public Template() 
+        {
+            Grid.Rows.Add("*");
+        }
+
         public Color BackgroundColor { get; set; }
+
+        public Grid Grid { get; set; } = new();
 
         public Color LineColor { get; set; }
 

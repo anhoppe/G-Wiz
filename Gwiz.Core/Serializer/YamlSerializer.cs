@@ -12,7 +12,7 @@ using YamlDotNet.Serialization;
 namespace Gwiz.Core.Serializer
 {
     public class YamlSerializer : Contract.ISerializer
-    {
+    {   
         public Graph Deserialize(Stream stream)
         {
             Graph graph = new Graph();

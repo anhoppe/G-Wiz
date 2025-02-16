@@ -24,7 +24,7 @@ using System.Xml.Linq;
 
 namespace Gwiz.UiControl.WinUi3
 {
-    internal enum InteractionState
+    public enum InteractionState
     {
         None,
         Dragging,
@@ -105,10 +105,9 @@ namespace Gwiz.UiControl.WinUi3
                 _resizeHorz = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
             }
 
-
-
             _canvasControl.Invalidate();
         }
+
         private static Stream GetEmbeddedSvgStream(string iconName)
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -142,6 +141,17 @@ namespace Gwiz.UiControl.WinUi3
                     // Draw the node shape
                     drawingSession.FillRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.BackgroundColor));
                     drawingSession.DrawRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.LineColor), 1);
+
+                    // Draw the grid
+                    foreach (var yPos in node.GetRowLinePositions())
+                    {
+                        drawingSession.DrawLine(node.X, node.Y + yPos, node.X + node.Width, node.Y + yPos, ConvertColor(node.Template.LineColor));
+                    }
+
+                    foreach (var xPos in node.GetColLinePositions())
+                    {
+                        drawingSession.DrawLine(node.X + xPos, node.Y, node.X + xPos, node.Y + node.Height, ConvertColor(node.Template.LineColor));
+                    }
 
                     // Draw the resize all icon
                     if (node.Template.Resize == Resize.Both || node.Template.Resize == Resize.HorzVertBoth)

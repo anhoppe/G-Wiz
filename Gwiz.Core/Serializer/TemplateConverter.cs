@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gwiz.Core.Contract;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -26,6 +27,9 @@ namespace Gwiz.Core.Serializer
                 {
                     case "BackgroundColor":
                         template.BackgroundColor = ColorTranslator.FromHtml(parser.Consume<Scalar>().Value);
+                        break;
+                    case "Grid":
+                        template.Grid = (Grid)(deserializer(typeof(Grid)) ?? new Grid());
                         break;
                     case "LineColor":
                         template.LineColor = ColorTranslator.FromHtml(parser.Consume<Scalar>().Value);

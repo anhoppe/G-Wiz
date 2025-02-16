@@ -188,5 +188,59 @@ namespace Gwiz.Core.Test.Serializer
                 }
             }
         }
+
+        [Test]
+        public void Deserialize_WhenNoGridIsDefined_ThenGridHasOneRowWithAsteriks()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            if (graph.Templates.Count == 0)
+            {
+                Assert.Fail();
+            }
+            var template = graph.Templates[0];
+
+            Assert.That(template.Grid.Cols.Count, Is.EqualTo(0));
+            Assert.That(template.Grid.Rows.Count, Is.EqualTo(1));
+            Assert.That(template.Grid.Rows[0], Is.EqualTo("*"));
+        }
+
+        [Test]
+        public void Deserialize_WhenGridRowsDefined_ThenGridRowsInTemplate()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 300\n" +
+                "        - 100\n" +
+                "        - auto\n" +
+                "        - \"*\"\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var grid = graph.Templates[0].Grid;
+
+            Assert.That(grid.Rows.Count, Is.EqualTo(4));
+            Assert.That(grid.Rows[0], Is.EqualTo("300"));
+            Assert.That(grid.Rows[1], Is.EqualTo("100"));
+            Assert.That(grid.Rows[2], Is.EqualTo("auto"));
+            Assert.That(grid.Rows[3], Is.EqualTo("*"));
+        }
     }
 }
