@@ -18,6 +18,7 @@ using Microsoft.Graphics.Canvas.Svg;
 using System.Numerics;
 using System.Reflection;
 using System.Xml.Linq;
+using Microsoft.Graphics.Canvas.Text;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,6 +43,8 @@ namespace Gwiz.UiControl.WinUi3
 
         private static readonly int MinNodeSize = 80;
 
+        private Icons _icons = new Icons();
+
         private Node? _hoveredNode;
 
         private InteractionState _currentInteractionState = InteractionState.None;
@@ -51,27 +54,12 @@ namespace Gwiz.UiControl.WinUi3
         private Point _mouseToNodeDelta;
         
         private InteractionState _potentialInteractionState = InteractionState.None;
-
-        private CanvasSvgDocument? _resizeBottomRight;
-
-        private CanvasSvgDocument? _resizeHorz;
-        
+                
         private Point _resizeStartSize = new Point();
-        
-        private CanvasSvgDocument? _resizeVert;
-
 
         public GraphUiControl()
         {
             this.InitializeComponent();
-
-            var assembly = Assembly.GetExecutingAssembly();
-            foreach (string resource in assembly.GetManifestResourceNames())
-            {
-                System.Diagnostics.Debug.WriteLine(resource); // Print all embedded resources
-            }
-
-            LoadSvgAsync();
         }
 
         // Nodes Dependency Property
@@ -87,39 +75,6 @@ namespace Gwiz.UiControl.WinUi3
         {
             get => (List<Node>)GetValue(NodesProperty);
             set => SetValue(NodesProperty, value);
-        }
-
-        private async void LoadSvgAsync()
-        {
-            CanvasDevice device = CanvasDevice.GetSharedDevice();
-            using (var stream = GetEmbeddedSvgStream("resize-bottom-right.svg"))
-            {
-                _resizeBottomRight = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
-            }
-            using (var stream = GetEmbeddedSvgStream("drag-horizontal-variant.svg"))
-            {
-                _resizeVert = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
-            }
-            using (var stream = GetEmbeddedSvgStream("drag-vertical-variant.svg"))
-            {
-                _resizeHorz = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
-            }
-
-            _canvasControl.Invalidate();
-        }
-
-        private static Stream GetEmbeddedSvgStream(string iconName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            string resourceName = "Gwiz.UiControl.WinUi3.icons." + iconName; // Adjust the namespace
-
-            Stream? stream = assembly.GetManifestResourceStream(resourceName);
-
-            if (stream == null)
-            {
-                throw new FileNotFoundException($"Resource {resourceName} not found in assembly {assembly.FullName}");
-            }
-            return stream;
         }
 
         public static Color ConvertColor(System.Drawing.Color color)
@@ -142,30 +97,48 @@ namespace Gwiz.UiControl.WinUi3
                     drawingSession.FillRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.BackgroundColor));
                     drawingSession.DrawRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.LineColor), 1);
 
-                    // Draw the grid
-                    foreach (var yPos in node.GetRowLinePositions())
+                    // Draw the grid lines
+                    foreach (var yPos in node.Grid.GetRowLinePositions())
                     {
                         drawingSession.DrawLine(node.X, node.Y + yPos, node.X + node.Width, node.Y + yPos, ConvertColor(node.Template.LineColor));
                     }
 
-                    foreach (var xPos in node.GetColLinePositions())
+                    foreach (var xPos in node.Grid.GetColLinePositions())
                     {
                         drawingSession.DrawLine(node.X + xPos, node.Y, node.X + xPos, node.Y + node.Height, ConvertColor(node.Template.LineColor));
+                    }
+
+                    // Draw the gried field edit buttons and the contained text
+                    var textFormat = new CanvasTextFormat()
+                    {
+                        FontFamily = "Segoe UI Variable", // Set font family
+                        FontSize = 16,                    // Set font size
+                    };
+
+                    var grid = node.Grid;
+                    for (int x = 0; x < grid.Cols.Count; x++)
+                    {
+                        for (int y = 0; y < grid.Rows.Count; y++)
+                        {
+                            (var posText, var posEdit) = grid.GetFieldTextAndEditButtonPosition(x, y);
+                            drawingSession.DrawText(grid.FieldText[x][y], new Vector2(posText.X, posEdit.Y), ConvertColor(node.Template.LineColor), textFormat);
+                            args.DrawingSession.DrawSvg(_icons.Edit, new Size(IconSize, IconSize), new Vector2(posEdit.X, posEdit.Y));
+                        }
                     }
 
                     // Draw the resize all icon
                     if (node.Template.Resize == Resize.Both || node.Template.Resize == Resize.HorzVertBoth)
                     {
-                        args.DrawingSession.DrawSvg(_resizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
+                        args.DrawingSession.DrawSvg(_icons.ResizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
                     }
 
                     if (node.Template.Resize == Resize.HorzVert || node.Template.Resize == Resize.HorzVertBoth)
                     {
                         // Draw the resize horz icon
-                        args.DrawingSession.DrawSvg(_resizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
+                        args.DrawingSession.DrawSvg(_icons.ResizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
 
                         // Draw the resize vert icon
-                        args.DrawingSession.DrawSvg(_resizeVert, new Size(IconSize, IconSize), new Vector2(node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75)));
+                        args.DrawingSession.DrawSvg(_icons.ResizeVert, new Size(IconSize, IconSize), new Vector2(node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75)));
                     }                
                 }
             }

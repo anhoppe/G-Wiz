@@ -14,8 +14,7 @@ namespace Gwiz.Core.Test.Serializer
     [TestFixture]
     public class YamlSerializerTest
     {
-        YamlSerializer _sut = new YamlSerializer();
-
+        YamlSerializer _sut = new YamlSerializer((text) => new Size(0, 0));
 
         [Test]
         public void Deserialize_WhenNodesDefinedInYaml_ThenNodesAreInGraph()
@@ -53,6 +52,31 @@ namespace Gwiz.Core.Test.Serializer
             Assert.That(node2.Height, Is.EqualTo(80));
         }
 
+        [Test]
+        public void Deserialize_WhenNodeIsDefined_ThenGridHasNodeParentSet()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - X: 50\n" +
+                "    Y: 60\n" +
+                "    Width: 70\n" +
+                "    Height: 80\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Nodes.Count, Is.EqualTo(1));
+
+            var node = graph.Nodes.First();
+            Assert.That(node.Grid.ParentNode, Is.EqualTo(node));
+        }
+
+
+        
         [Test]
         public void Deserialize_WhenTemplatesDefinedInYaml_ThenTemplatesAreInGraph()
         {
@@ -190,7 +214,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNoGridIsDefined_ThenGridHasOneRowWithAsteriks()
+        public void Deserialize_WhenNoGridIsDefined_ThenGridHasOneRowAndOneColWith1()
         {
             // Arrange
             var yaml =
@@ -209,9 +233,10 @@ namespace Gwiz.Core.Test.Serializer
             }
             var template = graph.Templates[0];
 
-            Assert.That(template.Grid.Cols.Count, Is.EqualTo(0));
+            Assert.That(template.Grid.Cols.Count, Is.EqualTo(1));
             Assert.That(template.Grid.Rows.Count, Is.EqualTo(1));
-            Assert.That(template.Grid.Rows[0], Is.EqualTo("*"));
+            Assert.That(template.Grid.Rows[0], Is.EqualTo("1"));
+            Assert.That(template.Grid.Cols[0], Is.EqualTo("1"));
         }
 
         [Test]
@@ -241,6 +266,71 @@ namespace Gwiz.Core.Test.Serializer
             Assert.That(grid.Rows[1], Is.EqualTo("100"));
             Assert.That(grid.Rows[2], Is.EqualTo("auto"));
             Assert.That(grid.Rows[3], Is.EqualTo("*"));
+        }
+
+        [Test]
+        public void Deserialize_WhenGridDefined_ThenEachGridInANodeThatReferencesTheTemplateHasAText()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Cols:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "Nodes:\n" +
+                "  - Template: Foo\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            if (graph.Nodes.Count < 1)
+            {
+                Assert.Fail();
+            }
+
+            var node = graph.Nodes[0];
+
+            Assert.That(node.Grid.Rows.Count, Is.EqualTo(3));
+            Assert.That(node.Grid.Cols.Count, Is.EqualTo(3));
+
+            for (int x = 0; x < node.Grid.Cols.Count; x++)
+            {
+                for (int y = 0; y < node.Grid.Rows.Count; y++)
+                {
+                    Assert.That(node.Grid.FieldText[x][y], Is.EqualTo(string.Empty));
+                }
+            }
+        }
+
+        [Test]
+        public void Deserialize_WhenOneRowSpecified_ThenGridHasOneRowAndOneCol()
+        {
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 1\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var grid = graph.Templates[0].Grid;
+
+            Assert.That(grid.Cols.Count, Is.EqualTo(1));
         }
     }
 }

@@ -19,7 +19,9 @@ Templates:
       Rows:
         - 1
         - 1
+        - 1
       Cols:
+        - 1
         - 1
         - 1
   - Name: Hint

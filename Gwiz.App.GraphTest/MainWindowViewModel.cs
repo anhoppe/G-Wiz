@@ -10,6 +10,9 @@ using WinRT.Interop;
 using System;
 using System.IO;
 using System.IO.Pipes;
+using Microsoft.Graphics.Canvas.Text;
+using Microsoft.Graphics.Canvas;
+using System.Drawing;
 
 namespace Gwiz.App.GraphTest
 {
@@ -19,7 +22,7 @@ namespace Gwiz.App.GraphTest
 
         internal async void LoadGraph(StorageFile file)
         {
-            YamlSerializer serializer = new();
+            YamlSerializer serializer = new(GetTextSize);
             using (var fileStream = await file.OpenStreamForReadAsync())
             {
                 var graph = serializer.Deserialize(fileStream);
@@ -27,6 +30,27 @@ namespace Gwiz.App.GraphTest
             }
 
             RaisePropertyChanged(nameof(Nodes));
+        }
+
+        private Size GetTextSize(string text)
+        {
+            CanvasTextFormat textFormat = new CanvasTextFormat()
+            {
+                FontFamily = "Segoe UI Variable",
+                FontSize = 16
+            };
+
+            CanvasDevice device = CanvasDevice.GetSharedDevice();
+            CanvasTextLayout textLayout = new CanvasTextLayout(device, 
+                text, 
+                textFormat, 
+                float.MaxValue, 
+                float.MaxValue);
+
+            int textWidth = (int)textLayout.LayoutBounds.Width;
+            int textHeight = (int)textLayout.LayoutBounds.Height;
+
+            return new Size(textWidth, textHeight);
         }
     }
 }

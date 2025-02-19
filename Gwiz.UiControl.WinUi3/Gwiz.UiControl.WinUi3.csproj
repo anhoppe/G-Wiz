@@ -11,11 +11,13 @@
   <ItemGroup>
     <None Remove="icons\drag-horizontal-variant.svg" />
     <None Remove="icons\drag-vertical-variant.svg" />
+    <None Remove="icons\file-edit-outline.svg" />
     <None Remove="icons\resize-bottom-right.svg" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icons\drag-horizontal-variant.svg" />
     <EmbeddedResource Include="icons\drag-vertical-variant.svg" />
+    <EmbeddedResource Include="icons\file-edit-outline.svg" />
     <EmbeddedResource Include="icons\resize-bottom-right.svg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
