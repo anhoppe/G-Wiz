@@ -124,7 +124,7 @@ namespace Gwiz.Core.Test
             _sut.Rows = new List<string> { "1" };
 
             // Act
-            Assert.Throws<ArgumentException>(() => _sut.GetFieldTextPosition(1, 0));
+            Assert.Throws<ArgumentException>(() => _sut.GetFieldTextAndEditButtonPosition(1, 0));
         }
     }
 }
