@@ -1,15 +1,15 @@
 ﻿using Gwiz.Core.Contract;
 using System.Collections.Generic;
 
-namespace Gwiz.Core.Contract
+namespace Gwiz.Core
 {
     public class Graph : IGraph
     {
-        public List<Node> Nodes { get; set; } = new();
+        public List<INode> Nodes { get; set; } = new();
 
-        public List<Template> Templates { get; set; } = new ();
+        public List<ITemplate> Templates { get; set; } = new ();
 
-        public Node AddNode(string templateName)
+        public INode AddNode(string templateName)
         {
             var template = Templates.Find(t => t.Name == templateName);
 
@@ -20,9 +20,7 @@ namespace Gwiz.Core.Contract
 
             var node = new Node();
 
-            node.Template = template;
-            node.Grid = new Grid(template.Grid);
-            node.Grid.ParentNode = node;
+            node.UpdateableGrid = new Grid(template.Grid);
 
             Nodes.Add(node);
 

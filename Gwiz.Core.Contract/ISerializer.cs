@@ -16,6 +16,6 @@ namespace Gwiz.Core.Contract
         /// </summary>
         /// <param name="stream">Stream to be deserialized</param>
         /// <returns>Deserialized graph</returns>
-        Graph Deserialize(Stream stream);
+        IGraph Deserialize(Stream stream);
     }
 }

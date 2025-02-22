@@ -13,11 +13,11 @@ namespace Gwiz.Core.Serializer
 {
     internal class TemplateConverter : IYamlTypeConverter
     {
-        public bool Accepts(Type type) => type == typeof(Contract.Template);
+        public bool Accepts(Type type) => type == typeof(Template);
 
         public object ReadYaml(IParser parser, Type type, ObjectDeserializer deserializer)
         {
-            var template = new TemplateInternal();
+            var template = new Template();
             
             parser.Consume<MappingStart>();
 

@@ -13,6 +13,7 @@
   
   <ItemGroup>
     <InternalsVisibleTo Include="Gwiz.Core.Test" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
   
   <ItemGroup>

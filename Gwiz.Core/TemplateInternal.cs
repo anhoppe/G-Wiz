@@ -10,27 +10,6 @@ namespace Gwiz.Core
 {
     internal class TemplateInternal : Template
     {
-        public string ResizeName { get; set; } = string.Empty;
 
-        internal void ResolveResize()
-        {
-            switch (ResizeName.ToLower())
-            {
-                case "":
-                    Resize = Resize.None;
-                    break;
-                case "horzvert":
-                    Resize = Resize.HorzVert;
-                    break;
-                case "both":
-                    Resize = Resize.Both;
-                    break;
-                case "horzvertboth":
-                    Resize = Resize.HorzVertBoth;
-                    break;
-                default:
-                    throw new UnknownTemplateParameterValue("Resize", ResizeName);
-            }
-        }
     }
 }

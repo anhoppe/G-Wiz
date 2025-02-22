@@ -18,11 +18,11 @@ namespace Gwiz.App.GraphTest
 {
     internal class MainWindowViewModel : Prism.Mvvm.BindableBase
     {
-        public IList<Node> Nodes { get; private set; } = new List<Node>();
+        public IList<INode> Nodes { get; private set; } = new List<INode>();
 
         internal async void LoadGraph(StorageFile file)
         {
-            YamlSerializer serializer = new(GetTextSize);
+            YamlSerializer serializer = new();
             using (var fileStream = await file.OpenStreamForReadAsync())
             {
                 var graph = serializer.Deserialize(fileStream);
@@ -30,27 +30,6 @@ namespace Gwiz.App.GraphTest
             }
 
             RaisePropertyChanged(nameof(Nodes));
-        }
-
-        private Size GetTextSize(string text)
-        {
-            CanvasTextFormat textFormat = new CanvasTextFormat()
-            {
-                FontFamily = "Segoe UI Variable",
-                FontSize = 16
-            };
-
-            CanvasDevice device = CanvasDevice.GetSharedDevice();
-            CanvasTextLayout textLayout = new CanvasTextLayout(device, 
-                text, 
-                textFormat, 
-                float.MaxValue, 
-                float.MaxValue);
-
-            int textWidth = (int)textLayout.LayoutBounds.Width;
-            int textHeight = (int)textLayout.LayoutBounds.Height;
-
-            return new Size(textWidth, textHeight);
         }
     }
 }

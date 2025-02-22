@@ -27,9 +27,6 @@ namespace Gwiz.Core.Test
 
             // Assert
             Assert.That(sut.Nodes.Count, Is.EqualTo(1));
-            Assert.That(node.Grid.ParentNode, Is.EqualTo(node));
         }
-
-        
     }
 }

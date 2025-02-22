@@ -14,7 +14,7 @@ namespace Gwiz.Core.Test.Serializer
     [TestFixture]
     public class YamlSerializerTest
     {
-        YamlSerializer _sut = new YamlSerializer((text) => new Size(0, 0));
+        YamlSerializer _sut = new YamlSerializer();
 
         [Test]
         public void Deserialize_WhenNodesDefinedInYaml_ThenNodesAreInGraph()
@@ -72,10 +72,7 @@ namespace Gwiz.Core.Test.Serializer
             Assert.That(graph.Nodes.Count, Is.EqualTo(1));
 
             var node = graph.Nodes.First();
-            Assert.That(node.Grid.ParentNode, Is.EqualTo(node));
         }
-
-
         
         [Test]
         public void Deserialize_WhenTemplatesDefinedInYaml_ThenTemplatesAreInGraph()
@@ -110,7 +107,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNodeReferencesExistingTemplate_ThenNodeHasTemplate()
+        public void Deserialize_WhenNodeReferencesExistingTemplate_ThenNodeHasTemplateProperties()
         {
             // Arrange
             var yaml =
@@ -131,9 +128,8 @@ namespace Gwiz.Core.Test.Serializer
             
             // Assert
             var node = graph.Nodes[0];
-            Assert.That(node.Template.Name, Is.EqualTo("Foo"));
-            Assert.That(node.Template.BackgroundColor, Is.EqualTo(Color.FromArgb(40, 10, 20, 30)));
-            Assert.That(node.Template.LineColor, Is.EqualTo(Color.FromArgb(20, 5, 10, 15)));
+            Assert.That(node.BackgroundColor, Is.EqualTo(Color.FromArgb(40, 10, 20, 30)));
+            Assert.That(node.LineColor, Is.EqualTo(Color.FromArgb(20, 5, 10, 15)));
         }
 
         [Test]
@@ -178,9 +174,9 @@ namespace Gwiz.Core.Test.Serializer
             var graph = _sut.Deserialize(stream);
 
             // Assert
-            Assert.That(graph.Nodes[0].Template.Resize, Is.EqualTo(Resize.HorzVert));
-            Assert.That(graph.Nodes[1].Template.Resize, Is.EqualTo(Resize.Both));
-            Assert.That(graph.Nodes[2].Template.Resize, Is.EqualTo(Resize.HorzVertBoth));
+            Assert.That(graph.Nodes[0].Resize, Is.EqualTo(Resize.HorzVert));
+            Assert.That(graph.Nodes[1].Resize, Is.EqualTo(Resize.Both));
+            Assert.That(graph.Nodes[2].Resize, Is.EqualTo(Resize.HorzVertBoth));
         }
 
         [Test]

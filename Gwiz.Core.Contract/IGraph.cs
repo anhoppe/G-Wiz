@@ -8,8 +8,10 @@ namespace Gwiz.Core.Contract
 {
     public interface IGraph
     {
-        List<Node> Nodes { get; }
+        List<INode> Nodes { get; }
 
-        Node AddNode(string templateName);
+        List<ITemplate> Templates { get; }
+
+        INode AddNode(string templateName);
     }
 }

@@ -1,8 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.UI;
@@ -13,11 +11,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
 using Gwiz.Core.Contract;
 using Microsoft.Graphics.Canvas;
-using System.IO;
-using Microsoft.Graphics.Canvas.Svg;
 using System.Numerics;
-using System.Reflection;
-using System.Xml.Linq;
 using Microsoft.Graphics.Canvas.Text;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -43,9 +37,15 @@ namespace Gwiz.UiControl.WinUi3
 
         private static readonly int MinNodeSize = 80;
 
+        private static readonly CanvasTextFormat TextFormat = new CanvasTextFormat()
+        {
+            FontFamily = "Segoe UI Variable", // Set font family
+            FontSize = 16,                    // Set font size
+        };
+
         private Icons _icons = new Icons();
 
-        private Node? _hoveredNode;
+        private INode? _hoveredNode;
 
         private InteractionState _currentInteractionState = InteractionState.None;
 
@@ -66,21 +66,20 @@ namespace Gwiz.UiControl.WinUi3
         public static readonly DependencyProperty NodesProperty =
         DependencyProperty.Register(
             nameof(Nodes),
-            typeof(IList<Node>),
+            typeof(IList<INode>),
             typeof(GraphUiControl),
-            new PropertyMetadata(new List<Node>(), OnGraphDataChanged)
+            new PropertyMetadata(new List<INode>(), OnGraphDataChanged)
         );
 
-        public List<Node> Nodes
+        public List<INode> Nodes
         {
-            get => (List<Node>)GetValue(NodesProperty);
+            get => (List<INode>)GetValue(NodesProperty);
             set => SetValue(NodesProperty, value);
         }
 
-        public static Color ConvertColor(System.Drawing.Color color)
-        {
-            return Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
+        public static Color ConvertColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
+
+        private static Rect ConvertRect(System.Drawing.Rectangle rect) => new Rect(rect.X, rect.Y, rect.Width, rect.Height);
 
         private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
         {
@@ -91,48 +90,31 @@ namespace Gwiz.UiControl.WinUi3
 
             if (Nodes != null)
             {
-                foreach (Node node in Nodes)
+                foreach (var node in Nodes)
                 {
-                    // Draw the node shape
-                    drawingSession.FillRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.BackgroundColor));
-                    drawingSession.DrawRectangle(new Rect(node.X, node.Y, node.Width, node.Height), ConvertColor(node.Template.LineColor), 1);
-
-                    // Draw the grid lines
-                    foreach (var yPos in node.Grid.GetRowLinePositions())
-                    {
-                        drawingSession.DrawLine(node.X, node.Y + yPos, node.X + node.Width, node.Y + yPos, ConvertColor(node.Template.LineColor));
-                    }
-
-                    foreach (var xPos in node.Grid.GetColLinePositions())
-                    {
-                        drawingSession.DrawLine(node.X + xPos, node.Y, node.X + xPos, node.Y + node.Height, ConvertColor(node.Template.LineColor));
-                    }
-
-                    // Draw the gried field edit buttons and the contained text
-                    var textFormat = new CanvasTextFormat()
-                    {
-                        FontFamily = "Segoe UI Variable", // Set font family
-                        FontSize = 16,                    // Set font size
-                    };
-
                     var grid = node.Grid;
                     for (int x = 0; x < grid.Cols.Count; x++)
                     {
                         for (int y = 0; y < grid.Rows.Count; y++)
                         {
-                            (var posText, var posEdit) = grid.GetFieldTextAndEditButtonPosition(x, y);
-                            drawingSession.DrawText(grid.FieldText[x][y], new Vector2(posText.X, posEdit.Y), ConvertColor(node.Template.LineColor), textFormat);
-                            args.DrawingSession.DrawSvg(_icons.Edit, new Size(IconSize, IconSize), new Vector2(posEdit.X, posEdit.Y));
+                            var rect = grid.FieldRects[x][y];
+                            drawingSession.FillRectangle(ConvertRect(rect), ConvertColor(node.BackgroundColor));
+                            drawingSession.DrawRectangle(ConvertRect(rect), ConvertColor(node.LineColor), 1);
+
+                            var textSize = GetTextSize(grid.FieldText[x][y]);
+                            var xText = (float)(rect.X + (rect.Width - textSize.Width) / 2);
+                            var yText = (float)(rect.Y + (rect.Height - textSize.Height) / 2);
+                            drawingSession.DrawText(grid.FieldText[x][y], new Vector2(xText, yText), ConvertColor(node.LineColor), TextFormat);
                         }
                     }
 
                     // Draw the resize all icon
-                    if (node.Template.Resize == Resize.Both || node.Template.Resize == Resize.HorzVertBoth)
+                    if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
                     {
                         args.DrawingSession.DrawSvg(_icons.ResizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
                     }
 
-                    if (node.Template.Resize == Resize.HorzVert || node.Template.Resize == Resize.HorzVertBoth)
+                    if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
                     {
                         // Draw the resize horz icon
                         args.DrawingSession.DrawSvg(_icons.ResizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
@@ -142,6 +124,21 @@ namespace Gwiz.UiControl.WinUi3
                     }                
                 }
             }
+        }
+
+        private static Size GetTextSize(string text)
+        {
+            CanvasDevice device = CanvasDevice.GetSharedDevice();
+            CanvasTextLayout textLayout = new CanvasTextLayout(device,
+                text,
+                TextFormat,
+                float.MaxValue,
+                float.MaxValue);
+
+            int textWidth = (int)textLayout.LayoutBounds.Width;
+            int textHeight = (int)textLayout.LayoutBounds.Height;
+
+            return new Size(textWidth, textHeight);
         }
 
         // Callback when Nodes or Edges change
@@ -175,14 +172,14 @@ namespace Gwiz.UiControl.WinUi3
                     if (_hoveredNode != null)
                     {
                         // Check if the mouse cursor is over the both resize icon
-                        if ((_hoveredNode.Template.Resize == Resize.Both || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                        if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
                             pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - IconSize &&
                             pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - IconSize)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
                             _potentialInteractionState = InteractionState.ResizeAll;
                         }
-                        else if ((_hoveredNode.Template.Resize == Resize.HorzVert || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                        else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
                                  pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(IconSize * 0.75) &&
                                  pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - IconSize / 2 &&
                                  pointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + IconSize / 2)
@@ -191,7 +188,7 @@ namespace Gwiz.UiControl.WinUi3
                             _potentialInteractionState = InteractionState.ResizeHorz;
 
                         }
-                        else if ((_hoveredNode.Template.Resize == Resize.HorzVert || _hoveredNode.Template.Resize == Resize.HorzVertBoth) &&
+                        else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
                                  pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - IconSize / 2 &&
                                  pointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + IconSize / 2 &&
                                  pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(IconSize * 0.75))

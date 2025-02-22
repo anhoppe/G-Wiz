@@ -12,11 +12,11 @@ namespace Gwiz.Core.Serializer
 {
     internal class NodeConverter : IYamlTypeConverter
     {
-        public bool Accepts(Type type) => type == typeof(Contract.Node);
+        public bool Accepts(Type type) => type == typeof(INode);
 
         public object ReadYaml(IParser parser, Type type, ObjectDeserializer deserializer)
         {
-            var node = new NodeInternal(); // Create instance manually
+            var node = new Node(); // Create instance manually
 
             // Expect a mapping start (YAML object)
             parser.Consume<MappingStart>();

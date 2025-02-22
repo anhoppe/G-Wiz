@@ -1,6 +1,9 @@
 ﻿using Gwiz.Core.Contract;
+using Moq;
+using Newtonsoft.Json.Bson;
 using NUnit.Framework;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace Gwiz.Core.Test
 {
@@ -8,123 +11,72 @@ namespace Gwiz.Core.Test
     public class GridTest
     {
         private Node _parentNode = new Node();
-        private Grid _sut = new Grid();
-
-        [SetUp]
-        public void SetUp()
-        {
-            _sut = new Grid()
-            {
-                ParentNode = _parentNode,
-            };
-        }
 
         [Test]
-        public void RowLinePositions_When2RowsWith1To10AreDefined_ThenRowLinePositionsAreCorrectWithRespectToHeight()
+        public void UpdateFieldRects_WhenOneFieldConfigured_ThenRectUsesEntireSpaceOfNode()
         {
             // Arrange
-            _sut.Rows = new List<string>()
-            {
-                "1",
-                "10"
-            };
+            var gridMock = new Mock<IGrid>();
 
-            _parentNode.Height = 100;
-
-            // Act
-            var result = _sut.GetRowLinePositions();
-
-            // Assert
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(9));
-        }
-
-        [Test]
-        public void ColLinePositions_When2ColsWith1To10AreDefined_ThenColLinePositionsAreCorrectWithRespectToHeight()
-        {
-            // Arrange
-            _sut.Cols = new List<string>()
-            {
-                "10",
-                "100"
-            };
-
+            gridMock.Setup(p => p.Cols).Returns(new List<string> { "1" });
+            gridMock.Setup(p => p.Rows).Returns(new List<string> { "1" }); 
+         
             _parentNode.Width = 100;
-
-            // Act
-            var result = _sut.GetColLinePositions();
-
-            // Assert
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(9));
-        }
-
-
-        [Test]
-        public void GetFieldTextAndEditButtonPosition_WhenOneFieldWithDefinedSizeAndSimulatedTextSize_ThenExectedTopLeftTextPositionsAreReturned()
-        {
-            // Arrange
-            _parentNode.Width = 200;
-            _parentNode.Height = 200;
-
+            _parentNode.Height = 100;
             _parentNode.X = 100;
             _parentNode.Y = 200;
 
-            _sut.Cols = new List<string> { "1", "1" };
-            _sut.Rows = new List<string> { "1", "1" };
+            var sut = new Grid(gridMock.Object);
 
-            _sut.TextSizeFactory = (string text) => { 
-                if (text == "foo") 
-                {
-                    return new Size(50, 50);
-                }            
-
-                return new Size(0, 0);
-            };
-
-            _sut.FieldText = new string[2][];
-            _sut.FieldText[0] = new[] { "foo", "foo" };
-            _sut.FieldText[1] = new[] { "foo", "foo" };
-
-            _sut.EditButtonMargin = 5;
-            _sut.IconSize = 20;
             // Act
-            var positionTopLeft = _sut.GetFieldTextAndEditButtonPosition(0, 0);
-            var positionTopRight = _sut.GetFieldTextAndEditButtonPosition(1, 0);
-            var positionBottomLeft = _sut.GetFieldTextAndEditButtonPosition(0, 1);
-            var positionBottomRight = _sut.GetFieldTextAndEditButtonPosition(1, 1);
+            sut.UpdateFieldRects(_parentNode);
 
             // Assert
-            Assert.That(positionTopLeft.Item1.X, Is.EqualTo(125));
-            Assert.That(positionTopLeft.Item1.Y, Is.EqualTo(225));
-            Assert.That(positionTopLeft.Item2.X, Is.EqualTo(155));
-            Assert.That(positionTopLeft.Item2.Y, Is.EqualTo(210));
-
-            Assert.That(positionTopRight.Item1.X, Is.EqualTo(225));
-            Assert.That(positionTopRight.Item1.Y, Is.EqualTo(225));
-            Assert.That(positionTopRight.Item2.X, Is.EqualTo(255));
-            Assert.That(positionTopRight.Item2.Y, Is.EqualTo(210));
-
-            Assert.That(positionBottomLeft.Item1.X, Is.EqualTo(125));
-            Assert.That(positionBottomLeft.Item1.Y, Is.EqualTo(325));
-            Assert.That(positionBottomLeft.Item2.X, Is.EqualTo(155));
-            Assert.That(positionBottomLeft.Item2.Y, Is.EqualTo(310));
-
-            Assert.That(positionBottomRight.Item1.X, Is.EqualTo(225));
-            Assert.That(positionBottomRight.Item1.Y, Is.EqualTo(325));
-            Assert.That(positionBottomRight.Item2.X, Is.EqualTo(255));
-            Assert.That(positionBottomRight.Item2.Y, Is.EqualTo(310));
+            Assert.That(sut.FieldRects[0][0].X, Is.EqualTo(100));
+            Assert.That(sut.FieldRects[0][0].Y, Is.EqualTo(200));
+            Assert.That(sut.FieldRects[0][0].Width, Is.EqualTo(100));
+            Assert.That(sut.FieldRects[0][0].Height, Is.EqualTo(100));
         }
 
         [Test]
-        public void GetFieldTextPosition_WhenNonExistingFieldIsRequested_ThenInvalidArgumentExceptionIsThrown()
+        public void UpdateFieldRects_WhenTwoFieldsWithDefinedRatio_ThenFieldsAreOfExpectedSizeAndPosition()
         {
-            // Arrange 
-            _sut.Cols = new List<string> { "1" };
-            _sut.Rows = new List<string> { "1" };
+            // Arrange
+            var gridMock = new Mock<IGrid>();
+
+            gridMock.Setup(p => p.Cols).Returns(new List<string> { "3", "7" });
+            gridMock.Setup(p => p.Rows).Returns(new List<string> { "4", "6" });
+
+            _parentNode.Width = 100;
+            _parentNode.Height = 100;
+            _parentNode.X = 20;
+            _parentNode.Y = 10;
+
+            var sut = new Grid(gridMock.Object);
 
             // Act
-            Assert.Throws<ArgumentException>(() => _sut.GetFieldTextAndEditButtonPosition(1, 0));
+            sut.UpdateFieldRects(_parentNode);
+
+            // Assert
+            Assert.That(sut.FieldRects[0][0].X, Is.EqualTo(20));
+            Assert.That(sut.FieldRects[0][0].Y, Is.EqualTo(10));
+            Assert.That(sut.FieldRects[0][0].Width, Is.EqualTo(30));
+            Assert.That(sut.FieldRects[0][0].Height, Is.EqualTo(40));
+
+            Assert.That(sut.FieldRects[1][0].X, Is.EqualTo(50));
+            Assert.That(sut.FieldRects[1][0].Y, Is.EqualTo(10));
+            Assert.That(sut.FieldRects[1][0].Width, Is.EqualTo(70));
+            Assert.That(sut.FieldRects[1][0].Height, Is.EqualTo(40));
+
+            Assert.That(sut.FieldRects[0][1].X, Is.EqualTo(20));
+            Assert.That(sut.FieldRects[0][1].Y, Is.EqualTo(50));
+            Assert.That(sut.FieldRects[0][1].Width, Is.EqualTo(30));
+            Assert.That(sut.FieldRects[0][1].Height, Is.EqualTo(60));
+
+            Assert.That(sut.FieldRects[1][1].X, Is.EqualTo(50));
+            Assert.That(sut.FieldRects[1][1].Y, Is.EqualTo(50));
+            Assert.That(sut.FieldRects[1][1].Width, Is.EqualTo(70));
+            Assert.That(sut.FieldRects[1][1].Height, Is.EqualTo(60));
         }
     }
 }
