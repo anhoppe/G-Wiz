@@ -4,13 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
-using System.Drawing;
-using YamlDotNet.Serialization.BufferedDeserialization;
-using YamlDotNet.Serialization.NodeDeserializers;
 
 namespace Gwiz.Core.Serializer
 {

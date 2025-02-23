@@ -6,13 +6,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using Windows.Storage;
-using WinRT.Interop;
-using System;
 using System.IO;
-using System.IO.Pipes;
-using Microsoft.Graphics.Canvas.Text;
-using Microsoft.Graphics.Canvas;
-using System.Drawing;
 
 namespace Gwiz.App.GraphTest
 {

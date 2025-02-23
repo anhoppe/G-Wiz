@@ -1,5 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Gwiz.Core
 {
@@ -19,9 +20,9 @@ namespace Gwiz.Core
             }
 
             var node = new Node();
+            node.AssignTemplate(template);
 
             node.UpdateableGrid = new Grid(template.Grid);
-
             Nodes.Add(node);
 
             return node;
