@@ -17,6 +17,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="MathNet.Spatial" Version="0.6.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 

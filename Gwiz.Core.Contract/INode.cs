@@ -10,6 +10,8 @@ namespace Gwiz.Core.Contract
 
         int Height { get; set; }
 
+        string Id { get; }
+
         Color LineColor { get; }
 
         Resize Resize { get; }

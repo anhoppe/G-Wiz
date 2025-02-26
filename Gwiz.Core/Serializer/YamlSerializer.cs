@@ -22,6 +22,7 @@ namespace Gwiz.Core.Serializer
 
                 var deserializer = new DeserializerBuilder()
                     .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                    .WithTypeConverter(new EdgeConverter())
                     .WithTypeConverter(new GraphConverter())
                     .WithTypeConverter(new NodeConverter())
                     .WithTypeConverter(new TemplateConverter())
@@ -32,11 +33,12 @@ namespace Gwiz.Core.Serializer
 
             CompleteGrid(graph);
             ResolveTemplatesInNodes(graph);
+            ResolveNodeReferencesInEdges(graph);
 
             return graph;
         }
 
-        private void CompleteGrid(IGraph graph)
+        private static void CompleteGrid(IGraph graph)
         {
             foreach (var template in graph.Templates)
             {
@@ -52,7 +54,23 @@ namespace Gwiz.Core.Serializer
             }
         }
 
-        private void ResolveTemplatesInNodes(IGraph graph)
+        private static void ResolveNodeReferencesInEdges(IGraph graph)
+        {
+            foreach (var edge in graph.Edges)
+            {
+                var edgeInternal = edge as Edge;
+                if (edgeInternal != null)
+                {
+                    var fromNode = graph.Nodes.FirstOrDefault(n => n.Id == edgeInternal.FromId) as Node;
+                    var toNode = graph.Nodes.FirstOrDefault(n => n.Id == edgeInternal.ToId) as Node;
+
+                    edgeInternal.FromInternal = fromNode ?? new Node();
+                    edgeInternal.ToInternal = toNode ?? new Node();
+                }
+            }
+        }
+
+        private static void ResolveTemplatesInNodes(IGraph graph)
         {
             foreach (var node in graph.Nodes)
             {

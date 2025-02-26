@@ -6,6 +6,8 @@ namespace Gwiz.Core
 {
     public class Graph : IGraph
     {
+        public List<IEdge> Edges { get; set; } = new();
+
         public List<INode> Nodes { get; set; } = new();
 
         public List<ITemplate> Templates { get; set; } = new ();

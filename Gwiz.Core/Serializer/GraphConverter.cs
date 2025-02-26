@@ -22,6 +22,10 @@ namespace Gwiz.Core.Serializer
             {
                 switch (key.Value)
                 {
+                    case "Edges":
+                        var edges = (List<IEdge>)(rootDeserializer(typeof(List<IEdge>)) ?? new List<IEdge>());
+                        graph.Edges = edges;
+                        break;
                     case "Nodes":
                         var nodes = (List<INode>)(rootDeserializer(typeof(List<INode>)) ?? new List<INode>());
                         graph.Nodes = nodes;

@@ -13,6 +13,34 @@ namespace Gwiz.Core.Test
         private Node _parentNode = new Node();
 
         [Test]
+        public void RegisterParentNodeChanged_WhenNodeChanged_ThenUpdateFieldRectsCalled()
+        {
+            // Arrange
+            var nodeMock = new Mock<IUpdatableNode>();
+
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+            nodeMock.Setup(p => p.X).Returns(100);
+            nodeMock.Setup(p => p.Y).Returns(200);
+
+            var sut = new Grid()
+            {
+                Cols = ["1"],
+                Rows = ["1"],
+            };
+            sut.RegisterParentNodeChanged(nodeMock.Object);
+
+            // Act
+            nodeMock.Raise(p => p.NodeChanged += null, EventArgs.Empty, nodeMock.Object);
+
+            // Assert
+            Assert.That(sut.FieldRects[0][0].X, Is.EqualTo(100));
+            Assert.That(sut.FieldRects[0][0].Y, Is.EqualTo(200));
+            Assert.That(sut.FieldRects[0][0].Width, Is.EqualTo(100));
+            Assert.That(sut.FieldRects[0][0].Height, Is.EqualTo(100));
+        }
+
+        [Test]
         public void UpdateFieldRects_WhenOneFieldConfigured_ThenRectUsesEntireSpaceOfNode()
         {
             // Arrange

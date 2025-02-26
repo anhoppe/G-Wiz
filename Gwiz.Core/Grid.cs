@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Gwiz.Core
 {
-    public class Grid : IUpdateableGrid
+    internal class Grid : IUpdatableGrid
     {
         public Grid()
         {
@@ -68,6 +68,14 @@ namespace Gwiz.Core
 
                 xPos += width;
             }
+        }
+
+        public void RegisterParentNodeChanged(IUpdatableNode parentNode)
+        {
+            parentNode.NodeChanged += (sender, args) =>
+            {
+                UpdateFieldRects(parentNode);
+            };
         }
 
         private static List<double> ToRatioFactor(IList<string> fields)

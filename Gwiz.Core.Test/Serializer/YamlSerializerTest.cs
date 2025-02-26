@@ -48,6 +48,42 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void Deserialize_WhenNodesDefinesEdge_ThenEdgeIsInGraph()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - X: 10\n" +
+                "    Y: 20\n" +
+                "    Width: 30\n" +
+                "    Height: 40\n" +
+                "    Id: foo\n" +
+                "  - X: 50\n" +
+                "    Y: 60\n" +
+                "    Width: 70\n" +
+                "    Height: 80\n" +
+                "    Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges.Count, Is.EqualTo(1));
+
+            var edge = graph.Edges[0];
+            var fooNode = graph.Nodes.First(n => n.Id == "foo");
+            var barNode = graph.Nodes.First(n => n.Id == "bar");
+
+            Assert.That(fooNode, Is.EqualTo(edge.From));
+            Assert.That(barNode, Is.EqualTo(edge.To));
+        }
+
+        [Test]
         public void Deserialize_WhenNodeIsDefined_ThenGridHasNodeParentSet()
         {
             // Arrange

@@ -62,6 +62,21 @@ namespace Gwiz.UiControl.WinUi3
             this.InitializeComponent();
         }
 
+        // Edges Dependency Property
+        public static readonly DependencyProperty EdgesProperty =
+        DependencyProperty.Register(
+            nameof(Edges),
+            typeof(IList<IEdge>),
+            typeof(GraphUiControl),
+            new PropertyMetadata(new List<IEdge>(), OnGraphDataChanged)
+        );
+
+        public List<IEdge> Edges
+        {
+            get => (List<IEdge>)GetValue(EdgesProperty);
+            set => SetValue(EdgesProperty, value);
+        }
+
         // Nodes Dependency Property
         public static readonly DependencyProperty NodesProperty =
         DependencyProperty.Register(
@@ -79,6 +94,8 @@ namespace Gwiz.UiControl.WinUi3
 
         public static Color ConvertColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
 
+        private static Vector2 ConvertPoint(System.Drawing.Point pos) => new Vector2(pos.X, pos.Y);
+
         private static Rect ConvertRect(System.Drawing.Rectangle rect) => new Rect(rect.X, rect.Y, rect.Width, rect.Height);
 
         private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
@@ -87,6 +104,14 @@ namespace Gwiz.UiControl.WinUi3
 
             // Clear the canvas
             drawingSession.Clear(Colors.CornflowerBlue);
+
+            if (Edges != null)
+            {
+                foreach (var edge in Edges)
+                {
+                    drawingSession.DrawLine(ConvertPoint(edge.FromPosition), ConvertPoint(edge.ToPosition), Color.FromArgb(255, 0, 0, 0));
+                }
+            }
 
             if (Nodes != null)
             {
@@ -141,7 +166,6 @@ namespace Gwiz.UiControl.WinUi3
             return new Size(textWidth, textHeight);
         }
 
-        // Callback when Nodes or Edges change
         private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiControl = d as GraphUiControl;

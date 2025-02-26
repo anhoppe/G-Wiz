@@ -1,9 +1,5 @@
 ﻿using Gwiz.Core.Contract;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -27,6 +23,9 @@ namespace Gwiz.Core.Serializer
                 {
                     case "Height":
                         node.Height = int.Parse(parser.Consume<Scalar>().Value);
+                        break;
+                    case "Id":
+                        node.Id = parser.Consume<Scalar>().Value;
                         break;
                     case "Template":
                         node.TemplateName = parser.Consume<Scalar>().Value;

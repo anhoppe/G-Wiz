@@ -20,6 +20,6 @@
                 <MenuFlyoutItem Text="Open" Click="OpenFile_Click"/>
             </MenuBarItem>
         </MenuBar>
-        <uicontrol:GraphUiControl Grid.Row="1" x:Name="_uiControl" Nodes="{Binding Nodes}" />
+        <uicontrol:GraphUiControl Grid.Row="1" x:Name="_uiControl" Nodes="{Binding Nodes}" Edges="{Binding Edges}" />
     </Grid>
 </Window>

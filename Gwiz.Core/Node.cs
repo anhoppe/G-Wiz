@@ -1,13 +1,14 @@
 using Gwiz.Core.Contract;
+using System;
 using System.Drawing;
 
 namespace Gwiz.Core
 {
-    internal class Node : INode
+    internal class Node : IUpdatableNode
     {
         private int _height;
 
-        private IUpdateableGrid _grid = new Grid();
+        private IUpdatableGrid _grid = new Grid();
 
         private int _width;
 
@@ -25,9 +26,11 @@ namespace Gwiz.Core
             set
             {
                 _height = value;
-                UpdateableGrid.UpdateFieldRects(this);
+                NodeChanged?.Invoke(this, this);
             }
         }
+
+        public string Id { get; set; } = string.Empty;
 
         public Color LineColor { get; set; } = Color.Black;
 
@@ -39,7 +42,7 @@ namespace Gwiz.Core
             set
             {
                 _width = value;
-                UpdateableGrid.UpdateFieldRects(this);
+                NodeChanged?.Invoke(this, this);
             }
         }
 
@@ -49,8 +52,8 @@ namespace Gwiz.Core
             set 
             {
                 _x = value;
-                UpdateableGrid.UpdateFieldRects(this);
-            } 
+                NodeChanged?.Invoke(this, this);
+            }
         }
 
         public int Y
@@ -59,19 +62,21 @@ namespace Gwiz.Core
             set
             {
                 _y = value;
-                UpdateableGrid.UpdateFieldRects(this);
+                NodeChanged?.Invoke(this, this);
             }
         }
 
+        public event EventHandler<IUpdatableNode> NodeChanged = delegate { };
+
         internal string TemplateName { get; set; } = string.Empty;
 
-        internal IUpdateableGrid UpdateableGrid 
+        internal IUpdatableGrid UpdateableGrid 
         { 
             get => _grid;
             set 
             {
                 _grid = value;
-                _grid.UpdateFieldRects(this);
+                _grid.RegisterParentNodeChanged(this);
             } 
         }
 

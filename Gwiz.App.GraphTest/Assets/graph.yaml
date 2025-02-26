@@ -36,11 +36,13 @@ Nodes:
     Width: 100
     Height: 100
     Template: Class
+    Id: Foo
   - X: 300
     Y: 50
     Width: 100
     Height: 100
     Template: Class
+    Id: Bar
   - X: 200
     Y: 200
     Width: 200
@@ -56,3 +58,7 @@ Nodes:
     Width: 600
     Height: 400
     Template: Frame
+
+Edges:
+  - From: Foo
+    To: Bar    
