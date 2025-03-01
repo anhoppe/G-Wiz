@@ -1,5 +1,7 @@
 ﻿using Gwiz.Core.Contract;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Gwiz.Core
@@ -11,6 +13,28 @@ namespace Gwiz.Core
         public List<INode> Nodes { get; set; } = new();
 
         public List<ITemplate> Templates { get; set; } = new ();
+
+        public void AddEdge(INode from, INode to)
+        {
+            var fromInternal = from as IUpdatableNode;
+            var toInternal = to as IUpdatableNode;
+
+            if (fromInternal == null || toInternal == null)
+            {
+                throw new ArgumentException("Nodes passed to Graph.AddEdge have invalid type");
+            }
+
+            if (Nodes.All(n => n != fromInternal) || Nodes.All(n => n != toInternal))
+            {
+                throw new ArgumentException("Nodes passed to Graph.AddEsge are not part of the graph");
+            }    
+
+            Edges.Add(new Edge()
+            {
+                FromInternal = fromInternal,
+                ToInternal = toInternal,
+            });
+        }
 
         public INode AddNode(string templateName)
         {

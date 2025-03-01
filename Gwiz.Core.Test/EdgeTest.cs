@@ -17,7 +17,7 @@ namespace Gwiz.Core.Test
                 X = 10,
                 Y = 10,
                 Width = 100,
-                Height = 100
+                Height = 100,
             };
 
             sut.ToInternal = new Node()

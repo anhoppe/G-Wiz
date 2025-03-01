@@ -1,5 +1,7 @@
 ﻿using Gwiz.Core.Contract;
+using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -73,6 +75,30 @@ namespace Gwiz.Core.Test
             // Assert
             Assert.That(node.Grid.Cols.Count, Is.EqualTo(2));
             Assert.That(node.Grid.Rows.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void AddEdge_WhenAddingEdgeWithNodes_ThenEdgeHasFromAndToSet()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            var sut = new Graph()
+            {
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            // Act
+            sut.AddEdge(node1Mock.Object, node2Mock.Object);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0];
+            Assert.That(edge.From, Is.EqualTo(node1Mock.Object));
+            Assert.That(edge.To, Is.EqualTo(node2Mock.Object));
+
         }
     }
 }
