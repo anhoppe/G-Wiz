@@ -33,17 +33,11 @@ namespace Gwiz.UiControl.WinUi3
     /// </summary>
     public sealed partial class GraphUiControl : Page
     {
-        private static readonly int IconSize = 30;
-
         private static readonly int MinNodeSize = 80;
 
-        private static readonly CanvasTextFormat TextFormat = new CanvasTextFormat()
-        {
-            FontFamily = "Segoe UI Variable", // Set font family
-            FontSize = 16,                    // Set font size
-        };
+        private Draw _draw = new Draw();
 
-        private Icons _icons = new Icons();
+        private GraphDrawer _graphDrawer = new();
 
         private INode? _hoveredNode;
 
@@ -59,6 +53,8 @@ namespace Gwiz.UiControl.WinUi3
 
         public GraphUiControl()
         {
+            _graphDrawer.Draw = _draw;
+
             this.InitializeComponent();
         }
 
@@ -89,91 +85,28 @@ namespace Gwiz.UiControl.WinUi3
         public List<INode> Nodes
         {
             get => (List<INode>)GetValue(NodesProperty);
-            set => SetValue(NodesProperty, value);
-        }
-
-        public static Color ConvertColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
-
-        private static Vector2 ConvertPoint(System.Drawing.Point pos) => new Vector2(pos.X, pos.Y);
-
-        private static Rect ConvertRect(System.Drawing.Rectangle rect) => new Rect(rect.X, rect.Y, rect.Width, rect.Height);
-
-        private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
-        {
-            var drawingSession = args.DrawingSession;
-
-            // Clear the canvas
-            drawingSession.Clear(Colors.CornflowerBlue);
-
-            if (Edges != null)
-            {
-                foreach (var edge in Edges)
-                {
-                    drawingSession.DrawLine(ConvertPoint(edge.FromPosition), ConvertPoint(edge.ToPosition), Color.FromArgb(255, 0, 0, 0));
-                }
-            }
-
-            if (Nodes != null)
-            {
-                foreach (var node in Nodes)
-                {
-                    var grid = node.Grid;
-                    for (int x = 0; x < grid.Cols.Count; x++)
-                    {
-                        for (int y = 0; y < grid.Rows.Count; y++)
-                        {
-                            var rect = grid.FieldRects[x][y];
-                            drawingSession.FillRectangle(ConvertRect(rect), ConvertColor(node.BackgroundColor));
-                            drawingSession.DrawRectangle(ConvertRect(rect), ConvertColor(node.LineColor), 1);
-
-                            var textSize = GetTextSize(grid.FieldText[x][y]);
-                            var xText = (float)(rect.X + (rect.Width - textSize.Width) / 2);
-                            var yText = (float)(rect.Y + (rect.Height - textSize.Height) / 2);
-                            drawingSession.DrawText(grid.FieldText[x][y], new Vector2(xText, yText), ConvertColor(node.LineColor), TextFormat);
-                        }
-                    }
-
-                    // Draw the resize all icon
-                    if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
-                    {
-                        args.DrawingSession.DrawSvg(_icons.ResizeBottomRight, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - IconSize, node.Y + node.Height - IconSize));
-                    }
-
-                    if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
-                    {
-                        // Draw the resize horz icon
-                        args.DrawingSession.DrawSvg(_icons.ResizeHorz, new Size(IconSize, IconSize), new Vector2(node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2));
-
-                        // Draw the resize vert icon
-                        args.DrawingSession.DrawSvg(_icons.ResizeVert, new Size(IconSize, IconSize), new Vector2(node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75)));
-                    }                
-                }
-            }
-        }
-
-        private static Size GetTextSize(string text)
-        {
-            CanvasDevice device = CanvasDevice.GetSharedDevice();
-            CanvasTextLayout textLayout = new CanvasTextLayout(device,
-                text,
-                TextFormat,
-                float.MaxValue,
-                float.MaxValue);
-
-            int textWidth = (int)textLayout.LayoutBounds.Width;
-            int textHeight = (int)textLayout.LayoutBounds.Height;
-
-            return new Size(textWidth, textHeight);
+            set => SetValue(NodesProperty, value); 
         }
 
         private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiControl = d as GraphUiControl;
 
-            if (uiControl != null && uiControl._canvasControl != null)
+            if (uiControl != null)
             {
-                uiControl._canvasControl.Invalidate();
+                uiControl.UpdateGraphDrawer();
+
+                if (uiControl._canvasControl != null)
+                {
+                    uiControl._canvasControl.Invalidate();
+                }
             }
+        }
+
+        private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
+        {
+            _draw.DrawingSession = args.DrawingSession;
+            _graphDrawer.DrawGraph();
         }
 
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
@@ -197,25 +130,25 @@ namespace Gwiz.UiControl.WinUi3
                     {
                         // Check if the mouse cursor is over the both resize icon
                         if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                            pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - IconSize &&
-                            pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - IconSize)
+                            pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
+                            pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
                             _potentialInteractionState = InteractionState.ResizeAll;
                         }
                         else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(IconSize * 0.75) &&
-                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - IconSize / 2 &&
-                                 pointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + IconSize / 2)
+                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(_graphDrawer.IconSize * 0.75) &&
+                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - _graphDrawer.IconSize / 2 &&
+                                 pointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + _graphDrawer.IconSize / 2)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
                             _potentialInteractionState = InteractionState.ResizeHorz;
 
                         }
                         else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - IconSize / 2 &&
-                                 pointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + IconSize / 2 &&
-                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(IconSize * 0.75))
+                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - _graphDrawer.IconSize / 2 &&
+                                 pointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + _graphDrawer.IconSize / 2 &&
+                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(_graphDrawer.IconSize * 0.75))
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
                             _potentialInteractionState = InteractionState.ResizeVert;
@@ -310,5 +243,10 @@ namespace Gwiz.UiControl.WinUi3
             _currentInteractionState = InteractionState.None;
         }
 
+        private void UpdateGraphDrawer()
+        {
+            _graphDrawer.Edges = Edges;
+            _graphDrawer.Nodes = Nodes;
+        }
     }
 }

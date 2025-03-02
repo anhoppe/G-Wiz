@@ -1,5 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using System;
+using System.ComponentModel;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -25,6 +26,9 @@ namespace Gwiz.Core.Serializer
                     case "To":
                         edge.ToId = parser.Consume<Scalar>().Value;
                         break;
+                    case "Ending":
+                        edge.Ending = FromString(parser.Consume<Scalar>().Value);
+                        break;
                     default:
                         // Skip unknown properties
                         parser.SkipThisAndNestedEvents();
@@ -35,7 +39,25 @@ namespace Gwiz.Core.Serializer
 
             return edge;
         }
-        
+
+        private Ending FromString(string value)
+        {
+            if (value == "OpenArrow")
+            {
+                return Ending.OpenArrow;
+            }
+            if (value == "ClosedArrow")
+            {
+                return Ending.ClosedArrow;
+            }
+            if (value == "Rhombus")
+            {
+                return Ending.Rhombus;
+            }
+
+            throw new InvalidEnumArgumentException($"No such ending <{value}>");
+        }
+
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
             throw new NotImplementedException();

@@ -2,11 +2,24 @@
 
 namespace Gwiz.Core.Contract
 {
+    public enum Ending
+    {
+        None,
+        OpenArrow,
+        ClosedArrow,
+        Rhombus
+    }
+
     /// <summary>
     /// Represents an edge in a graph
     /// </summary>
     public interface IEdge
     {
+        /// <summary>
+        /// Ending symbol of the edge
+        /// </summary>
+        Ending Ending { get; }
+
         /// <summary>
         /// The node the edge is coming from
         /// </summary>

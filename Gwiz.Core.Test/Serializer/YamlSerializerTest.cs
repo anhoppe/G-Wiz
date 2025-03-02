@@ -1,8 +1,12 @@
 ﻿using Gwiz.Core.Contract;
 using Gwiz.Core.Serializer;
+using MathNet.Numerics;
 using NUnit.Framework;
+using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.Serialization;
 using System.Text;
+using YamlDotNet.Core;
 
 namespace Gwiz.Core.Test.Serializer
 {
@@ -104,7 +108,7 @@ namespace Gwiz.Core.Test.Serializer
 
             var node = graph.Nodes.First();
         }
-        
+
         [Test]
         public void Deserialize_WhenTemplatesDefinedInYaml_ThenTemplatesAreInGraph()
         {
@@ -153,10 +157,10 @@ namespace Gwiz.Core.Test.Serializer
                 "    Height: 40\n" +
                 "    Template: Foo\n";
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
-         
+
             // Act
             var graph = _sut.Deserialize(stream);
-            
+
             // Assert
             var node = graph.Nodes[0];
             Assert.That(node.BackgroundColor, Is.EqualTo(Color.FromArgb(40, 10, 20, 30)));
@@ -234,7 +238,7 @@ namespace Gwiz.Core.Test.Serializer
                     Assert.Fail();
                 }
                 else
-                { 
+                {
                     Assert.That(innerException.GetType, Is.EqualTo(typeof(UnknownTemplateParameterValue)));
                 }
             }
@@ -358,6 +362,55 @@ namespace Gwiz.Core.Test.Serializer
             var grid = graph.Templates[0].Grid;
 
             Assert.That(grid.Cols.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void EdgeEnding_WhenEdgeEndingSpecified_ThenEdgeHasCorrectEndingIdentifierSet()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Ending: OpenArrow\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Ending: ClosedArrow\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Ending: Rhombus\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges[0].Ending, Is.EqualTo(Ending.OpenArrow));
+            Assert.That(graph.Edges[1].Ending, Is.EqualTo(Ending.ClosedArrow));
+            Assert.That(graph.Edges[2].Ending, Is.EqualTo(Ending.Rhombus));
+        }
+
+        [Test]
+        public void EdgeEnding_WhenEdgeEndingHasUnknwonSpecifier_ThenExceptionIsThrown()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Ending: InvalidEndingId\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act / Assert
+            Assert.Throws<YamlException>(() => _sut.Deserialize(stream));
         }
     }
 }

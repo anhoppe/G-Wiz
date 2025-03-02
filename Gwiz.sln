@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gwiz.Core.Contract", "Gwiz.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gwiz.Core.Test", "Gwiz.Core.Test\Gwiz.Core.Test.csproj", "{ED1A41AB-D7A2-424B-996E-B55D2396AFBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gwiz.UiControl.WinUi3.Test", "Gwiz.UiControl.WinUi3.Test\Gwiz.UiControl.WinUi3.Test.csproj", "{8ADC7A57-367D-4C7F-AB94-9B6E4D9C0B0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -40,8 +42,15 @@ Global
 		{ED1A41AB-D7A2-424B-996E-B55D2396AFBE}.Debug|x64.Build.0 = Debug|x64
 		{ED1A41AB-D7A2-424B-996E-B55D2396AFBE}.Release|x64.ActiveCfg = Release|x64
 		{ED1A41AB-D7A2-424B-996E-B55D2396AFBE}.Release|x64.Build.0 = Release|x64
+		{8ADC7A57-367D-4C7F-AB94-9B6E4D9C0B0D}.Debug|x64.ActiveCfg = Debug|x64
+		{8ADC7A57-367D-4C7F-AB94-9B6E4D9C0B0D}.Debug|x64.Build.0 = Debug|x64
+		{8ADC7A57-367D-4C7F-AB94-9B6E4D9C0B0D}.Release|x64.ActiveCfg = Release|x64
+		{8ADC7A57-367D-4C7F-AB94-9B6E4D9C0B0D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1C0960D5-BE23-44B2-805E-3403760D763F}
 	EndGlobalSection
 EndGlobal

@@ -12,6 +12,8 @@ namespace Gwiz.Core
         
         private IUpdatableNode _to = new Node();
 
+        public Ending Ending { get; internal set; } = Ending.None;
+
         public INode From => FromInternal;
 
         public INode To => ToInternal;

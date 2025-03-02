@@ -27,7 +27,6 @@ Templates:
   - Name: Hint
     BackgroundColor: 100, 100, 100, 255
     LineColor: 255, 0, 0, 0
-  
     
 
 Nodes:
@@ -53,12 +52,21 @@ Nodes:
     Width: 200
     Height: 100
     Template: Hint
+    Id: Foobar
   - X: 0
     Y: 0
     Width: 600
     Height: 400
     Template: Frame
+    Id: Barbuz
 
 Edges:
   - From: Foo
-    To: Bar    
+    To: Bar
+    Ending: OpenArrow
+  - From: Foobar
+    To: Barbuz
+    Ending: ClosedArrow
+  - From: Foo
+    To: Barbuz
+    Ending: Rhombus
