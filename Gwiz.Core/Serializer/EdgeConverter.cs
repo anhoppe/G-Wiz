@@ -20,14 +20,17 @@ namespace Gwiz.Core.Serializer
             {
                 switch (key.Value)
                 {
+                    case "Ending":
+                        edge.Ending = StringToEnding(parser.Consume<Scalar>().Value);
+                        break;
                     case "From":
                         edge.FromId = parser.Consume<Scalar>().Value;
                         break;
+                       case "Style":
+                        edge.Style = StringToStyle(parser.Consume<Scalar>().Value);
+                        break;
                     case "To":
                         edge.ToId = parser.Consume<Scalar>().Value;
-                        break;
-                    case "Ending":
-                        edge.Ending = FromString(parser.Consume<Scalar>().Value);
                         break;
                     default:
                         // Skip unknown properties
@@ -40,7 +43,7 @@ namespace Gwiz.Core.Serializer
             return edge;
         }
 
-        private Ending FromString(string value)
+        private Ending StringToEnding(string value)
         {
             if (value == "OpenArrow")
             {
@@ -56,6 +59,20 @@ namespace Gwiz.Core.Serializer
             }
 
             throw new InvalidEnumArgumentException($"No such ending <{value}>");
+        }
+
+        private Style StringToStyle(string value)
+        {
+            if (value == "Dashed")
+            {
+                return Style.Dashed;
+            }
+            if (value == "Dotted")
+            {
+                return Style.Dotted;
+            }
+
+            throw new InvalidEnumArgumentException($"No such style <{value}>");
         }
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)

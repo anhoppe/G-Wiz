@@ -1,10 +1,7 @@
 ﻿using Gwiz.Core.Contract;
 using Gwiz.Core.Serializer;
-using MathNet.Numerics;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.Serialization;
 using System.Text;
 using YamlDotNet.Core;
 
@@ -406,6 +403,50 @@ namespace Gwiz.Core.Test.Serializer
                 "  - From: foo\n" +
                 "    To: bar\n" +
                 "    Ending: InvalidEndingId\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act / Assert
+            Assert.Throws<YamlException>(() => _sut.Deserialize(stream));
+        }
+
+        [Test]
+        public void EdgeStyle_WhenEdgeStyleIsStippled_ThenStyleEnumIsSet()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Style: Dashed\n" +
+                "  - From: foo\n" +
+                "    To: bar\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges[0].Style, Is.EqualTo(Style.Dashed));
+            Assert.That(graph.Edges[1].Style, Is.EqualTo(Style.None));
+        }
+
+        [Test]
+        public void EdgeEnding_WhenEdgeStyleHasUnknwonSpecifier_ThenExceptionIsThrown()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Style: Foo\n";
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
 

@@ -1,18 +1,16 @@
-﻿using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Svg;
-using Microsoft.Graphics.Canvas.Text;
+﻿using Gwiz.Core.Contract;
+using SkiaSharp;
 using System;
 using System.Drawing;
 using System.Numerics;
-using Windows.Foundation;
 
 namespace Gwiz.UiControl.WinUi3
 {
     internal class Draw : IDraw
     {
-        private static readonly Windows.UI.Color LineColor = Windows.UI.Color.FromArgb(255, 0, 0, 0);
+        private static readonly SKColor LineColor = SKColors.Black;
 
-        internal CanvasDrawingSession? DrawingSession { private get; set; }
+        internal SKCanvas? DrawingSession { private get; set; }
 
         public void Clear()
         {
@@ -21,17 +19,33 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            DrawingSession.Clear(Microsoft.UI.Colors.CornflowerBlue);
+            DrawingSession.Clear(SKColors.CornflowerBlue);
         }
 
-        public void DrawLine(System.Drawing.Point from, System.Drawing.Point to)
+        public void DrawLine(Point from, Point to, Style style)
         {
             if (DrawingSession == null)
             {
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            DrawingSession.DrawLine(ConvertPoint(from), ConvertPoint(to), LineColor);
+            using (var paint = new SKPaint 
+            { 
+                Color = LineColor, 
+                Style = SKPaintStyle.Stroke, 
+                StrokeWidth = 2 })
+            {
+                switch (style)
+                {
+                    case Style.Dashed:
+                        paint.PathEffect = SKPathEffect.CreateDash(new float[] { 10, 10 }, 0);
+                        break;
+                    case Style.Dotted:
+                        paint.PathEffect = SKPathEffect.CreateDash(new float[] { 2, 2 }, 0);
+                        break;
+                }
+                DrawingSession.DrawLine(ConvertPoint(from), ConvertPoint(to), paint);
+            }
         }
 
         public void DrawRectangle(Rectangle rect, Color color, float strokeWidth)
@@ -41,10 +55,13 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            DrawingSession.DrawRectangle(ConvertRect(rect), ConvertColor(color), strokeWidth);
+            using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
+            {
+                DrawingSession.DrawRect(ConvertRect(rect), paint);
+            }        
         }
 
-        public void DrawSvgIcon(CanvasSvgDocument? icon, Windows.Foundation.Size size, float x, float y)
+        public void DrawSvgIcon(SKBitmap? icon, Windows.Foundation.Size size, float x, float y)
         {
             if (DrawingSession == null)
             {
@@ -56,17 +73,36 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawIcon recevied null icon document");
             }
 
-            DrawingSession.DrawSvg(icon, size, new Vector2(x, y));
+            DrawingSession.DrawBitmap(icon, new SKPoint(x, y));
         }
 
-        public void DrawText(string text, System.Drawing.Point position, Color color, CanvasTextFormat font)
+        public void DrawText(string text, Point position, Color color)
         {
             if (DrawingSession == null)
             {
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            DrawingSession.DrawText(text, ConvertPoint(position), ConvertColor(color), font);
+            using (var paint = new SKPaint
+            {
+                Color = SKColors.Black,
+                IsAntialias = true,
+            })
+            {
+                using (var font = new SKFont
+                {
+                    Size = 16,
+                    Typeface = SKTypeface.FromFamilyName("Segoe UI") // Use Segoe UI
+                })
+                { 
+                    float textWidth = font.MeasureText(text);
+
+                    // Measure height using FontMetrics
+                    var metrics = font.Metrics;
+                    float textHeight = metrics.Descent - metrics.Ascent;
+                    DrawingSession.DrawText(text, position.X, position.Y, font, paint);
+                }            
+            }            
         }
 
         public void FillRectangle(Rectangle rect, Color backgroundColor)
@@ -76,15 +112,23 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            DrawingSession.FillRectangle(ConvertRect(rect), ConvertColor(backgroundColor));
+            if (DrawingSession == null)
+            {
+                throw new NullReferenceException("Draw.DrawingSession not set");
+            }
+
+            using (var paint = new SKPaint { Color = ConvertColor(backgroundColor), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
+            {
+                DrawingSession.DrawRect(ConvertRect(rect), paint);
+            }
         }
 
 
-        public static Windows.UI.Color ConvertColor(System.Drawing.Color color) => Windows.UI.Color.FromArgb(color.A, color.R, color.G, color.B);
+        public static SKColor ConvertColor(Color color) => new SKColor(color.R, color.G, color.B, color.A);
 
-        private static Vector2 ConvertPoint(System.Drawing.Point pos) => new Vector2(pos.X, pos.Y);
+        private static Vector2 ConvertPoint(Point pos) => new Vector2(pos.X, pos.Y);
 
-        private static Rect ConvertRect(System.Drawing.Rectangle rect) => new Rect(rect.X, rect.Y, rect.Width, rect.Height);
+        private static SKRect ConvertRect(Rectangle rect) => new SKRect(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);
 
     }
 }

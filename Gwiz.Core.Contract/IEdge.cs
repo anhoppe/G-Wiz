@@ -7,7 +7,14 @@ namespace Gwiz.Core.Contract
         None,
         OpenArrow,
         ClosedArrow,
-        Rhombus
+        Rhombus,
+    }
+
+    public enum Style
+    {
+        None,
+        Dashed,
+        Dotted
     }
 
     /// <summary>
@@ -29,6 +36,13 @@ namespace Gwiz.Core.Contract
         /// The position of the edge coming from
         /// </summary>
         Point FromPosition { get; }
+
+        /// <summary>
+        /// The style of the edge indicates how it is drawn
+        /// (e.g. stippled, dotted)
+        /// </summary>
+        Style Style { get; }
+
 
         /// <summary>
         /// The node the edge is going to

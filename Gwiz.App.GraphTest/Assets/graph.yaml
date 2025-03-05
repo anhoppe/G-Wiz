@@ -64,9 +64,11 @@ Edges:
   - From: Foo
     To: Bar
     Ending: OpenArrow
+    Style: Dashed
   - From: Foobar
     To: Barbuz
     Ending: ClosedArrow
   - From: Foo
     To: Barbuz
     Ending: Rhombus
+    Style: Dotted

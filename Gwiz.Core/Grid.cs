@@ -30,7 +30,7 @@ namespace Gwiz.Core
                 FieldRects[x] = new Rectangle[Rows.Count];
                 for (int y = 0; y < Rows.Count; y++)
                 {
-                    FieldText[x][y] = "";
+                    FieldText[x][y] = string.Empty;
                     FieldRects[x][y] = new Rectangle();
                 }
             }

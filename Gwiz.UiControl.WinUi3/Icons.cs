@@ -1,13 +1,7 @@
-﻿using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Svg;
-using Microsoft.Graphics.Canvas.UI.Xaml;
-using System;
-using System.Collections.Generic;
+﻿using SkiaSharp;
+using SkiaSharp.Extended.Svg;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -18,13 +12,13 @@ namespace Gwiz.UiControl.WinUi3
             LoadSvgAsync();
         }
 
-        public CanvasSvgDocument? Edit { get; private set; }
+        public SKBitmap? Edit { get; private set; }
         
-        public CanvasSvgDocument? ResizeBottomRight { get; private set; }
+        public SKBitmap? ResizeBottomRight { get; private set; }
 
-        public CanvasSvgDocument? ResizeHorz { get; private set; }
+        public SKBitmap? ResizeHorz { get; private set; }
 
-        public CanvasSvgDocument? ResizeVert { get; private set; }
+        public SKBitmap? ResizeVert { get; private set; }
 
         private static Stream GetEmbeddedSvgStream(string iconName)
         {
@@ -41,24 +35,20 @@ namespace Gwiz.UiControl.WinUi3
             return stream;
         }
 
-        private async void LoadSvgAsync()
+        private void LoadSvgAsync()
         {
-            CanvasDevice device = CanvasDevice.GetSharedDevice();
-            using (var stream = GetEmbeddedSvgStream("file-edit-outline.svg"))
+
+            using (var stream = GetEmbeddedSvgStream("resize-bottom-right.png"))
             {
-                Edit = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
+                ResizeBottomRight = SKBitmap.Decode(stream);
             }
-            using (var stream = GetEmbeddedSvgStream("resize-bottom-right.svg"))
+            using (var stream = GetEmbeddedSvgStream("drag-horizontal-variant.png"))
             {
-                ResizeBottomRight = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
+                ResizeVert = SKBitmap.Decode(stream);
             }
-            using (var stream = GetEmbeddedSvgStream("drag-horizontal-variant.svg"))
+            using (var stream = GetEmbeddedSvgStream("drag-vertical-variant.png"))
             {
-                ResizeVert = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
-            }
-            using (var stream = GetEmbeddedSvgStream("drag-vertical-variant.svg"))
-            {
-                ResizeHorz = await CanvasSvgDocument.LoadAsync(device, stream.AsRandomAccessStream());
+                ResizeHorz = SKBitmap.Decode(stream);
             }
         }
     }

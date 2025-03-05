@@ -36,6 +36,8 @@ namespace Gwiz.Core
 
         public Point FromPosition { get; set; }
 
+        public Style Style { get; internal set; } = Style.None;
+
         internal string ToId { get; set; } = string.Empty;
 
         internal IUpdatableNode ToInternal 

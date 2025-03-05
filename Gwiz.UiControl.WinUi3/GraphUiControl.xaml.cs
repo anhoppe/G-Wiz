@@ -3,16 +3,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.UI;
 using Microsoft.UI.Input;
 using System;
 using Windows.Foundation;
-using Microsoft.Graphics.Canvas.UI.Xaml;
-using Microsoft.UI;
 using Gwiz.Core.Contract;
-using Microsoft.Graphics.Canvas;
-using System.Numerics;
-using Microsoft.Graphics.Canvas.Text;
+using SkiaSharp.Views.Windows;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -103,9 +98,9 @@ namespace Gwiz.UiControl.WinUi3
             }
         }
 
-        private void DrawGraph(CanvasControl sender, CanvasDrawEventArgs args)
+        private void DrawGraph(object sender, SKPaintSurfaceEventArgs e)
         {
-            _draw.DrawingSession = args.DrawingSession;
+            _draw.DrawingSession = e.Surface.Canvas;
             _graphDrawer.DrawGraph();
         }
 
