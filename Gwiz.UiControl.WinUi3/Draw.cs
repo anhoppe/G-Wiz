@@ -1,4 +1,5 @@
 ﻿using Gwiz.Core.Contract;
+using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
 using System;
 using System.Drawing;
@@ -100,7 +101,15 @@ namespace Gwiz.UiControl.WinUi3
                     // Measure height using FontMetrics
                     var metrics = font.Metrics;
                     float textHeight = metrics.Descent - metrics.Ascent;
-                    DrawingSession.DrawText(text, position.X, position.Y, font, paint);
+                    const float lineFeed = 0.12f;
+
+                    string[] lines = text.Split('\n');
+                    int count = 0;
+
+                    foreach (var line in lines)
+                    {
+                        DrawingSession.DrawText(line, position.X, position.Y + count++ * (textHeight + lineFeed), font, paint);
+                    }                
                 }            
             }            
         }
