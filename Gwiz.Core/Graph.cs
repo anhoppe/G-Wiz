@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace Gwiz.Core
 {
@@ -16,24 +15,12 @@ namespace Gwiz.Core
 
         public void AddEdge(INode from, INode to)
         {
-            var fromInternal = from as IUpdatableNode;
-            var toInternal = to as IUpdatableNode;
+            Edges.Add(CreateEdge(from, to, Ending.None, Style.None));
+        }
 
-            if (fromInternal == null || toInternal == null)
-            {
-                throw new ArgumentException("Nodes passed to Graph.AddEdge have invalid type");
-            }
-
-            if (Nodes.All(n => n != fromInternal) || Nodes.All(n => n != toInternal))
-            {
-                throw new ArgumentException("Nodes passed to Graph.AddEsge are not part of the graph");
-            }    
-
-            Edges.Add(new Edge()
-            {
-                FromInternal = fromInternal,
-                ToInternal = toInternal,
-            });
+        public void AddEdge(INode from, INode to, Ending ending, Style style)
+        {
+            Edges.Add(CreateEdge(from, to, ending, style));
         }
 
         public INode AddNode(string templateName)
@@ -52,6 +39,30 @@ namespace Gwiz.Core
             Nodes.Add(node);
 
             return node;
+        }
+
+        private Edge CreateEdge(INode from, INode to, Ending ending, Style style)
+        {
+            var fromInternal = from as IUpdatableNode;
+            var toInternal = to as IUpdatableNode;
+
+            if (fromInternal == null || toInternal == null)
+            {
+                throw new ArgumentException("Nodes passed to Graph.AddEdge have invalid type");
+            }
+
+            if (Nodes.All(n => n != fromInternal) || Nodes.All(n => n != toInternal))
+            {
+                throw new ArgumentException("Nodes passed to Graph.AddEdge are not part of the graph");
+            }
+
+            return new Edge()
+            {
+                Ending = ending,
+                FromInternal = fromInternal,
+                Style = style,
+                ToInternal = toInternal,
+            };
         }
     }
 }
