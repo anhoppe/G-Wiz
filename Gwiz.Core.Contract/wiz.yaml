@@ -1,0 +1,9 @@
+Views:
+    - Name: graph_structure
+      Include:
+        - IEdge
+        - IGraph
+        - IGrid
+        - INode
+        - ITemplate
+        

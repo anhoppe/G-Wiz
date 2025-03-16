@@ -1,0 +1,11 @@
+Views:
+    - Name: graph_structure
+      Include:
+        - Edge
+        - Graph
+        - Grid
+        - IUpdatableGrid
+        - IUpdatableNode
+        - Node
+        - Template
+        
