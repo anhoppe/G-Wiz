@@ -168,8 +168,8 @@ namespace Gwiz.UiControl.WinUi3
                         throw new InvalidOperationException("Dragging without seleceted node");
                     }
 
-                    _hoveredNode.X = (int)(pointerPosition.X - _mouseToNodeDelta.X);
-                    _hoveredNode.Y = (int)(pointerPosition.Y - _mouseToNodeDelta.Y);
+                    _hoveredNode.X = (int)(pointerPosition.X + _mouseToNodeDelta.X);
+                    _hoveredNode.Y = (int)(pointerPosition.Y + _mouseToNodeDelta.Y);
 
                     _canvasControl.Invalidate();
                     break;
