@@ -17,10 +17,11 @@ namespace Gwiz.UiControl.WinUi3
     public enum InteractionState
     {
         None,
-        Dragging,
+        DraggingNode,
         ResizeAll,
         ResizeHorz,
         ResizeVert,
+        DraggingView
     }
 
     /// <summary>
@@ -28,7 +29,40 @@ namespace Gwiz.UiControl.WinUi3
     /// </summary>
     public sealed partial class GraphUiControl : Page
     {
+        private class Bounds
+        {
+            public int MaxX;
+            public int MaxY;
+
+            public int MinX;
+            public int MinY;
+
+            public Bounds()
+            {
+                Reset();
+            }
+
+            public void Reset()
+            {
+                MaxX = int.MinValue;
+                MaxY = int.MinValue;
+                MinX = int.MaxValue;
+                MinY = int.MaxValue;
+            }
+
+            public void Add(int xPos, int yPos, int width, int height)
+            {
+                MaxX = Math.Max(MaxX, xPos + width);
+                MaxY = Math.Max(MaxY, yPos + height);
+
+                MinX = Math.Min(MinX, xPos);
+                MinY = Math.Min(MinY, yPos);
+            }
+        }
+
         private static readonly int MinNodeSize = 80;
+
+        private Bounds _bounds = new();
 
         private Draw _draw = new Draw();
 
@@ -45,6 +79,10 @@ namespace Gwiz.UiControl.WinUi3
         private InteractionState _potentialInteractionState = InteractionState.None;
                 
         private Point _resizeStartSize = new Point();
+
+        private Point _scrollPosition = new Point(0, 0);
+        
+        private Point _scrollStartPosition = new Point(0, 0);
 
         public GraphUiControl()
         {
@@ -100,13 +138,47 @@ namespace Gwiz.UiControl.WinUi3
 
         private void DrawGraph(object sender, SKPaintSurfaceEventArgs e)
         {
+            var canvas = e.Surface.Canvas;
+            // Apply translation for scrolling
+            canvas.Translate(-(float)_scrollPosition.X, -(float)_scrollPosition.Y);
             _draw.DrawingSession = e.Surface.Canvas;
             _graphDrawer.DrawGraph();
         }
 
+        private void Invalidate()
+        {
+            _bounds.Reset();
+            foreach (var node in Nodes)
+            {
+                _bounds.Add(node.X, node.Y, node.Width, node.Height);
+            }
+
+            if (_scrollPosition.X < _bounds.MinX)
+            {
+                _scrollPosition.X = _bounds.MinX;
+            }
+            if (_scrollPosition.Y < _bounds.MinY)
+            {
+                _scrollPosition.Y = _bounds.MinY;
+            }
+            if (_scrollPosition.X > _bounds.MaxX - _canvasControl.CanvasSize.Width)
+            {
+                _scrollPosition.X = _bounds.MaxX - _canvasControl.CanvasSize.Width;
+            }
+            if (_scrollPosition.Y > _bounds.MaxY - _canvasControl.CanvasSize.Height)
+            {
+                _scrollPosition.Y = _bounds.MaxY - _canvasControl.CanvasSize.Height;
+            }
+
+            _canvasControl.Invalidate();
+        }
+
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            var pointerPosition = e.GetCurrentPoint(this).Position;
+            var screenPointerPosition = e.GetCurrentPoint(this).Position;
+            var worldPointerPosition = screenPointerPosition;
+            worldPointerPosition.X += _scrollPosition.X;
+            worldPointerPosition.Y += _scrollPosition.Y;
 
             double xDelta = 0;
             double yDelta = 0;
@@ -116,62 +188,60 @@ namespace Gwiz.UiControl.WinUi3
                 case InteractionState.None:
                     // Check if the pointer is over any node
                     _hoveredNode = Nodes?.FirstOrDefault(node =>
-                    pointerPosition.X >= node.X &&
-                    pointerPosition.X <= node.X + node.Width &&
-                    pointerPosition.Y >= node.Y &&
-                    pointerPosition.Y <= node.Y + node.Height);
+                    worldPointerPosition.X >= node.X &&
+                    worldPointerPosition.X <= node.X + node.Width &&
+                    worldPointerPosition.Y >= node.Y &&
+                    worldPointerPosition.Y <= node.Y + node.Height);
 
                     if (_hoveredNode != null)
                     {
                         // Check if the mouse cursor is over the both resize icon
                         if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                            pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
-                            pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
+                            worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
+                            worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
                             _potentialInteractionState = InteractionState.ResizeAll;
                         }
                         else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(_graphDrawer.IconSize * 0.75) &&
-                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - _graphDrawer.IconSize / 2 &&
-                                 pointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + _graphDrawer.IconSize / 2)
+                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(_graphDrawer.IconSize * 0.75) &&
+                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - _graphDrawer.IconSize / 2 &&
+                                 worldPointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + _graphDrawer.IconSize / 2)
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
                             _potentialInteractionState = InteractionState.ResizeHorz;
-
                         }
                         else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 pointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - _graphDrawer.IconSize / 2 &&
-                                 pointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + _graphDrawer.IconSize / 2 &&
-                                 pointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(_graphDrawer.IconSize * 0.75))
+                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - _graphDrawer.IconSize / 2 &&
+                                 worldPointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + _graphDrawer.IconSize / 2 &&
+                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(_graphDrawer.IconSize * 0.75))
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
                             _potentialInteractionState = InteractionState.ResizeVert;
-
                         }
                         else
                         {
                             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-                            _potentialInteractionState = InteractionState.Dragging;
+                            _potentialInteractionState = InteractionState.DraggingNode;
                         }
                     }
                     else
                     {
                         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-                        _potentialInteractionState = InteractionState.None;
+                        _potentialInteractionState = InteractionState.DraggingView;
                     }
                     break;
 
-                case InteractionState.Dragging:
+                case InteractionState.DraggingNode:
                     if (_hoveredNode == null)
                     {
                         throw new InvalidOperationException("Dragging without seleceted node");
                     }
 
-                    _hoveredNode.X = (int)(pointerPosition.X + _mouseToNodeDelta.X);
-                    _hoveredNode.Y = (int)(pointerPosition.Y + _mouseToNodeDelta.Y);
+                    _hoveredNode.X = (int)(worldPointerPosition.X + _mouseToNodeDelta.X);
+                    _hoveredNode.Y = (int)(worldPointerPosition.Y + _mouseToNodeDelta.Y);
 
-                    _canvasControl.Invalidate();
+                    Invalidate();
                     break;
 
                 case InteractionState.ResizeAll:
@@ -180,13 +250,13 @@ namespace Gwiz.UiControl.WinUi3
                         throw new InvalidOperationException("Resizing without seleceted node");
                     }
 
-                    xDelta = pointerPosition.X - _interactionStartPosition.X;
-                    yDelta = pointerPosition.Y - _interactionStartPosition.Y;
+                    xDelta = worldPointerPosition.X - _interactionStartPosition.X;
+                    yDelta = worldPointerPosition.Y - _interactionStartPosition.Y;
 
                     _hoveredNode.Width = Math.Max((int)(_resizeStartSize.X + xDelta), MinNodeSize);
                     _hoveredNode.Height = Math.Max((int)(_resizeStartSize.Y + yDelta), MinNodeSize);
 
-                    _canvasControl.Invalidate();
+                    Invalidate();
                     break;
 
                 case InteractionState.ResizeHorz:
@@ -195,11 +265,11 @@ namespace Gwiz.UiControl.WinUi3
                         throw new InvalidOperationException("Resizing without seleceted node");
                     }
 
-                    xDelta = pointerPosition.X - _interactionStartPosition.X;
+                    xDelta = worldPointerPosition.X - _interactionStartPosition.X;
 
                     _hoveredNode.Width = Math.Max((int)(_resizeStartSize.X + xDelta), MinNodeSize);
 
-                    _canvasControl.Invalidate();
+                    Invalidate();
                     break;
 
                 case InteractionState.ResizeVert:
@@ -208,23 +278,35 @@ namespace Gwiz.UiControl.WinUi3
                         throw new InvalidOperationException("Resizing without seleceted node");
                     }
 
-                    yDelta = pointerPosition.Y - _interactionStartPosition.Y;
+                    yDelta = worldPointerPosition.Y - _interactionStartPosition.Y;
 
                     _hoveredNode.Height = Math.Max((int)(_resizeStartSize.Y + yDelta), MinNodeSize);
 
                     _canvasControl.Invalidate();
                     break;
+                case InteractionState.DraggingView:
+                    _scrollPosition.X = _scrollStartPosition.X  - screenPointerPosition.X;
+                    _scrollPosition.Y = _scrollStartPosition.Y - screenPointerPosition.Y;
 
+                    Invalidate();
+                    break;
             }
         }
 
         private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (_hoveredNode != null)
-            {
-                _currentInteractionState = _potentialInteractionState;
+            _currentInteractionState = _potentialInteractionState;
+            _interactionStartPosition = e.GetCurrentPoint(this).Position;
 
-                _interactionStartPosition = e.GetCurrentPoint(this).Position;
+            _interactionStartPosition.X += _scrollPosition.X;
+            _interactionStartPosition.Y += _scrollPosition.Y;
+
+            if (_currentInteractionState == InteractionState.DraggingView)
+            {
+                _scrollStartPosition = _interactionStartPosition    ;
+            }
+            if (_hoveredNode != null)
+            { 
                 _mouseToNodeDelta.X = _hoveredNode.X - _interactionStartPosition.X;
                 _mouseToNodeDelta.Y = _hoveredNode.Y - _interactionStartPosition.Y;
 
@@ -240,6 +322,7 @@ namespace Gwiz.UiControl.WinUi3
 
         private void UpdateGraphDrawer()
         {
+            _scrollPosition = new(0, 0);
             _graphDrawer.Edges = Edges;
             _graphDrawer.Nodes = Nodes;
         }

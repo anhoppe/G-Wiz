@@ -61,10 +61,13 @@ namespace Gwiz.Core
             var centerFromNode = new Point2D(From.X + From.Width / 2, From.Y + From.Height / 2);
             var centerToNode = new Point2D(To.X + To.Width / 2, To.Y + To.Height / 2);
 
-            var centerLine = new LineSegment2D(centerFromNode, centerToNode);
+            if (centerFromNode != centerToNode)
+            {
+                var centerLine = new LineSegment2D(centerFromNode, centerToNode);
 
-            FromPosition = CalculateIntersection(From, centerLine);
-            ToPosition = CalculateIntersection(To, centerLine);
+                FromPosition = CalculateIntersection(From, centerLine);
+                ToPosition = CalculateIntersection(To, centerLine);
+            }
         }
 
         private static Point CalculateIntersection(INode node, LineSegment2D centerLine)
