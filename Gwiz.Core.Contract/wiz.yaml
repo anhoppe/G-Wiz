@@ -6,4 +6,12 @@ Views:
         - IGrid
         - INode
         - ITemplate
+    - Name: graph_contracts
+      Include:
+        - IEdge
+        - IGraph
+        - IGrid
+        - INode
+        - ITemplate
+
         
