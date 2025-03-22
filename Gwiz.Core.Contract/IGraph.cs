@@ -13,5 +13,7 @@
         void AddEdge(INode from, INode to);
 
         void AddEdge(INode from, INode to, Ending ending, Style style);
+
+        void Update();
     }
 }

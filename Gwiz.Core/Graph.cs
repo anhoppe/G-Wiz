@@ -7,7 +7,7 @@ namespace Gwiz.Core
 {
     public class Graph : IGraph
     {
-        public List<IEdge> Edges { get; set; } = new();
+         public List<IEdge> Edges { get; set; } = new();
 
         public List<INode> Nodes { get; set; } = new();
 
@@ -39,6 +39,19 @@ namespace Gwiz.Core
             Nodes.Add(node);
 
             return node;
+        }
+
+        public void Update()
+        {
+            foreach (var node in Nodes)
+            {
+                var nodeInternal = node as Node;
+
+                if (nodeInternal != null)
+                {
+                    nodeInternal.Update();
+                }    
+            }
         }
 
         private Edge CreateEdge(INode from, INode to, Ending ending, Style style)

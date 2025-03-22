@@ -88,6 +88,8 @@ namespace Gwiz.Core.Serializer
                         var template = graph.Templates.FirstOrDefault(t => t.Name == nodeInternal.TemplateName) ?? new Template();
 
                         nodeInternal.AssignTemplate(template);
+
+                        nodeInternal.Update();
                     }
                 }
             }

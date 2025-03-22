@@ -87,5 +87,10 @@ namespace Gwiz.Core
             LineColor = template.LineColor;
             Resize = template.Resize;
         }
+
+        internal void Update()
+        {
+            NodeChanged?.Invoke(this, this);
+        }
     }
 }
