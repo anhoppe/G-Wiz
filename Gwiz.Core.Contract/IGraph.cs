@@ -14,6 +14,8 @@
 
         void AddEdge(INode from, INode to, Ending ending, Style style);
 
+        void AddEdge(INode from, INode to, string fromLabel, string toLabel, float labelOffsetPerCent);
+
         void Update();
     }
 }
