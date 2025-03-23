@@ -105,7 +105,6 @@ namespace Gwiz.UiControl.WinUi3.Test
 
             _sut.Edges = [edgeMock.Object];
 
-
             var expectedEndPoint1 = new Point(2, 17);
             var expectedEndPoint2 = new Point(17, 17);
             var expectedModifiedTo = new Point(10, 4);

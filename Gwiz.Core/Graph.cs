@@ -55,7 +55,7 @@ namespace Gwiz.Core
                 if (nodeInternal != null)
                 {
                     nodeInternal.Update();
-                }    
+                }
             }
         }
 
