@@ -1,7 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
-using System;
 using System.Drawing;
 
 namespace Gwiz.Core
@@ -34,7 +33,11 @@ namespace Gwiz.Core
             }
         }
 
+        public string FromLabel { get; set; } = string.Empty;
+
         public Point FromPosition { get; set; }
+
+        public float LabelOffsetPerCent { get; set; }
 
         public Style Style { get; internal set; } = Style.None;
 
@@ -53,6 +56,8 @@ namespace Gwiz.Core
                 };
             }
         }
+
+        public string ToLabel { get; set; } = string.Empty;
 
         public Point ToPosition { get; set; }
 

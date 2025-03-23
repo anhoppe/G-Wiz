@@ -23,6 +23,11 @@ namespace Gwiz.Core
             Edges.Add(CreateEdge(from, to, ending, style));
         }
 
+        public void AddEdge(INode from, INode to, string fromLabel, string toLabel, float labelOffsetPerCent)
+        {
+            Edges.Add(CreateEdge(from, to, fromLabel, toLabel, labelOffsetPerCent));
+        }
+
         public INode AddNode(string templateName)
         {
             var template = Templates.Find(t => t.Name == templateName);
@@ -54,7 +59,7 @@ namespace Gwiz.Core
             }
         }
 
-        private Edge CreateEdge(INode from, INode to, Ending ending, Style style)
+        private Edge CreateEdge(INode from, INode to)
         {
             var fromInternal = from as IUpdatableNode;
             var toInternal = to as IUpdatableNode;
@@ -71,11 +76,30 @@ namespace Gwiz.Core
 
             return new Edge()
             {
-                Ending = ending,
                 FromInternal = fromInternal,
-                Style = style,
                 ToInternal = toInternal,
             };
+        }
+
+        private Edge CreateEdge(INode from, INode to, Ending ending, Style style)
+        {
+            var edge = CreateEdge(from, to);
+
+            edge.Ending = ending;
+            edge.Style = style;
+
+            return edge;
+        }
+
+        private IEdge CreateEdge(INode from, INode to, string fromLabel, string toLabel, float labelOffsetPerCent)
+        {
+            var edge = CreateEdge(from, to);
+
+            edge.FromLabel = fromLabel;
+            edge.ToLabel = toLabel;
+            edge.LabelOffsetPerCent = labelOffsetPerCent;
+
+            return edge;
         }
     }
 }

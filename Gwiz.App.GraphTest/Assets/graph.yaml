@@ -59,6 +59,12 @@ Nodes:
     Height: 400
     Template: Frame
     Id: Barbuz
+  - X: 400
+    Y: 500
+    Width: 300
+    Height: 300
+    Template: Frame
+    Id: Barfoo
 
 Edges:
   - From: Foo
@@ -72,3 +78,8 @@ Edges:
     To: Barbuz
     Ending: Rhombus
     Style: Dotted
+  - From: Foobar
+    To: Barfoo
+    FromLabel: foo
+    ToLabel: bar
+    LabelOffsetPerCent: 7

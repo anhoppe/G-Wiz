@@ -98,7 +98,30 @@ namespace Gwiz.Core.Test
             var edge = sut.Edges[0];
             Assert.That(edge.From, Is.EqualTo(node1Mock.Object));
             Assert.That(edge.To, Is.EqualTo(node2Mock.Object));
+        }
 
+        [Test]
+        public void AddEdge_WhenAddingEdgeWithFromToLabelsAndOffset_ThenEdgeHasFromAndToLabelsSet()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            var sut = new Graph()
+            {
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            // Act
+            sut.AddEdge(node1Mock.Object, node2Mock.Object, "foo", "bar", 7);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0];
+            Assert.That(edge.FromLabel, Is.EqualTo("foo"));
+            Assert.That(edge.ToLabel, Is.EqualTo("bar"));
+            Assert.That(edge.LabelOffsetPerCent, Is.EqualTo(7));
         }
     }
 }

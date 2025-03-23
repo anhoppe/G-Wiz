@@ -4,6 +4,7 @@ using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
 using System.Drawing;
 using SkiaSharp;
+using System;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -34,8 +35,6 @@ namespace Gwiz.UiControl.WinUi3
             DrawNodes();
         }
 
-        private static Point2D ConvertPoint(Point pos) => new Point2D(pos.X, pos.Y);
-        
         private void DrawEdges()
         {
             if (Edges != null)
@@ -45,6 +44,14 @@ namespace Gwiz.UiControl.WinUi3
                     var modifiedEndingPosition = DrawEdgeEnding(edge);
 
                     Draw.DrawLine(edge.FromPosition, modifiedEndingPosition, edge.Style);
+
+                    if (!string.IsNullOrEmpty(edge.FromLabel))
+                    {
+                        (var fromPos, var toPos) = GetFromToLabelPos(edge);
+
+                        Draw.DrawText(edge.FromLabel, fromPos, Color.Black);
+                        Draw.DrawText(edge.ToLabel, toPos, Color.Black);
+                    }
                 }
             }
         }
@@ -77,7 +84,7 @@ namespace Gwiz.UiControl.WinUi3
                 Draw.DrawLine(arrowHead1, arrowHead2, Style.None);
 
                 // Calculate the modified ending position (which is the middle of the arrow head closing line)
-                var vec = ConvertPoint(arrowHead2) - ConvertPoint(arrowHead1);
+                var vec = arrowHead2.ToMathNetPoint() - arrowHead1.ToMathNetPoint();
                 vec *= 0.5;
                 modifiedEndingPosition = new Point((int)(arrowHead1.X + vec.X), (int)(arrowHead1.Y + vec.Y));
             }
@@ -140,6 +147,27 @@ namespace Gwiz.UiControl.WinUi3
                 }
             }
         }
+
+        private (Point fromPos, Point toPos) GetFromToLabelPos(IEdge edge)
+        {
+            Point fromPos;
+            Point toPos;
+
+            var directionVec = edge.ToPosition.ToMathNetPoint() -
+                edge.FromPosition.ToMathNetPoint();
+
+            var len = directionVec.Length;
+            directionVec = directionVec.Normalize();
+            directionVec *= len * edge.LabelOffsetPerCent / 100.0f;
+
+            fromPos = edge.FromPosition.Add(directionVec);
+
+            directionVec *= -1;
+            toPos = edge.ToPosition.Add(directionVec);
+
+            return (fromPos, toPos);
+        }
+
         private static Size GetTextSize(string text)
         {
             var size = new Size(0, 0);

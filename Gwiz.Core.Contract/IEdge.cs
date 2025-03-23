@@ -33,9 +33,20 @@ namespace Gwiz.Core.Contract
         INode From { get; }
 
         /// <summary>
+        /// Label that is shown on the from position
+        /// </summary>
+        string FromLabel { get; }
+
+        /// <summary>
         /// The position of the edge coming from
         /// </summary>
         Point FromPosition { get; }
+
+        /// <summary>
+        /// Offset of the from / to labels in per cent of the
+        /// absolute edge length. 0.5 means both labels are in the middle.
+        /// </summary>
+        float LabelOffsetPerCent { get; }
 
         /// <summary>
         /// The style of the edge indicates how it is drawn
@@ -43,11 +54,15 @@ namespace Gwiz.Core.Contract
         /// </summary>
         Style Style { get; }
 
-
         /// <summary>
         /// The node the edge is going to
         /// </summary>
         INode To { get; }
+
+        /// <summary>
+        /// Label shown at the to position
+        /// </summary>
+        string ToLabel { get; }
 
         /// <summary>
         /// The position of the edge going to

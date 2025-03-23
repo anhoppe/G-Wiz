@@ -124,5 +124,58 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
             _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedModifiedTo), Style.None));
         }
+
+        [Test]
+        public void EdgeLabels_WhenEdgeHasFromToLabelsDefined_ThenTheLabelsAreDrawn()
+        {
+            // Arrange
+            var edgeMock = new Mock<IEdge>();
+
+            var from = new Point(10, 0);
+            var to = new Point(10, 30);
+            edgeMock.SetupGet(x => x.FromPosition).Returns(from);
+            edgeMock.SetupGet(x => x.ToPosition).Returns(to);
+
+            edgeMock.SetupGet(x => x.FromLabel).Returns("foo");
+            edgeMock.SetupGet(x => x.ToLabel).Returns("bar");
+
+            _sut.Edges = [edgeMock.Object];
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawText("foo", It.Is<Point>(p => p == from), It.IsAny<Color>()));
+            _drawMock.Verify(m => m.DrawText("bar", It.Is<Point>(p => p == to), It.IsAny<Color>()));
+        }
+
+        [Test]
+        public void EdgeLabels_WhenEdgeLabelIsDefinedWithOffset_ThenLabelAtCorrectPosition()
+        {
+            // Arrange
+            var edgeMock = new Mock<IEdge>();
+            var from = new Point(0, 0);
+            var to = new Point(100, 0);
+
+            edgeMock.SetupGet(x => x.FromPosition).Returns(from);
+            edgeMock.SetupGet(x => x.ToPosition).Returns(to);
+
+            edgeMock.SetupGet(x => x.FromLabel).Returns("foo");
+            edgeMock.SetupGet(x => x.ToLabel).Returns("bar");
+
+            edgeMock.SetupGet(x => x.LabelOffsetPerCent).Returns(5);
+
+            _sut.Edges = [edgeMock.Object];
+
+            var fromLabelExpectedPos = new Point(5, 0);
+            var toLabelExpectedPos = new Point(95, 0);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawText("foo", It.Is<Point>(p => p == fromLabelExpectedPos), It.IsAny<Color>()));
+            _drawMock.Verify(m => m.DrawText("bar", It.Is<Point>(p => p == toLabelExpectedPos), It.IsAny<Color>()));
+        }
     }
 }

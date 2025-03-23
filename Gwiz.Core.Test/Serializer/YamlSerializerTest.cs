@@ -2,6 +2,7 @@
 using Gwiz.Core.Serializer;
 using NUnit.Framework;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using YamlDotNet.Core;
 
@@ -13,7 +14,7 @@ namespace Gwiz.Core.Test.Serializer
         YamlSerializer _sut = new YamlSerializer();
 
         [Test]
-        public void Deserialize_WhenNodesDefinedInYaml_ThenNodesAreInGraph()
+        public void Nodes_WhenNodesDefinedInYaml_ThenNodesAreInGraph()
         {
             // Arrange
             var yaml =
@@ -49,7 +50,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNodesDefinesEdge_ThenEdgeIsInGraph()
+        public void NodesWithEdges_WhenNodesDefinesEdge_ThenEdgeIsInGraph()
         {
             // Arrange
             var yaml =
@@ -85,7 +86,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNodeIsDefined_ThenGridHasNodeParentSet()
+        public void Grid_WhenNodeIsDefined_ThenGridHasNodeParentSet()
         {
             // Arrange
             var yaml =
@@ -107,7 +108,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenTemplatesDefinedInYaml_ThenTemplatesAreInGraph()
+        public void Templates_WhenTemplatesDefinedInYaml_ThenTemplatesAreInGraph()
         {
             // Arrange
             var yaml =
@@ -139,7 +140,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNodeReferencesExistingTemplate_ThenNodeHasTemplateProperties()
+        public void Templates_WhenNodeReferencesExistingTemplate_ThenNodeHasTemplateProperties()
         {
             // Arrange
             var yaml =
@@ -165,7 +166,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenTemplateHasInvalidTemplate_ThenExceptionIsThrown()
+        public void Templates_WhenTemplateHasInvalidTemplate_ThenExceptionIsThrown()
         {
             var yaml =
                 "Templates:\n" +
@@ -185,7 +186,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenTemplateResize_ThenCorrectResizeIdInNode()
+        public void Templates_WhenTemplateResize_ThenCorrectResizeIdInNode()
         {
             var yaml =
                 "Templates:\n" +
@@ -212,7 +213,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenUnkownResizeIdentifier_ThenExceptionIsThrown()
+        public void Templates_WhenUnkownResizeIdentifier_ThenExceptionIsThrown()
         {
             var yaml =
                 "Templates:\n" +
@@ -242,7 +243,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenNoGridIsDefined_ThenGridHasOneRowAndOneColWith1()
+        public void Grid_WhenNoGridIsDefined_ThenGridHasOneRowAndOneColWith1()
         {
             // Arrange
             var yaml =
@@ -268,7 +269,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenGridRowsDefined_ThenGridRowsInTemplate()
+        public void Grid_WhenGridRowsDefined_ThenGridRowsInTemplate()
         {
             // Arrange
             var yaml =
@@ -297,7 +298,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenGridDefined_ThenEachGridInANodeThatReferencesTheTemplateHasAText()
+        public void Grid_WhenGridDefined_ThenEachGridInANodeThatReferencesTheTemplateHasAText()
         {
             // Arrange
             var yaml =
@@ -341,7 +342,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Deserialize_WhenOneRowSpecified_ThenGridHasOneRowAndOneCol()
+        public void Grid_WhenOneRowSpecified_ThenGridHasOneRowAndOneCol()
         {
             var yaml =
                 "Templates:\n" +
@@ -452,6 +453,52 @@ namespace Gwiz.Core.Test.Serializer
 
             // Act / Assert
             Assert.Throws<YamlException>(() => _sut.Deserialize(stream));
+        }
+
+        [Test]
+        public void EdgeLabel_WhenEdgeHasLabels_ThenLabelsAreSet()
+        {
+            var yaml = 
+                "Nodes:\n" + 
+                "  - Id: foo\n" + 
+                "  - Id: bar\n" + 
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    FromLabel: moo\n" +
+                "    ToLabel: goo\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges[0].FromLabel, Is.EqualTo("moo"));
+            Assert.That(graph.Edges[0].ToLabel, Is.EqualTo("goo"));
+        }
+
+        [Test]
+        public void EdgeLabel_WhenLabelOffsetInPerCentIsSet_ThenOffsetIsSet()
+        {
+            var yaml = 
+                "Nodes:\n" + 
+                "  - Id: foo\n" + 
+                "  - Id: bar\n" + 
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    FromLabel: moo\n" +
+                "    ToLabel: goo\n" +
+                "    LabelOffsetPerCent: 0.5\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges[0].LabelOffsetPerCent, Is.EqualTo(0.5f));
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Gwiz.UiControl.WinUi3
                         paint.PathEffect = SKPathEffect.CreateDash(new float[] { 2, 2 }, 0);
                         break;
                 }
-                DrawingSession.DrawLine(ConvertPoint(from), ConvertPoint(to), paint);
+                DrawingSession.DrawLine(from.ToVector2(), to.ToVector2(), paint);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Gwiz.UiControl.WinUi3
 
             using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
             {
-                DrawingSession.DrawRect(ConvertRect(rect), paint);
+                DrawingSession.DrawRect(rect.ToSKRect(), paint);
             }        
         }
 
@@ -128,16 +128,10 @@ namespace Gwiz.UiControl.WinUi3
 
             using (var paint = new SKPaint { Color = ConvertColor(backgroundColor), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
             {
-                DrawingSession.DrawRect(ConvertRect(rect), paint);
+                DrawingSession.DrawRect(rect.ToSKRect(), paint);
             }
         }
 
-
-        public static SKColor ConvertColor(Color color) => new SKColor(color.R, color.G, color.B, color.A);
-
-        private static Vector2 ConvertPoint(Point pos) => new Vector2(pos.X, pos.Y);
-
-        private static SKRect ConvertRect(Rectangle rect) => new SKRect(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);
-
+        private static SKColor ConvertColor(Color color) => new SKColor(color.R, color.G, color.B, color.A);
     }
 }
