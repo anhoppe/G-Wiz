@@ -17,6 +17,8 @@ namespace Gwiz.UiControl.WinUi3
 
         void DrawSvgIcon(SKBitmap? icon, Windows.Foundation.Size size, float x, float y);
 
+        void DrawClippedText(string text, Rectangle rect, Point position, Color color);
+
         void DrawText(string text, Point position, Color color);
 
         void FillRectangle(Rectangle rect, Color backgroundColor);

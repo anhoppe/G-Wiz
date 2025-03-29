@@ -34,6 +34,7 @@ namespace Gwiz.Core.Serializer
             CompleteGrid(graph);
             ResolveTemplatesInNodes(graph);
             ResolveNodeReferencesInEdges(graph);
+            ResolveGridContentInNodes(graph);
 
             return graph;
         }
@@ -50,6 +51,21 @@ namespace Gwiz.Core.Serializer
                 if (!template.Grid.Rows.Any())
                 {
                     template.Grid.Rows.Add("1");
+                }
+            }
+        }
+
+        private void ResolveGridContentInNodes(IGraph graph)
+        {
+            foreach (var node in graph.Nodes)
+            {
+                var nodeInternal = node as Node;
+                if (nodeInternal != null)
+                {
+                    foreach (var content in nodeInternal.Content)
+                    {
+                        node.Grid.FieldText[content.Col][content.Row] = content.Text;
+                    }
                 }
             }
         }

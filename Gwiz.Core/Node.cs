@@ -1,5 +1,7 @@
 using Gwiz.Core.Contract;
+using Gwiz.Core.Serializer;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Gwiz.Core
@@ -16,12 +18,14 @@ namespace Gwiz.Core
 
         private int _y;
 
+        public Alignment Alignment { get; set; } = Alignment.CenterCenter;
+
         public Color BackgroundColor { get; set; } = Color.White;
 
         public IGrid Grid => UpdateableGrid;
 
-        public int Height 
-        { 
+        public int Height
+        {
             get => _height;
             set
             {
@@ -46,10 +50,10 @@ namespace Gwiz.Core
             }
         }
 
-        public int X 
-        { 
+        public int X
+        {
             get => _x;
-            set 
+            set
             {
                 _x = value;
                 NodeChanged?.Invoke(this, this);
@@ -68,24 +72,27 @@ namespace Gwiz.Core
 
         public event EventHandler<IUpdatableNode> NodeChanged = delegate { };
 
+        internal List<Content> Content { get; set; } = new List<Content>();
+
         internal string TemplateName { get; set; } = string.Empty;
 
-        internal IUpdatableGrid UpdateableGrid 
-        { 
+        internal IUpdatableGrid UpdateableGrid
+        {
             get => _grid;
-            set 
+            set
             {
                 _grid = value;
                 _grid.RegisterParentNodeChanged(this);
-            } 
+            }
         }
 
         internal void AssignTemplate(ITemplate template)
         {
-            UpdateableGrid = new Grid(template.Grid);
+            Alignment = template.Alignment;
             BackgroundColor = template.BackgroundColor;
             LineColor = template.LineColor;
             Resize = template.Resize;
+            UpdateableGrid = new Grid(template.Grid);
         }
 
         internal void Update()

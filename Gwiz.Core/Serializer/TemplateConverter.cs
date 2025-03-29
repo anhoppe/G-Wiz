@@ -1,10 +1,5 @@
-﻿using Gwiz.Core.Contract;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -25,6 +20,9 @@ namespace Gwiz.Core.Serializer
             {
                 switch (key.Value)
                 {
+                    case "Alignment":
+                        template.AlignmentStr = parser.Consume<Scalar>().Value;
+                        break;
                     case "BackgroundColor":
                         template.BackgroundColor = ColorTranslator.FromHtml(parser.Consume<Scalar>().Value);
                         break;
@@ -38,7 +36,7 @@ namespace Gwiz.Core.Serializer
                         template.Name = parser.Consume<Scalar>().Value;
                         break;
                     case "Resize":
-                        template.ResizeName = parser.Consume<Scalar>().Value;
+                        template.ResizeStr = parser.Consume<Scalar>().Value;
                         break;
                     default:
                         // Skip unknown properties (including Template if present)
@@ -49,7 +47,8 @@ namespace Gwiz.Core.Serializer
             
             parser.Consume<MappingEnd>();
 
-            template.ResolveResize();
+            template.ResolveEnums();
+            
 
             return template;
         }

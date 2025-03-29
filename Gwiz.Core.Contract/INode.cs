@@ -4,6 +4,8 @@ namespace Gwiz.Core.Contract
 {
     public interface INode
     {
+        Alignment Alignment { get; }
+
         Color BackgroundColor { get; }
 
         IGrid Grid { get; }

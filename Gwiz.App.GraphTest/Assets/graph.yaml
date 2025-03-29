@@ -12,6 +12,7 @@ Templates:
     LineColor: 255, 0, 0, 0
     Resize: Both
   - Name: Frame
+    Alignment: CenterLeft
     BackgroundColor: 00, 255, 255, 0
     LineColor: 255, 0, 0, 255
     Resize: HorzVert
@@ -27,7 +28,6 @@ Templates:
   - Name: Hint
     BackgroundColor: 100, 100, 100, 255
     LineColor: 255, 0, 0, 0
-    
 
 Nodes:
   - X: 10
@@ -59,6 +59,10 @@ Nodes:
     Height: 400
     Template: Frame
     Id: Barbuz
+    Content:
+      - Row: 1
+        Col: 0
+        Text: Foobar
   - X: 400
     Y: 500
     Width: 300

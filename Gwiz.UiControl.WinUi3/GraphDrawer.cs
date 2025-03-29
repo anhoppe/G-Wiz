@@ -1,10 +1,11 @@
 ﻿using Gwiz.Core.Contract;
-using System.Collections.Generic;
 using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
-using System.Drawing;
+using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -25,6 +26,36 @@ namespace Gwiz.UiControl.WinUi3
         public int IconSize => 30;
 
         public List<INode> Nodes { get; set; } = new();
+
+        public Func<string, Size> TextSizeCalculator { get; set; } = (text) =>
+        {
+            var size = new Size(0, 0);
+
+            using (var font = new SKFont
+            {
+                Size = 16,
+                Typeface = SKTypeface.FromFamilyName("Segoe UI") // Use Segoe UI
+            })
+            {
+                var metrics = font.Metrics;
+                float lineHeight = metrics.Descent - metrics.Ascent; // Correct height per line
+                float baselineAdjustment = lineHeight / 2; // Fix baseline offset
+
+                string[] lines = text.Split('\n'); // Handle multi-line text
+
+                float maxWidth = 0;
+                foreach (string line in lines)
+                {
+                    float lineWidth = font.MeasureText(line);
+                    maxWidth = Math.Max(maxWidth, lineWidth);
+                }
+
+                size.Width = (int)Math.Ceiling(maxWidth);
+                size.Height = (int)Math.Ceiling(lineHeight * (lines.Length - 1) - baselineAdjustment); // Adjust for baseline
+            }
+
+            return size;
+        };
 
         public void DrawGraph()
         {
@@ -103,7 +134,25 @@ namespace Gwiz.UiControl.WinUi3
             return modifiedEndingPosition;
         }
 
-        private void DrawNodeGrid(INode node)
+        private void DrawIcons(INode node)
+        {
+            // Draw the resize all icon
+            if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
+            {
+                Draw.DrawSvgIcon(_icons.ResizeBottomRight, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - IconSize, node.Y + node.Height - IconSize);
+            }
+
+            if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
+            {
+                // Draw the resize horz icon
+                Draw.DrawSvgIcon(_icons.ResizeHorz, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2);
+
+                // Draw the resize vert icon
+                Draw.DrawSvgIcon(_icons.ResizeVert, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75));
+            }
+        }
+
+        private void DrawGrid(INode node)
         {
             var grid = node.Grid;
             for (int x = 0; x < grid.Cols.Count; x++)
@@ -111,15 +160,77 @@ namespace Gwiz.UiControl.WinUi3
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
                     var rect = grid.FieldRects[x][y];
+
                     Draw.FillRectangle(rect, node.BackgroundColor);
                     Draw.DrawRectangle(rect, node.LineColor, 1);
 
-                    var textSize = GetTextSize(grid.FieldText[x][y]);
-                    var xText = (float)(rect.X + (rect.Width - textSize.Width) / 2);
-                    var yText = (float)(rect.Y + (rect.Height - textSize.Height) / 2);
-                    Draw.DrawText(grid.FieldText[x][y], new Point((int)xText, (int)yText), node.LineColor);
+                    var text = grid.FieldText[x][y];
+
+                    if (!string.IsNullOrEmpty(text))
+                    {                    
+                        var textPos = GetTextPosition(text, rect, node.Alignment);
+
+                        Draw.DrawClippedText(text,
+                            rect,
+                            textPos,
+                            node.LineColor);
+
+                    }
                 }
             }
+        }
+
+        private Point GetTextPosition(string placedText, Rectangle rect, Alignment alignment)
+        {
+            var textSize = TextSizeCalculator(placedText);
+
+            float xText = 0f;
+            float yText = 0f;
+
+            switch (alignment)
+            {
+                case Alignment.TopLeft:
+                    xText = rect.Left;
+                    yText = rect.Top;
+                    break;
+                case Alignment.TopCenter:
+                    xText = rect.X + (rect.Width - textSize.Width) / 2;
+                    yText = rect.Top;
+                    break;
+                case Alignment.TopRight:
+                    xText = rect.Right - textSize.Width;
+                    yText = rect.Top;
+                    break;
+                case Alignment.CenterLeft:
+                    xText = rect.Left;
+                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
+                    break;
+                case Alignment.CenterCenter:
+                    xText = rect.X + (rect.Width - textSize.Width) / 2;
+                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
+                    break;
+                case Alignment.CenterRight:
+                    xText = rect.Right - textSize.Width;
+                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
+                    break;
+                case Alignment.BottomLeft:
+                    xText = 0;
+                    yText = rect.Bottom - textSize.Height;
+                    break;
+                case Alignment.BottomCenter:
+                    xText = rect.X + (rect.Width - textSize.Width) / 2;
+                    yText = rect.Bottom - textSize.Height;
+                    break;
+                case Alignment.BottomRight:
+                    xText = rect.Right - textSize.Width;
+                    yText = rect.Bottom - textSize.Height;
+                    break;
+            }
+
+            xText = Math.Max(xText, rect.X);
+            yText = Math.Max(yText, rect.Y);
+
+            return new Point((int)xText, (int)yText);
         }
 
         private void DrawNodes()
@@ -128,22 +239,8 @@ namespace Gwiz.UiControl.WinUi3
             {
                 foreach (var node in Nodes)
                 {
-                    DrawNodeGrid(node);
-
-                    // Draw the resize all icon
-                    if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
-                    {
-                        Draw.DrawSvgIcon(_icons.ResizeBottomRight, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - IconSize, node.Y + node.Height - IconSize);
-                    }
-
-                    if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
-                    {
-                        // Draw the resize horz icon
-                        Draw.DrawSvgIcon(_icons.ResizeHorz, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2);
-
-                        // Draw the resize vert icon
-                        Draw.DrawSvgIcon(_icons.ResizeVert, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75));
-                    }
+                    DrawGrid(node);
+                    DrawIcons(node);
                 }
             }
         }
@@ -166,29 +263,6 @@ namespace Gwiz.UiControl.WinUi3
             toPos = edge.ToPosition.Add(directionVec);
 
             return (fromPos, toPos);
-        }
-
-        private static Size GetTextSize(string text)
-        {
-            var size = new Size(0, 0);
-
-            using (var font = new SKFont
-            {
-                Size = 16,
-                Typeface = SKTypeface.FromFamilyName("Segoe UI") // Use Segoe UI
-            })
-            {
-                float textWidth = font.MeasureText(text);
-
-                // Measure height using FontMetrics
-                var metrics = font.Metrics;
-                float textHeight = /*metrics.Descent - metrics.Ascent;*/metrics.XHeight;
-
-                size.Width = (int)textWidth;
-                size.Height = (int)textHeight;
-            }
-
-            return size;
         }
     }
 }

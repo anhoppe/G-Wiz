@@ -1,13 +1,13 @@
+using Gwiz.Core.Contract;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using SkiaSharp.Views.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.UI.Input;
-using System;
 using Windows.Foundation;
-using Gwiz.Core.Contract;
-using SkiaSharp.Views.Windows;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -75,13 +75,13 @@ namespace Gwiz.UiControl.WinUi3
         private Point _interactionStartPosition = new();
 
         private Point _mouseToNodeDelta;
-        
+
         private InteractionState _potentialInteractionState = InteractionState.None;
-                
+
         private Point _resizeStartSize = new Point();
 
         private Point _scrollPosition = new Point(0, 0);
-        
+
         private Point _scrollStartPosition = new Point(0, 0);
 
         public GraphUiControl()
@@ -118,7 +118,7 @@ namespace Gwiz.UiControl.WinUi3
         public List<INode> Nodes
         {
             get => (List<INode>)GetValue(NodesProperty);
-            set => SetValue(NodesProperty, value); 
+            set => SetValue(NodesProperty, value);
         }
 
         private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -284,8 +284,9 @@ namespace Gwiz.UiControl.WinUi3
 
                     _canvasControl.Invalidate();
                     break;
+
                 case InteractionState.DraggingView:
-                    _scrollPosition.X = _scrollStartPosition.X  - screenPointerPosition.X;
+                    _scrollPosition.X = _scrollStartPosition.X - screenPointerPosition.X;
                     _scrollPosition.Y = _scrollStartPosition.Y - screenPointerPosition.Y;
 
                     Invalidate();
@@ -303,10 +304,10 @@ namespace Gwiz.UiControl.WinUi3
 
             if (_currentInteractionState == InteractionState.DraggingView)
             {
-                _scrollStartPosition = _interactionStartPosition    ;
+                _scrollStartPosition = _interactionStartPosition;
             }
             if (_hoveredNode != null)
-            { 
+            {
                 _mouseToNodeDelta.X = _hoveredNode.X - _interactionStartPosition.X;
                 _mouseToNodeDelta.Y = _hoveredNode.Y - _interactionStartPosition.Y;
 

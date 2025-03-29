@@ -1,9 +1,7 @@
 ﻿using Gwiz.Core.Contract;
-using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
 using System;
 using System.Drawing;
-using System.Numerics;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -30,11 +28,12 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            using (var paint = new SKPaint 
-            { 
-                Color = LineColor, 
-                Style = SKPaintStyle.Stroke, 
-                StrokeWidth = 2 })
+            using (var paint = new SKPaint
+            {
+                Color = LineColor,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 2
+            })
             {
                 switch (style)
                 {
@@ -59,7 +58,7 @@ namespace Gwiz.UiControl.WinUi3
             using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
             {
                 DrawingSession.DrawRect(rect.ToSKRect(), paint);
-            }        
+            }
         }
 
         public void DrawSvgIcon(SKBitmap? icon, Windows.Foundation.Size size, float x, float y)
@@ -75,6 +74,21 @@ namespace Gwiz.UiControl.WinUi3
             }
 
             DrawingSession.DrawBitmap(icon, new SKPoint(x, y));
+        }
+
+        public void DrawClippedText(string text, Rectangle rect, Point position, Color color)
+        {
+            if (DrawingSession == null)
+            {
+                throw new NullReferenceException("Draw.DrawingSession not set");
+            }
+
+            DrawingSession.Save();
+            DrawingSession.ClipRect(rect.ToSKRect()); // Restrict drawing to the box
+
+            DrawText(text, position, color);
+
+            DrawingSession.Restore();
         }
 
         public void DrawText(string text, Point position, Color color)
@@ -95,7 +109,7 @@ namespace Gwiz.UiControl.WinUi3
                     Size = 16,
                     Typeface = SKTypeface.FromFamilyName("Segoe UI") // Use Segoe UI
                 })
-                { 
+                {
                     float textWidth = font.MeasureText(text);
 
                     // Measure height using FontMetrics
@@ -109,9 +123,9 @@ namespace Gwiz.UiControl.WinUi3
                     foreach (var line in lines)
                     {
                         DrawingSession.DrawText(line, position.X, position.Y + count++ * (textHeight + lineFeed), font, paint);
-                    }                
-                }            
-            }            
+                    }
+                }
+            }
         }
 
         public void FillRectangle(Rectangle rect, Color backgroundColor)

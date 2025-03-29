@@ -92,7 +92,7 @@ namespace Gwiz.Core
             {
                 ratioFactors.Add(field / (double)fieldSum);
             }
-            
+
             return ratioFactors;
         }
     }

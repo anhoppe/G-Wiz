@@ -9,10 +9,10 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <skia:SKXamlCanvas x:Name="_canvasControl" 
+        <skia:SKXamlCanvas x:Name="_canvasControl"
                              PaintSurface="DrawGraph"
                              PointerMoved="OnPointerMoved"
                              PointerPressed="OnPointerPressed"
-                             PointerReleased="OnPointerReleased"/>
-    </Grid>   
+                             PointerReleased="OnPointerReleased" />
+    </Grid>
 </Page>

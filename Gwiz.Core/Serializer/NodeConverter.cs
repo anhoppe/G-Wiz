@@ -1,5 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using System;
+using System.Collections.Generic;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -21,6 +22,9 @@ namespace Gwiz.Core.Serializer
             {
                 switch (key.Value)
                 {
+                    case "Content":
+                        node.Content = ((List<Content>)(deserializer(typeof(List<Content>)) ?? new List<Content>()));
+                        break;
                     case "Height":
                         node.Height = int.Parse(parser.Consume<Scalar>().Value);
                         break;

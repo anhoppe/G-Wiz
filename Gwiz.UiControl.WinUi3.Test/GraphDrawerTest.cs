@@ -37,7 +37,6 @@ namespace Gwiz.UiControl.WinUi3.Test
 
             _sut.Edges = [edgeMock.Object];
 
-
             var expectedEndPoint1 = new Point(2, 2);
             var expectedEndPoint2 = new Point(17, 2);
 
@@ -54,7 +53,6 @@ namespace Gwiz.UiControl.WinUi3.Test
             _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == to), Style.None));
         }
 
-
         [Test]
         public void Edges_DrawEdgeWithClosedArrowEnding_ArrowDrawnAsExpected()
         {
@@ -68,7 +66,6 @@ namespace Gwiz.UiControl.WinUi3.Test
             edgeMock.Setup(p => p.Ending).Returns(Ending.ClosedArrow);
 
             _sut.Edges = [edgeMock.Object];
-
 
             var expectedEndPoint1 = new Point(2, 2);
             var expectedEndPoint2 = new Point(17, 2);
@@ -84,7 +81,6 @@ namespace Gwiz.UiControl.WinUi3.Test
 
             // In addition, the arrow head is closed by a line
             _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
-
 
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
             var modifiedTo = new Point(9, 2);
@@ -175,6 +171,94 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             _drawMock.Verify(m => m.DrawText("foo", It.Is<Point>(p => p == fromLabelExpectedPos), It.IsAny<Color>()));
             _drawMock.Verify(m => m.DrawText("bar", It.Is<Point>(p => p == toLabelExpectedPos), It.IsAny<Color>()));
+        }
+
+        [TestCase(Alignment.TopLeft, 0, 0)]
+        [TestCase(Alignment.TopCenter, 50, 0)]
+        [TestCase(Alignment.TopRight, 100, 0)]
+        [TestCase(Alignment.CenterLeft, 0, 50)]
+        [TestCase(Alignment.CenterCenter, 50, 50)]
+        [TestCase(Alignment.CenterRight, 100, 50)]
+        [TestCase(Alignment.BottomLeft, 0, 100)]
+        [TestCase(Alignment.BottomCenter, 50, 100)]
+        [TestCase(Alignment.BottomRight, 100, 100)]
+
+        public void GridText_WhenAlignemntSet_ThenTextPlacedAccordingly(Alignment alignment, int expectedX, int expectedY)
+        {
+            var nodeMock = new Mock<INode>();
+            var rect = new Rectangle(0, 0, 200, 200);
+            var gridMock = MockGrid("foo", rect);
+
+            nodeMock.Setup(p => p.Grid).Returns(gridMock.Object);
+            nodeMock.Setup(p => p.Alignment).Returns(alignment);
+
+            _sut.Nodes = [nodeMock.Object];
+
+            _sut.TextSizeCalculator = (text) => text == "foo" ? new Size(100, 100) : new Size(0, 0);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedTextPos = new Point(expectedX, expectedY);
+            _drawMock.Verify(m => m.DrawClippedText("foo", rect, expectedTextPos, It.IsAny<Color>()));
+        }
+
+        [Test]
+        public void TextSizeCalculator_WhenMultipleLinesOfSameText_ThenTextWidthIsEqual()
+        {
+            // Arrange
+            var text1 = "HelloWorld\n";
+            var text2 = "HelloWorld\nHelloWorld\nHelloWorld\nHelloWorld\nHelloWorld\n";
+
+            // Act
+            var size1 = _sut.TextSizeCalculator.Invoke(text1);
+            var size2 = _sut.TextSizeCalculator.Invoke(text2);
+
+            // Assert
+            Assert.That(size1.Width, Is.EqualTo(size2.Width));
+        }
+
+        [Test]
+        public void TextSizeCalculator_WhenTextIsLargerThanTheGridCell_ThenTextStartsAtTopLeftCornerOfCell()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+            var rect = new Rectangle(10, 10, 50, 50);
+            var gridMock = MockGrid("foo", rect);
+
+            nodeMock.Setup(p => p.Grid).Returns(gridMock.Object);
+            _sut.Nodes = [nodeMock.Object];
+
+            _sut.TextSizeCalculator = (text) => text == "foo" ? new Size(100, 100) : new Size(0, 0);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedTextPos = new Point(10, 10);
+            _drawMock.Verify(m => m.DrawClippedText("foo", rect, expectedTextPos, It.IsAny<Color>()), "Expected the text to be positioned at the grid coordinates becase the text is larger then the grid cell");
+        }
+
+        private Mock<IGrid> MockGrid(string text, Rectangle rect)
+        {
+            var gridMock = new Mock<IGrid>();
+
+            gridMock.SetupGet(p => p.Cols).Returns(["1"]);
+            gridMock.SetupGet(p => p.Rows).Returns(["1"]);
+
+            // This is the expected field size for a class node (1 column with 3 rows for title, props and methods)
+            var fieldText = new string[1][];
+            fieldText[0] = new string[1];
+            fieldText[0][0] = text;
+            gridMock.Setup(p => p.FieldText).Returns(fieldText);
+
+            var fieldRects = new Rectangle[1][];
+            fieldRects[0] = new Rectangle[1];
+            fieldRects[0][0] = new Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
+            gridMock.Setup(p => p.FieldRects).Returns(fieldRects);
+
+            return gridMock;
         }
     }
 }
