@@ -220,6 +220,33 @@ namespace Gwiz.UiControl.WinUi3.Test
         }
 
         [Test]
+        public void Shape_WhenEllispeShapeIsDefined_ThenNodeIsEllipse()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            nodeMock.Setup(p => p.Shape).Returns(Shape.Ellipse);
+            nodeMock.Setup(p => p.X).Returns(13);
+            nodeMock.Setup(p => p.Y).Returns(23);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            var gridMock = MockGrid("barfoo", new Rectangle(13, 23, 100, 100));
+            nodeMock.Setup(p => p.Grid).Returns(gridMock.Object);
+
+            _sut.Nodes = [nodeMock.Object];
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedRect = new Rectangle(13, 23, 100, 100);
+            _drawMock.Verify(m => m.DrawEllipse(expectedRect, It.IsAny<Color>()));
+            _drawMock.Verify(m => m.FillEllipse(expectedRect, It.IsAny<Color>()));
+            _drawMock.Verify(m => m.DrawClippedText("barfoo", It.IsAny<Rectangle>(), It.IsAny<Point>(), It.IsAny<Color>()));
+        }
+
+        [Test]
         public void TextSizeCalculator_WhenTextIsLargerThanTheGridCell_ThenTextStartsAtTopLeftCornerOfCell()
         {
             // Arrange

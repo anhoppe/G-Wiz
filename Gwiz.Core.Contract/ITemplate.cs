@@ -15,5 +15,7 @@ namespace Gwiz.Core.Contract
         string Name { get; }
 
         Resize Resize { get; }
+
+        Shape Shape { get; }
     }
 }

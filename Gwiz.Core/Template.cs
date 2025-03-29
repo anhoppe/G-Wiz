@@ -1,5 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using Gwiz.Core.Serializer;
+using System;
 using System.Drawing;
 
 namespace Gwiz.Core
@@ -24,14 +25,32 @@ namespace Gwiz.Core
 
         public Resize Resize { get; set; } = Resize.None;
 
+        public Shape Shape { get; set; }= Shape.Rectangle;
+
         internal string AlignmentStr { get; set; } = string.Empty;
 
         internal string ResizeStr { get; set; } = string.Empty;
+
+        internal string ShapeStr { get; set; } = string.Empty;
 
         internal void ResolveEnums()
         {
             ResolveAlignment();
             ResolveResize();
+            ResolveShape();
+        }
+
+        private void ResolveShape()
+        {
+            switch (ShapeStr.ToLower())
+            {
+                case "rectangle":
+                    Shape = Shape.Rectangle;
+                    break;
+                case "ellipse":
+                    Shape = Shape.Ellipse;
+                    break;
+            }
         }
 
         private void ResolveAlignment()

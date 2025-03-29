@@ -6,6 +6,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using WinRT;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -145,24 +146,43 @@ namespace Gwiz.UiControl.WinUi3
             if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
             {
                 // Draw the resize horz icon
-                Draw.DrawSvgIcon(_icons.ResizeHorz, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - (int)(IconSize * 0.75), node.Y + node.Height / 2 - IconSize / 2);
+                Draw.DrawSvgIcon(_icons.ResizeHorz, 
+                    new Windows.Foundation.Size(IconSize, IconSize), 
+                    node.X + node.Width - (int)(IconSize * 0.75), 
+                    node.Y + node.Height / 2 - IconSize / 2);
 
                 // Draw the resize vert icon
-                Draw.DrawSvgIcon(_icons.ResizeVert, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width / 2 - IconSize / 2, node.Y + node.Height - (int)(IconSize * 0.75));
+                Draw.DrawSvgIcon(_icons.ResizeVert, 
+                    new Windows.Foundation.Size(IconSize, IconSize), 
+                    node.X + node.Width / 2 - IconSize / 2, 
+                    node.Y + node.Height - (int)(IconSize * 0.75));
             }
         }
 
         private void DrawGrid(INode node)
         {
             var grid = node.Grid;
+
+            if (grid == null)
+            {
+                return;
+            }
+
+            var totalRect = new Rectangle(int.MaxValue, int.MaxValue, -1, -1);
+
             for (int x = 0; x < grid.Cols.Count; x++)
             {
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
                     var rect = grid.FieldRects[x][y];
 
-                    Draw.FillRectangle(rect, node.BackgroundColor);
-                    Draw.DrawRectangle(rect, node.LineColor, 1);
+                    totalRect = totalRect.Add(rect);
+
+                    if (node.Shape == Shape.Rectangle)
+                    {                    
+                        Draw.FillRectangle(rect, node.BackgroundColor);
+                        Draw.DrawRectangle(rect, node.LineColor, 1);
+                    }
 
                     var text = grid.FieldText[x][y];
 
@@ -177,6 +197,12 @@ namespace Gwiz.UiControl.WinUi3
 
                     }
                 }
+            }
+
+            if (node.Shape == Shape.Ellipse)
+            {
+                Draw.FillEllipse(totalRect, node.BackgroundColor);
+                Draw.DrawEllipse(totalRect, node.LineColor);
             }
         }
 

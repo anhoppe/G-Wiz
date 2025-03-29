@@ -13,7 +13,7 @@ Templates:
     Resize: Both
   - Name: Frame
     Alignment: CenterLeft
-    BackgroundColor: 00, 255, 255, 0
+    BackgroundColor: 0, 255, 255, 0
     LineColor: 255, 0, 0, 255
     Resize: HorzVert
     Grid:
@@ -28,6 +28,11 @@ Templates:
   - Name: Hint
     BackgroundColor: 100, 100, 100, 255
     LineColor: 255, 0, 0, 0
+  - Name: UseCase
+    BackgroundColor: 160, 20, 80, 20
+    LineColor: 50, 200, 80, 0
+    Shape: Ellipse
+    Resize: HorzVert
 
 Nodes:
   - X: 10
@@ -42,6 +47,10 @@ Nodes:
     Height: 100
     Template: Class
     Id: Bar
+    Content:
+      - Row: 1
+        Col: 0
+        Text: Barbuz
   - X: 200
     Y: 200
     Width: 200
@@ -69,6 +78,26 @@ Nodes:
     Height: 300
     Template: Frame
     Id: Barfoo
+  - X: 600
+    Y: 300
+    Width: 200
+    Height: 120
+    Template: UseCase
+    Content:
+      - Row: 0
+        Col: 0
+        Text: BuzBuz
+    Id: UC1
+  - X: 900
+    Y: 300
+    Width: 200
+    Height: 120
+    Template: UseCase
+    Content:
+      - Row: 0
+        Col: 0
+        Text: FooBuz
+    Id: UC2
 
 Edges:
   - From: Foo
@@ -87,3 +116,7 @@ Edges:
     FromLabel: foo
     ToLabel: bar
     LabelOffsetPerCent: 7
+  - From: UC1
+    To: UC2
+    Ending: OpenArrow
+    Style: Dotted

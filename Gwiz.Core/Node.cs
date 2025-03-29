@@ -40,6 +40,8 @@ namespace Gwiz.Core
 
         public Resize Resize { get; set; } = Resize.None;
 
+        public Shape Shape { get; set; } = Shape.Rectangle;
+
         public int Width
         {
             get => _width;
@@ -92,6 +94,7 @@ namespace Gwiz.Core
             BackgroundColor = template.BackgroundColor;
             LineColor = template.LineColor;
             Resize = template.Resize;
+            Shape = template.Shape;
             UpdateableGrid = new Grid(template.Grid);
         }
 

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Gwiz.Core.Contract;
+using Moq;
 using NUnit.Framework;
 
 namespace Gwiz.Core.Test
@@ -38,6 +39,50 @@ namespace Gwiz.Core.Test
             Assert.That(sut.FromPosition.Y, Is.EqualTo(60));
             Assert.That(sut.ToPosition.X, Is.EqualTo(120));
             Assert.That(sut.ToPosition.Y, Is.EqualTo(60));
+        }
+
+        [Test]
+        public void UpdateEdge_WhenToNodeIsEllipse_ThenIntersectionPointCorrect()
+        {
+            var sut = new Edge();
+
+            sut.FromInternal = new Node()
+            {
+                X = 0,
+                Y = 0,
+                Width = 100,
+                Height = 100,
+            };
+
+            sut.ToInternal = new Node()
+            {
+                X = 0,
+                Y = 100,
+                Width = 100,
+                Height = 100,
+                Shape = Shape.Ellipse,
+            };
+
+            // Act
+
+            // By changing the node position the edge should be updated
+            sut.ToInternal.X = 100;
+
+            // Assert
+
+            // This is the delta
+            // -----
+            // |   |
+            // |   |
+            // -----   ..
+            //       .    .
+            //      .      .  Center of the circle=150, 150, radius=50
+            //       .    .
+            //         ..
+            double expectedDelta = Math.Sin(Math.PI / 4f) * 50;
+
+            Assert.That(sut.ToPosition.X, Is.EqualTo(150 - expectedDelta).Within(0.75));
+            Assert.That(sut.ToPosition.Y, Is.EqualTo(150 - expectedDelta).Within(0.75));
         }
     }
 }

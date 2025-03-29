@@ -38,6 +38,9 @@ namespace Gwiz.Core.Serializer
                     case "Resize":
                         template.ResizeStr = parser.Consume<Scalar>().Value;
                         break;
+                    case "Shape":
+                        template.ShapeStr = parser.Consume<Scalar>().Value;
+                        break;
                     default:
                         // Skip unknown properties (including Template if present)
                         parser.SkipThisAndNestedEvents();

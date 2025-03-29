@@ -21,6 +21,19 @@ namespace Gwiz.UiControl.WinUi3
             DrawingSession.Clear(SKColors.CornflowerBlue);
         }
 
+        public void DrawEllipse(Rectangle rect, Color color)
+        {
+            if (DrawingSession == null)
+            {
+                throw new NullReferenceException("Draw.DrawingSession not set");
+            }
+
+            using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
+            {
+                DrawingSession.DrawOval(rect.ToSKRect(), paint);
+            }
+        }
+
         public void DrawLine(Point from, Point to, Style style)
         {
             if (DrawingSession == null)
@@ -128,13 +141,21 @@ namespace Gwiz.UiControl.WinUi3
             }
         }
 
-        public void FillRectangle(Rectangle rect, Color backgroundColor)
+        public void FillEllipse(Rectangle rect, Color backgroundColor)
         {
             if (DrawingSession == null)
             {
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
+            using (var paint = new SKPaint { Color = ConvertColor(backgroundColor), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
+            {
+                DrawingSession.DrawOval(rect.ToSKRect(), paint);
+            }
+        }
+
+        public void FillRectangle(Rectangle rect, Color backgroundColor)
+        {
             if (DrawingSession == null)
             {
                 throw new NullReferenceException("Draw.DrawingSession not set");

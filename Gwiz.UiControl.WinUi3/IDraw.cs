@@ -11,6 +11,8 @@ namespace Gwiz.UiControl.WinUi3
     {
         void Clear();
 
+        void DrawEllipse(Rectangle rect, Color color);
+        
         void DrawLine(Point from, Point to, Style style);
 
         void DrawRectangle(Rectangle rect, Color color, float strokeWidth);
@@ -21,6 +23,8 @@ namespace Gwiz.UiControl.WinUi3
 
         void DrawText(string text, Point position, Color color);
 
+        void FillEllipse(Rectangle rect, Color backgroundColor);
+        
         void FillRectangle(Rectangle rect, Color backgroundColor);
     }
 }

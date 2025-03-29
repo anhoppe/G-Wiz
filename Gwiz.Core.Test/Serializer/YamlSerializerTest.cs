@@ -442,6 +442,29 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void Shape_WhenEllipseIsDefinedForNodeTemplate_ThenNodeHasShape()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Shape: Ellipse\n" +
+                "Nodes:\n" +
+                "  - X: 10\n" +
+                "    Y: 20\n" +
+                "    Template: Foo\n";
+            
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var node = graph.Nodes[0];
+            Assert.That(node.Shape, Is.EqualTo(Shape.Ellipse));
+        }
+
+        [Test]
         public void Templates_WhenNodeReferencesExistingTemplate_ThenNodeHasTemplateProperties()
         {
             // Arrange
@@ -545,6 +568,7 @@ namespace Gwiz.Core.Test.Serializer
             Assert.That(teamplate2.BackgroundColor, Is.EqualTo(Color.FromArgb(80, 20, 40, 60)));
             Assert.That(teamplate2.LineColor, Is.EqualTo(Color.FromArgb(40, 10, 20, 30)));
         }
+
         [Test]
         public void Templates_WhenUnkownResizeIdentifier_ThenExceptionIsThrown()
         {

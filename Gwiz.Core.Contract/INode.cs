@@ -18,6 +18,8 @@ namespace Gwiz.Core.Contract
 
         Resize Resize { get; }
 
+        Shape Shape { get; }
+
         int Width { get; set; }
 
         int X { get; set; }
