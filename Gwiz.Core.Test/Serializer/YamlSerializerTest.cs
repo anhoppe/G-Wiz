@@ -195,6 +195,27 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void EdgeText_WhenDefiningEdgeText_ThenTextIsSet()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Text: Buzfoo\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            Assert.That(graph.Edges[0].Text, Is.EqualTo("Buzfoo"));
+        }
+
+        [Test]
         public void Grid_WhenGridDefined_ThenEachGridInANodeThatReferencesTheTemplateHasEmptyText()
         {
             // Arrange

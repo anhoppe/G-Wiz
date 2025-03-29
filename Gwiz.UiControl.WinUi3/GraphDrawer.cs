@@ -84,6 +84,14 @@ namespace Gwiz.UiControl.WinUi3
                         Draw.DrawText(edge.FromLabel, fromPos, Color.Black);
                         Draw.DrawText(edge.ToLabel, toPos, Color.Black);
                     }
+
+                    if (!string.IsNullOrEmpty(edge.Text))
+                    {
+                        var size = TextSizeCalculator(edge.Text);
+                        var center = GeoConv.Center(edge.FromPosition, edge.ToPosition);
+
+                        Draw.DrawText(edge.Text, new Point(center.X - size.Width / 2, center.Y - size.Height / 2), Color.Black);
+                    }
                 }
             }
         }

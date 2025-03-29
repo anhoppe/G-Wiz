@@ -43,7 +43,9 @@ namespace Gwiz.Core
 
         public float LabelOffsetPerCent { get; set; }
 
-        public Style Style { get; internal set; } = Style.None;
+        public Style Style { get; set; } = Style.None;
+
+        public string Text { get; set; } = string.Empty;
 
         internal string ToId { get; set; } = string.Empty;
 

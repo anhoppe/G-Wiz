@@ -20,6 +20,14 @@ namespace Gwiz.UiControl.WinUi3
             return rect;
         }
 
+        public static Point Center(Point p1, Point p2)
+        {
+            var dx = p2.X - p1.X;
+            var dy = p2.Y - p1.Y;
+
+            return new Point(p1.X + dx / 2, p1.Y + dy / 2);
+        }
+
         public static Point2D ToMathNetPoint(this Point pos) => new Point2D(pos.X, pos.Y);
         
         public static SKRect ToSKRect(this Rectangle rect) => new SKRect(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);

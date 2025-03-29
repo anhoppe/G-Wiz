@@ -36,6 +36,9 @@ namespace Gwiz.Core.Serializer
                     case "Style":
                         edge.Style = StringToStyle(parser.Consume<Scalar>().Value);
                         break;
+                    case "Text":
+                        edge.Text = parser.Consume<Scalar>().Value;
+                        break;
                     case "To":
                         edge.ToId = parser.Consume<Scalar>().Value;
                         break;

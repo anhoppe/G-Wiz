@@ -55,6 +55,12 @@ namespace Gwiz.Core.Contract
         Style Style { get; }
 
         /// <summary>
+        /// Text of the edge
+        /// The text is rendered at the center of the edge
+        /// </summary>
+        string Text { get; }
+
+        /// <summary>
         /// The node the edge is going to
         /// </summary>
         INode To { get; }

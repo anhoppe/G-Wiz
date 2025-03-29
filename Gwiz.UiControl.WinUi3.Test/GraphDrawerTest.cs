@@ -173,6 +173,30 @@ namespace Gwiz.UiControl.WinUi3.Test
             _drawMock.Verify(m => m.DrawText("bar", It.Is<Point>(p => p == toLabelExpectedPos), It.IsAny<Color>()));
         }
 
+        [Test]
+        public void EdgeText_WhenEdgeTextIsDefined_ThenItIsRenderedAtTheCenter()
+        {
+            // Arrange
+            var edgeMock = new Mock<IEdge>();
+            var from = new Point(0, 25);
+            var to = new Point(100, 25);
+
+            edgeMock.SetupGet(x => x.FromPosition).Returns(from);
+            edgeMock.SetupGet(x => x.ToPosition).Returns(to);
+
+            edgeMock.Setup(p => p.Text).Returns("foo");
+
+            _sut.Edges = [edgeMock.Object];
+            _sut.TextSizeCalculator = (text) => text == "foo" ? new Size(50, 50) : new Size(0, 0);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedTextPos = new Point(25, 0);
+            _drawMock.Verify(m => m.DrawText("foo", expectedTextPos, It.IsAny<Color>()));
+        }
+
         [TestCase(Alignment.TopLeft, 0, 0)]
         [TestCase(Alignment.TopCenter, 50, 0)]
         [TestCase(Alignment.TopRight, 100, 0)]

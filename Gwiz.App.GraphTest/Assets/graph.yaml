@@ -120,3 +120,4 @@ Edges:
     To: UC2
     Ending: OpenArrow
     Style: Dotted
+    Text: <<extends>>
