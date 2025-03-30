@@ -186,49 +186,60 @@ namespace Gwiz.UiControl.WinUi3
             switch (_currentInteractionState)
             {
                 case InteractionState.None:
-                    // Check if the pointer is over any node
-                    _hoveredNode = Nodes?.FirstOrDefault(node =>
-                    worldPointerPosition.X >= node.X &&
-                    worldPointerPosition.X <= node.X + node.Width &&
-                    worldPointerPosition.Y >= node.Y &&
-                    worldPointerPosition.Y <= node.Y + node.Height);
 
-                    if (_hoveredNode != null)
+                    // Check if the pointer is over any node
+                    // Iterate backwards to honor the drawing order defined by the input yaml / order of adding
+                    _hoveredNode = null;
+                    for (int i = Nodes.Count - 1; i >= 0; i--)
                     {
-                        // Check if the mouse cursor is over the both resize icon
-                        if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                            worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
-                            worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
+                        var node = Nodes[i];
+
+                        if (worldPointerPosition.X >= node.X &&
+                            worldPointerPosition.X <= node.X + node.Width &&
+                            worldPointerPosition.Y >= node.Y &&
+                            worldPointerPosition.Y <= node.Y + node.Height)
                         {
-                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
-                            _potentialInteractionState = InteractionState.ResizeAll;
+                            _hoveredNode = node;
+                            
+                            // Check if the mouse cursor is over the both resize icon
+                            if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
+                                worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
+                                worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
+                            {
+                                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
+                                _potentialInteractionState = InteractionState.ResizeAll;
+                            }
+                            else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
+                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(_graphDrawer.IconSize * 0.75) &&
+                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - _graphDrawer.IconSize / 2 &&
+                                     worldPointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + _graphDrawer.IconSize / 2)
+                            {
+                                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
+                                _potentialInteractionState = InteractionState.ResizeHorz;
+                            }
+                            else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
+                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - _graphDrawer.IconSize / 2 &&
+                                     worldPointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + _graphDrawer.IconSize / 2 &&
+                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(_graphDrawer.IconSize * 0.75))
+                            {
+                                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
+                                _potentialInteractionState = InteractionState.ResizeVert;
+                            }
+                            else
+                            {
+                                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+                                _potentialInteractionState = InteractionState.DraggingNode;
+                            }
+
+                            break;
                         }
-                        else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(_graphDrawer.IconSize * 0.75) &&
-                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - _graphDrawer.IconSize / 2 &&
-                                 worldPointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + _graphDrawer.IconSize / 2)
+
+                        if (_hoveredNode == null)
                         {
-                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
-                            _potentialInteractionState = InteractionState.ResizeHorz;
+                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+                            _potentialInteractionState = InteractionState.DraggingView;
                         }
-                        else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - _graphDrawer.IconSize / 2 &&
-                                 worldPointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + _graphDrawer.IconSize / 2 &&
-                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(_graphDrawer.IconSize * 0.75))
-                        {
-                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
-                            _potentialInteractionState = InteractionState.ResizeVert;
-                        }
-                        else
-                        {
-                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-                            _potentialInteractionState = InteractionState.DraggingNode;
-                        }
-                    }
-                    else
-                    {
-                        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-                        _potentialInteractionState = InteractionState.DraggingView;
+
                     }
                     break;
 

@@ -8,6 +8,12 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\account.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\account.png" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Gwiz.Core.Contract\Gwiz.Core.Contract.csproj" />
   </ItemGroup>
   

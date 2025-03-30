@@ -178,13 +178,27 @@ namespace Gwiz.UiControl.WinUi3
 
             var totalRect = new Rectangle(int.MaxValue, int.MaxValue, -1, -1);
 
+            if (node.Shape == Shape.Ellipse)
+            {
+                for (int x = 0; x < grid.Cols.Count; x++)
+                {
+                    for (int y = 0; y < grid.Rows.Count; y++)
+                    {
+                        var rect = grid.FieldRects[x][y];
+
+                        totalRect = totalRect.Add(rect);
+                    }
+                }
+                
+                Draw.FillEllipse(totalRect, node.BackgroundColor);
+                Draw.DrawEllipse(totalRect, node.LineColor);
+            }
+
             for (int x = 0; x < grid.Cols.Count; x++)
             {
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
                     var rect = grid.FieldRects[x][y];
-
-                    totalRect = totalRect.Add(rect);
 
                     if (node.Shape == Shape.Rectangle)
                     {                    
@@ -205,12 +219,6 @@ namespace Gwiz.UiControl.WinUi3
 
                     }
                 }
-            }
-
-            if (node.Shape == Shape.Ellipse)
-            {
-                Draw.FillEllipse(totalRect, node.BackgroundColor);
-                Draw.DrawEllipse(totalRect, node.LineColor);
             }
         }
 
