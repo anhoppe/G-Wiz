@@ -10,7 +10,7 @@ namespace Gwiz.Core.Serializer
 {
     internal class GraphConverter : IYamlTypeConverter
     {
-        public bool Accepts(Type type) => type == typeof(IGraph);
+        public bool Accepts(Type type) => typeof(IGraph).IsAssignableFrom(type);
 
         public object? ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
         {
@@ -44,7 +44,26 @@ namespace Gwiz.Core.Serializer
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
-            throw new NotImplementedException();
+            if (value is not IGraph graph)
+            {
+                throw new ArgumentException("Expected an IGraph instance.", nameof(value));
+            }
+
+            emitter.Emit(new MappingStart());
+
+            if (graph.Nodes.Any())
+            {
+                emitter.Emit(new Scalar("Nodes"));
+                serializer(graph.Nodes);
+            }
+
+            if (graph.Edges.Any())
+            {
+                emitter.Emit(new Scalar("Edges"));
+                serializer(graph.Edges);
+            }
+
+            emitter.Emit(new MappingEnd());
         }
     }
 }

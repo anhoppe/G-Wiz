@@ -10,7 +10,7 @@ namespace Gwiz.Core.Serializer
 {
     internal class EdgeConverter : IYamlTypeConverter
     {
-        public bool Accepts(Type type) => type == typeof(IEdge);
+        public bool Accepts(Type type) => typeof(IEdge).IsAssignableFrom(type);
 
         public object ReadYaml(IParser parser, Type type, ObjectDeserializer deserializer)
         {
@@ -56,8 +56,24 @@ namespace Gwiz.Core.Serializer
             return edge;
         }
 
+        private string EndingToString(Ending value)
+        {
+            return value switch
+            {
+                Ending.None => "None",
+                Ending.OpenArrow => "OpenArrow",
+                Ending.ClosedArrow => "ClosedArrow",
+                Ending.Rhombus => "Rhombus",
+                _ => throw new InvalidEnumArgumentException($"No such ending <{value}>"),
+            };
+        }
+
         private Ending StringToEnding(string value)
         {
+            if (value == "None")
+            {
+                return Ending.None;
+            }
             if (value == "OpenArrow")
             {
                 return Ending.OpenArrow;
@@ -76,6 +92,10 @@ namespace Gwiz.Core.Serializer
 
         private Style StringToStyle(string value)
         {
+            if (value == "None")
+            {
+                return Style.None;
+            }
             if (value == "Dashed")
             {
                 return Style.Dashed;
@@ -88,9 +108,51 @@ namespace Gwiz.Core.Serializer
             throw new InvalidEnumArgumentException($"No such style <{value}>");
         }
 
+        private string StyleToString(Style value)
+        {
+            return value switch
+            {
+                Style.None => "None",
+                Style.Dashed => "Dashed",
+                Style.Dotted => "Dotted",
+                _ => throw new InvalidEnumArgumentException($"No such style <{value}>"),
+            };
+        }
+
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
-            throw new NotImplementedException();
+            if (value is not Edge edge)
+            {
+                throw new ArgumentException("Expected an Edge instance.", nameof(value));
+            }
+
+            emitter.Emit(new MappingStart());
+
+            emitter.Emit(new Scalar("Ending"));
+            serializer(EndingToString(edge.Ending));
+
+            emitter.Emit(new Scalar("From"));
+            serializer(edge.FromId);
+
+            emitter.Emit(new Scalar("FromLabel"));
+            serializer(edge.FromLabel);
+
+            emitter.Emit(new Scalar("LabelOffsetPerCent"));
+            serializer(edge.LabelOffsetPerCent.ToString(CultureInfo.InvariantCulture));
+
+            emitter.Emit(new Scalar("Style"));
+            serializer(StyleToString(edge.Style));
+
+            emitter.Emit(new Scalar("Text"));
+            serializer(edge.Text);
+
+            emitter.Emit(new Scalar("To"));
+            serializer(edge.ToId);
+
+            emitter.Emit(new Scalar("ToLabel"));
+            serializer(edge.ToLabel);
+
+            emitter.Emit(new MappingEnd());
         }
     }
 }

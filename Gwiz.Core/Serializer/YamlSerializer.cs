@@ -39,6 +39,20 @@ namespace Gwiz.Core.Serializer
             return graph;
         }
 
+        public void Serialize(Stream stream, IGraph graph)
+        {
+            using (var writer = new StreamWriter(stream))
+            {
+                var serializer = new SerializerBuilder()
+                    .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                    .WithTypeConverter(new EdgeConverter())
+                    .WithTypeConverter(new GraphConverter())
+                    .WithTypeConverter(new NodeConverter())
+                    .Build();
+                serializer.Serialize(writer, graph);
+            }
+        }
+
         private static void CompleteGrid(IGraph graph)
         {
             foreach (var template in graph.Templates)
@@ -98,6 +112,7 @@ namespace Gwiz.Core.Serializer
                     {
                         if (!graph.Templates.Any(t => t.Name == nodeInternal.TemplateName))
                         {
+                            return;
                             throw new UnknownTemplateReference(nodeInternal.TemplateName);
                         }
 

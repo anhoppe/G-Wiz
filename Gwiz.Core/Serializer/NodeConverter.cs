@@ -1,6 +1,7 @@
 ﻿using Gwiz.Core.Contract;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -57,7 +58,38 @@ namespace Gwiz.Core.Serializer
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
-            throw new NotImplementedException();
+            if(value is not Node node)
+            {
+                throw new ArgumentException("Expected a Node instance.", nameof(value));
+            }
+
+            emitter.Emit(new MappingStart());
+
+            if (node.Content.Any())
+            {
+                emitter.Emit(new Scalar("Content"));
+                serializer(node.Content);
+            }
+
+            emitter.Emit(new Scalar("Height"));
+            serializer(node.Height);
+
+            emitter.Emit(new Scalar("Id"));
+            serializer(node.Id);
+
+            emitter.Emit(new Scalar("Template"));
+            serializer(node.TemplateName);
+
+            emitter.Emit(new Scalar("Width"));
+            serializer(node.Width);
+
+            emitter.Emit(new Scalar("X"));
+            serializer(node.X);
+
+            emitter.Emit(new Scalar("Y"));
+            serializer(node.Y);
+            
+            emitter.Emit(new MappingEnd());
         }
     }
 }
