@@ -9,7 +9,7 @@ using YamlDotNet.Serialization;
 namespace Gwiz.Core.Serializer
 {
     internal class NodeConverter : IYamlTypeConverter
-    {
+    {  
         public bool Accepts(Type type) => typeof(INode).IsAssignableFrom(type);
 
         public object ReadYaml(IParser parser, Type type, ObjectDeserializer deserializer)
