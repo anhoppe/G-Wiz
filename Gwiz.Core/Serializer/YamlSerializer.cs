@@ -78,7 +78,7 @@ namespace Gwiz.Core.Serializer
                 {
                     foreach (var content in nodeInternal.Content)
                     {
-                        node.Grid.FieldText[content.Col][content.Row] = content.Text;
+                        node.Grid.Cells[content.Col][content.Row].Text = content.Text;
                     }
                 }
             }
@@ -112,7 +112,6 @@ namespace Gwiz.Core.Serializer
                     {
                         if (!graph.Templates.Any(t => t.Name == nodeInternal.TemplateName))
                         {
-                            return;
                             throw new UnknownTemplateReference(nodeInternal.TemplateName);
                         }
 

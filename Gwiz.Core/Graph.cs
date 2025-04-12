@@ -40,7 +40,7 @@ namespace Gwiz.Core
             var node = new Node();
             node.AssignTemplate(template);
 
-            node.UpdateableGrid = new Grid(template.Grid);
+            node.UpdateableGrid = Grid.CreateFromTemplateGrid(template.Grid);
             Nodes.Add(node);
 
             return node;

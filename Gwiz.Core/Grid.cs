@@ -9,30 +9,16 @@ namespace Gwiz.Core
     {
         public Grid()
         {
-            FieldText = new string[1][];
-            FieldText[0] = new string[1];
-
-            FieldRects = new Rectangle[1][];
-            FieldRects[0] = new Rectangle[1];
+            GridCellInternal = new GridCell[1][];
+            Cells[0] = new GridCell[1];
+            Cells[0][0] = new GridCell();
         }
 
-        public Grid(IGrid grid)
+        public IGridCell[][] Cells
         {
-            Cols = new(grid.Cols);
-            Rows = new(grid.Rows);
-
-            FieldText = new string[Cols.Count][];
-            FieldRects = new Rectangle[Cols.Count][];
-
-            for (int x = 0; x < Cols.Count; x++)
+            get
             {
-                FieldText[x] = new string[Rows.Count];
-                FieldRects[x] = new Rectangle[Rows.Count];
-                for (int y = 0; y < Rows.Count; y++)
-                {
-                    FieldText[x][y] = string.Empty;
-                    FieldRects[x][y] = new Rectangle();
-                }
+                return GridCellInternal;
             }
         }
 
@@ -40,11 +26,29 @@ namespace Gwiz.Core
 
         public int EditButtonMargin { get; set; } = 10;
 
-        public Rectangle[][] FieldRects { get; }
-
-        public string[][] FieldText { get; set; }
-
         public List<string> Rows { get; set; } = new();
+
+        internal GridCell[][] GridCellInternal { get; set; }
+
+        public static Grid CreateFromTemplateGrid(IGrid grid)
+        {
+            var createdGrid = new Grid();
+
+            createdGrid.Cols = new(grid.Cols);
+            createdGrid.Rows = new(grid.Rows);
+
+            createdGrid.GridCellInternal = new GridCell[grid.Cols.Count][];
+            for (int x = 0; x < grid.Cols.Count; x++)
+            {
+                createdGrid.Cells[x] = new GridCell[grid.Rows.Count];
+                for (int y = 0; y < grid.Rows.Count; y++)
+                {
+                    createdGrid.Cells[x][y] = new GridCell();
+                }
+            }
+
+            return createdGrid;
+        }
 
         public void UpdateFieldRects(INode parentNode)
         {
@@ -61,7 +65,7 @@ namespace Gwiz.Core
                 for (int y = 0; y < Rows.Count; y++)
                 {
                     int height = (int)(parentNode.Height * yRatio[y]);
-                    FieldRects[x][y] = new Rectangle(xPos, yPos, width, height);
+                    GridCellInternal[x][y].Rectangle = new Rectangle(xPos, yPos, width, height);
 
                     yPos += height;
                 }

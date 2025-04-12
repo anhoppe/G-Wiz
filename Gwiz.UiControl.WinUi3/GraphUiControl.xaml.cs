@@ -1,4 +1,5 @@
 using Gwiz.Core.Contract;
+using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6,8 +7,13 @@ using Microsoft.UI.Xaml.Input;
 using SkiaSharp.Views.Windows;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using Windows.Foundation;
+using Windows.System;
+using Windows.UI.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,10 +24,11 @@ namespace Gwiz.UiControl.WinUi3
     {
         None,
         DraggingNode,
+        DraggingView,
+        EditText,
         ResizeAll,
         ResizeHorz,
         ResizeVert,
-        DraggingView
     }
 
     /// <summary>
@@ -66,6 +73,8 @@ namespace Gwiz.UiControl.WinUi3
 
         private Draw _draw = new Draw();
 
+        private IGridCell? _editGridCell;
+
         private GraphDrawer _graphDrawer = new();
 
         private INode? _hoveredNode;
@@ -89,6 +98,10 @@ namespace Gwiz.UiControl.WinUi3
             _graphDrawer.Draw = _draw;
 
             this.InitializeComponent();
+            this.IsTabStop = true; 
+            
+            this.KeyDown += OnKeyDown;
+
         }
 
         // Edges Dependency Property
@@ -121,20 +134,6 @@ namespace Gwiz.UiControl.WinUi3
             set => SetValue(NodesProperty, value);
         }
 
-        private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var uiControl = d as GraphUiControl;
-
-            if (uiControl != null)
-            {
-                uiControl.UpdateGraphDrawer();
-
-                if (uiControl._canvasControl != null)
-                {
-                    uiControl._canvasControl.Invalidate();
-                }
-            }
-        }
 
         private void DrawGraph(object sender, SKPaintSurfaceEventArgs e)
         {
@@ -143,6 +142,39 @@ namespace Gwiz.UiControl.WinUi3
             canvas.Translate(-(float)_scrollPosition.X, -(float)_scrollPosition.Y);
             _draw.DrawingSession = e.Surface.Canvas;
             _graphDrawer.DrawGraph();
+
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool GetKeyboardState(byte[] lpKeyState);
+
+        private static int GetStartOfPreviousWord(string text, int cursorPosition, bool goForward)
+        {
+            if (string.IsNullOrEmpty(text) || 
+                (!goForward && cursorPosition <= 0) || 
+                (goForward && cursorPosition >= text.Length))
+            {
+                return cursorPosition;
+            }
+
+            int modifier = goForward ? 1 : -1;
+
+            int i = cursorPosition + modifier;
+
+            // Skip trailing spaces before the current word
+            while (i > 0 && i < text.Length && char.IsWhiteSpace(text[i]))
+            {
+                i += modifier;
+            }
+
+            // Skip the characters of the current/previous word
+            int offset = goForward ? 0 : -1;
+            while (i > 0 && i < text.Length && !char.IsWhiteSpace(text[i + offset]))
+            {
+                i += modifier;
+            }
+
+            return i;
         }
 
         private void Invalidate()
@@ -173,6 +205,108 @@ namespace Gwiz.UiControl.WinUi3
             _canvasControl.Invalidate();
         }
 
+        [DllImport("user32.dll")]
+        private static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        private void OnKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (_currentInteractionState == InteractionState.EditText &&
+                _editGridCell != null)
+            {
+                var currentGridText = _editGridCell.Text;
+                var nextGridText = currentGridText;
+
+                var shift = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
+                var ctrl = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+
+                switch (e.Key)
+                {
+                    case VirtualKey.Enter:
+                    case VirtualKey.Escape:
+                        StopEditing();
+                        break;
+                    case VirtualKey.Back:
+                        if (_editGridCell.EditTextPosition > 0)
+                        {
+                            nextGridText = nextGridText.Remove(_editGridCell.EditTextPosition - 1, 1);
+                            _editGridCell.EditTextPosition--;
+                        }
+                        break;
+                    case VirtualKey.Delete:
+                        if (_editGridCell.EditTextPosition < nextGridText.Length)
+                        {
+                            nextGridText = nextGridText.Remove(_editGridCell.EditTextPosition, 1);
+                        }
+                        break;
+                    case VirtualKey.Left:
+                        if (ctrl != CoreVirtualKeyStates.Down)
+                        {
+                            _editGridCell.EditTextPosition = Math.Max(0, _editGridCell.EditTextPosition - 1);
+                        }
+                        else
+                        {
+                            _editGridCell.EditTextPosition = GetStartOfPreviousWord(nextGridText, _editGridCell.EditTextPosition, false);
+                        }
+                        _canvasControl.Invalidate();
+                        break;
+                    case VirtualKey.Right:
+                        if (ctrl != CoreVirtualKeyStates.Down)
+                        {
+                            _editGridCell.EditTextPosition = Math.Min(currentGridText.Length, _editGridCell.EditTextPosition + 1);
+                        }
+                        else
+                        {
+                            _editGridCell.EditTextPosition = GetStartOfPreviousWord(nextGridText, _editGridCell.EditTextPosition, true);
+                        }
+                        _canvasControl.Invalidate();
+                        break;
+                    default:
+                        StringBuilder buffer = new(2);
+                        byte[] keyboardState = new byte[256];
+                        GetKeyboardState(keyboardState);
+
+                        uint virtualKey = (uint)e.Key;
+                        uint scanCode = MapVirtualKey(virtualKey, 0);
+
+                        int result = ToUnicode(virtualKey, scanCode, keyboardState, buffer, buffer.Capacity, 0);
+                        if (result > 0)
+                        {
+                            string typedChar = buffer.ToString();
+                            nextGridText = nextGridText.Insert(_editGridCell.EditTextPosition, typedChar);
+                            _editGridCell.EditTextPosition++;
+                        }
+                        break;
+
+                }
+
+                if (nextGridText != currentGridText)
+                {
+                    _editGridCell.Text = nextGridText;
+                    _canvasControl.Invalidate();
+                }
+            }
+        }
+
+        private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uiControl = d as GraphUiControl;
+
+            if (uiControl != null)
+            {
+                uiControl.UpdateGraphDrawer();
+
+                if (uiControl._canvasControl != null)
+                {
+                    uiControl._canvasControl.Invalidate();
+                }
+            }
+        }
+
+        private void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            this.Focus(FocusState.Programmatic);
+        }
+
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
             var screenPointerPosition = e.GetCurrentPoint(this).Position;
@@ -190,9 +324,12 @@ namespace Gwiz.UiControl.WinUi3
                     // Check if the pointer is over any node
                     // Iterate backwards to honor the drawing order defined by the input yaml / order of adding
                     _hoveredNode = null;
+                    _editGridCell = null;
                     for (int i = Nodes.Count - 1; i >= 0; i--)
                     {
                         var node = Nodes[i];
+
+                        bool isOverEditButton = false;
 
                         if (worldPointerPosition.X >= node.X &&
                             worldPointerPosition.X <= node.X + node.Width &&
@@ -201,7 +338,40 @@ namespace Gwiz.UiControl.WinUi3
                         {
                             _hoveredNode = node;
                             
-                            // Check if the mouse cursor is over the both resize icon
+                            // Check if the mouse is over an edit text button
+                            for (int x = 0; x < _hoveredNode.Grid.Cols.Count; x++)
+                            {
+                                for (int y = 0; y < _hoveredNode.Grid.Rows.Count; y++)
+                                {
+                                    var cell = _hoveredNode.Grid.Cells[x][y].Rectangle;
+
+                                    if (worldPointerPosition.X >= cell.X && 
+                                        worldPointerPosition.X <= cell.X + _graphDrawer.IconSize &&
+                                        worldPointerPosition.Y <= cell.Y + cell.Height / 2 + _graphDrawer.IconSize / 2 && 
+                                        worldPointerPosition.Y >= cell.Y + cell.Height / 2 - _graphDrawer.IconSize / 2)
+                                    {
+                                        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+                                        _potentialInteractionState = InteractionState.EditText;
+
+                                        _editGridCell = _hoveredNode.Grid.Cells[x][y];
+
+                                        isOverEditButton = true;
+                                        break;
+                                    }
+                                }
+
+                                if (isOverEditButton)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (isOverEditButton)
+                            {
+                                break;
+                            }
+
+                                // Check if the mouse cursor is over the both resize icon
                             if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - _graphDrawer.IconSize &&
                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - _graphDrawer.IconSize)
@@ -307,6 +477,12 @@ namespace Gwiz.UiControl.WinUi3
 
         private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (_currentInteractionState == InteractionState.EditText)
+            {
+                StopEditing();
+                return;
+            }
+
             _currentInteractionState = _potentialInteractionState;
             _interactionStartPosition = e.GetCurrentPoint(this).Position;
 
@@ -329,8 +505,54 @@ namespace Gwiz.UiControl.WinUi3
 
         private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            _currentInteractionState = InteractionState.None;
+            if (_currentInteractionState != InteractionState.EditText)
+            {
+                _currentInteractionState = InteractionState.None;
+            }
+            else
+            {
+                StartEditing();
+            }
         }
+
+        private void StartEditing()
+        {
+            if (_editGridCell == null)
+            {
+                throw new InvalidOperationException("Editing without seleceted node");
+            }
+            _editGridCell.EditModeEnabled = true;
+            this.Focus(FocusState.Programmatic);
+            this.LostFocus += OnLostFocus;
+
+            Invalidate();
+        }
+
+        private void StopEditing()
+        {
+            if (_editGridCell == null)
+            {
+                throw new InvalidOperationException("Editing without seleceted node");
+            }
+
+            _editGridCell.EditModeEnabled = false;
+            _currentInteractionState = InteractionState.None;
+            this.LostFocus -= OnLostFocus;
+
+            _editGridCell = null;
+
+            Invalidate();
+        }
+
+        [DllImport("user32.dll")]
+        private static extern int ToUnicode(
+            uint virtualKeyCode,
+            uint scanCode,
+            byte[] keyboardState,
+            [Out, MarshalAs(UnmanagedType.LPWStr)]
+                    StringBuilder receivingBuffer,
+            int bufferSize,
+            uint flags);
 
         private void UpdateGraphDrawer()
         {

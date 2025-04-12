@@ -20,7 +20,7 @@ namespace Gwiz.UiControl.WinUi3
 
         public SKBitmap? ResizeVert { get; private set; }
 
-        private static Stream GetEmbeddedSvgStream(string iconName)
+        private static Stream GetEmbeddedStream(string iconName)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName = "Gwiz.UiControl.WinUi3.icons." + iconName; // Adjust the namespace
@@ -37,16 +37,19 @@ namespace Gwiz.UiControl.WinUi3
 
         private void LoadSvgAsync()
         {
-
-            using (var stream = GetEmbeddedSvgStream("resize-bottom-right.png"))
+            using (var stream = GetEmbeddedStream("text-box-edit-outline.png"))
+            {
+                Edit = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("resize-bottom-right.png"))
             {
                 ResizeBottomRight = SKBitmap.Decode(stream);
             }
-            using (var stream = GetEmbeddedSvgStream("drag-horizontal-variant.png"))
+            using (var stream = GetEmbeddedStream("drag-horizontal-variant.png"))
             {
                 ResizeVert = SKBitmap.Decode(stream);
             }
-            using (var stream = GetEmbeddedSvgStream("drag-vertical-variant.png"))
+            using (var stream = GetEmbeddedStream("drag-vertical-variant.png"))
             {
                 ResizeHorz = SKBitmap.Decode(stream);
             }

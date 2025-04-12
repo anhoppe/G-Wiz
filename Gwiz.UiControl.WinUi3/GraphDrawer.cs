@@ -143,7 +143,7 @@ namespace Gwiz.UiControl.WinUi3
             return modifiedEndingPosition;
         }
 
-        private void DrawIcons(INode node)
+        private void DrawSizingIcons(INode node)
         {
             // Draw the resize all icon
             if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
@@ -184,7 +184,7 @@ namespace Gwiz.UiControl.WinUi3
                 {
                     for (int y = 0; y < grid.Rows.Count; y++)
                     {
-                        var rect = grid.FieldRects[x][y];
+                        var rect = grid.Cells[x][y].Rectangle;
 
                         totalRect = totalRect.Add(rect);
                     }
@@ -198,7 +198,8 @@ namespace Gwiz.UiControl.WinUi3
             {
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
-                    var rect = grid.FieldRects[x][y];
+                    var cell = grid.Cells[x][y];
+                    var rect = cell.Rectangle;
 
                     if (node.Shape == Shape.Rectangle)
                     {                    
@@ -206,18 +207,33 @@ namespace Gwiz.UiControl.WinUi3
                         Draw.DrawRectangle(rect, node.LineColor, 1);
                     }
 
-                    var text = grid.FieldText[x][y];
+                    var text = cell.Text;
+
+                    var textPos = GetTextPosition(text, rect, node.Alignment);
 
                     if (!string.IsNullOrEmpty(text))
                     {                    
-                        var textPos = GetTextPosition(text, rect, node.Alignment);
-
                         Draw.DrawClippedText(text,
                             rect,
                             textPos,
                             node.LineColor);
-
                     }
+
+                    if (cell.EditModeEnabled)
+                    {
+                        var textBeforeCursor = text.Substring(0, cell.EditTextPosition);
+
+                        var size = TextSizeCalculator(textBeforeCursor);
+
+                        Draw.DrawLine(new Point(textPos.X + size.Width, textPos.Y + 3), 
+                            new Point(textPos.X + size.Width, textPos.Y + size.Height - 3), 
+                            Style.None);
+                    }
+
+                    Draw.DrawSvgIcon(_icons.Edit, 
+                        new Windows.Foundation.Size(IconSize, IconSize), 
+                        rect.X, 
+                        rect.Y + rect.Height / 2 - IconSize / 2);
                 }
             }
         }
@@ -282,7 +298,7 @@ namespace Gwiz.UiControl.WinUi3
                 foreach (var node in Nodes)
                 {
                     DrawGrid(node);
-                    DrawIcons(node);
+                    DrawSizingIcons(node);
                 }
             }
         }

@@ -95,7 +95,7 @@ namespace Gwiz.Core
             LineColor = template.LineColor;
             Resize = template.Resize;
             Shape = template.Shape;
-            UpdateableGrid = new Grid(template.Grid);
+            UpdateableGrid = Core.Grid.CreateFromTemplateGrid(template.Grid);
         }
 
         internal void Update()

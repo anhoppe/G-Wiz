@@ -254,7 +254,7 @@ namespace Gwiz.Core.Test.Serializer
             {
                 for (int y = 0; y < node.Grid.Rows.Count; y++)
                 {
-                    Assert.That(node.Grid.FieldText[x][y], Is.EqualTo(string.Empty));
+                    Assert.That(node.Grid.Cells[x][y].Text, Is.EqualTo(string.Empty));
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace Gwiz.Core.Test.Serializer
 
             // Assert
             var node = graph.Nodes[0];
-            Assert.That(node.Grid.FieldText[1][1], Is.EqualTo("FooBar"));
+            Assert.That(node.Grid.Cells[1][1].Text, Is.EqualTo("FooBar"));
         }
 
         [Test]
@@ -512,7 +512,7 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
-        public void Templates_WhenTemplateHasInvalidTemplate_ThenExceptionIsThrown()
+        public void Templates_WhenNodeReferencesInvalidTemplate_ThenExceptionIsThrown()
         {
             var yaml =
                 "Templates:\n" +

@@ -229,6 +229,36 @@ namespace Gwiz.UiControl.WinUi3.Test
         }
 
         [Test]
+        public void GridText_WhenEditingTextIsEnabled_ThenCursorIsDrawn()
+        {
+            var nodeMock = new Mock<INode>();
+            var rect = new Rectangle(0, 0, 100, 100);
+            var gridMock = MockGrid("foo", rect, 2);
+            nodeMock.Setup(p => p.Grid).Returns(gridMock.Object);
+            nodeMock.Setup(p => p.Alignment).Returns(Alignment.TopLeft);
+
+            _sut.Nodes = [nodeMock.Object];
+
+            _sut.TextSizeCalculator = (text) =>
+            {
+                if (text == "fo")
+                {
+                    return new Size(50, 10);
+                }
+
+                return new Size(0, 0);
+            };
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expecteCursorLineStartPoint = new Point(50, 3); // -3 is the offset for the cursor line
+            var expecteCursorLineEndPoint = new Point(50, 10 - 3);
+            _drawMock.Verify(m => m.DrawLine(expecteCursorLineStartPoint, expecteCursorLineEndPoint, Style.None));
+        }
+
+        [Test]
         public void TextSizeCalculator_WhenMultipleLinesOfSameText_ThenTextWidthIsEqual()
         {
             // Arrange
@@ -291,7 +321,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             _drawMock.Verify(m => m.DrawClippedText("foo", rect, expectedTextPos, It.IsAny<Color>()), "Expected the text to be positioned at the grid coordinates becase the text is larger then the grid cell");
         }
 
-        private Mock<IGrid> MockGrid(string text, Rectangle rect)
+        private Mock<IGrid> MockGrid(string text, Rectangle rect, int editPosition = -1)
         {
             var gridMock = new Mock<IGrid>();
 
@@ -299,15 +329,21 @@ namespace Gwiz.UiControl.WinUi3.Test
             gridMock.SetupGet(p => p.Rows).Returns(["1"]);
 
             // This is the expected field size for a class node (1 column with 3 rows for title, props and methods)
-            var fieldText = new string[1][];
-            fieldText[0] = new string[1];
-            fieldText[0][0] = text;
-            gridMock.Setup(p => p.FieldText).Returns(fieldText);
+            var cells = new IGridCell[1][];
+            cells[0] = new IGridCell[1];
 
-            var fieldRects = new Rectangle[1][];
-            fieldRects[0] = new Rectangle[1];
-            fieldRects[0][0] = new Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
-            gridMock.Setup(p => p.FieldRects).Returns(fieldRects);
+            var cellMock = new Mock<IGridCell>();
+            cells[0][0] = cellMock.Object;
+            cellMock.Setup(p => p.Text).Returns(text);
+            cellMock.Setup(p => p.Rectangle).Returns(new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
+
+            if (editPosition != -1)
+            {
+                cellMock.Setup(p => p.EditModeEnabled).Returns(true);
+                cellMock.Setup(p => p.EditTextPosition).Returns(editPosition);
+            }
+
+            gridMock.SetupGet(p => p.Cells).Returns(cells);
 
             return gridMock;
         }
