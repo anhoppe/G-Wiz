@@ -1,7 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
-using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using WinRT;
 
 namespace Gwiz.UiControl.WinUi3
 {
-    internal class GraphDrawer
+    internal class GraphDrawer : Drawer
     {
         private static readonly float ArrowHeadLen = 15;
 
@@ -20,11 +19,17 @@ namespace Gwiz.UiControl.WinUi3
 
         private Icons _icons = new Icons();
 
-        public IDraw Draw { private get; set; } = new Draw();
+        public GraphDrawer()
+        {
+            GridDrawer = new GridDrawer()
+            {
+                Draw = Draw,
+                Icons = _icons,
+                TextSizeCalculator = TextSizeCalculator,
+            };
+        }
 
         public List<IEdge> Edges { get; set; } = new();
-
-        public int IconSize => 30;
 
         public List<INode> Nodes { get; set; } = new();
 
@@ -58,6 +63,8 @@ namespace Gwiz.UiControl.WinUi3
             return size;
         };
 
+        internal IGridDrawer GridDrawer { get; set; }
+
         public void DrawGraph()
         {
             Draw.Clear();
@@ -65,6 +72,12 @@ namespace Gwiz.UiControl.WinUi3
             DrawEdges();
 
             DrawNodes();
+        }
+
+        public void SetDraw(IDraw draw)
+        {
+            Draw = draw;
+            GridDrawer.Draw = draw;
         }
 
         private void DrawEdges()
@@ -143,6 +156,7 @@ namespace Gwiz.UiControl.WinUi3
             return modifiedEndingPosition;
         }
 
+
         private void DrawSizingIcons(INode node)
         {
             // Draw the resize all icon
@@ -154,141 +168,17 @@ namespace Gwiz.UiControl.WinUi3
             if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
             {
                 // Draw the resize horz icon
-                Draw.DrawSvgIcon(_icons.ResizeHorz, 
-                    new Windows.Foundation.Size(IconSize, IconSize), 
-                    node.X + node.Width - (int)(IconSize * 0.75), 
+                Draw.DrawSvgIcon(_icons.ResizeHorz,
+                    new Windows.Foundation.Size(IconSize, IconSize),
+                    node.X + node.Width - (int)(IconSize * 0.75),
                     node.Y + node.Height / 2 - IconSize / 2);
 
                 // Draw the resize vert icon
-                Draw.DrawSvgIcon(_icons.ResizeVert, 
-                    new Windows.Foundation.Size(IconSize, IconSize), 
-                    node.X + node.Width / 2 - IconSize / 2, 
+                Draw.DrawSvgIcon(_icons.ResizeVert,
+                    new Windows.Foundation.Size(IconSize, IconSize),
+                    node.X + node.Width / 2 - IconSize / 2,
                     node.Y + node.Height - (int)(IconSize * 0.75));
             }
-        }
-
-        private void DrawGrid(INode node)
-        {
-            var grid = node.Grid;
-
-            if (grid == null)
-            {
-                return;
-            }
-
-            var totalRect = new Rectangle(int.MaxValue, int.MaxValue, -1, -1);
-
-            if (node.Shape == Shape.Ellipse)
-            {
-                for (int x = 0; x < grid.Cols.Count; x++)
-                {
-                    for (int y = 0; y < grid.Rows.Count; y++)
-                    {
-                        var rect = grid.Cells[x][y].Rectangle;
-
-                        totalRect = totalRect.Add(rect);
-                    }
-                }
-                
-                Draw.FillEllipse(totalRect, node.BackgroundColor);
-                Draw.DrawEllipse(totalRect, node.LineColor);
-            }
-
-            for (int x = 0; x < grid.Cols.Count; x++)
-            {
-                for (int y = 0; y < grid.Rows.Count; y++)
-                {
-                    var cell = grid.Cells[x][y];
-                    var rect = cell.Rectangle;
-
-                    if (node.Shape == Shape.Rectangle)
-                    {                    
-                        Draw.FillRectangle(rect, node.BackgroundColor);
-                        Draw.DrawRectangle(rect, node.LineColor, 1);
-                    }
-
-                    var text = cell.Text;
-
-                    var textPos = GetTextPosition(text, rect, node.Alignment);
-
-                    if (!string.IsNullOrEmpty(text))
-                    {                    
-                        Draw.DrawClippedText(text,
-                            rect,
-                            textPos,
-                            node.LineColor);
-                    }
-
-                    if (cell.EditModeEnabled)
-                    {
-                        var textBeforeCursor = text.Substring(0, cell.EditTextPosition);
-
-                        var size = TextSizeCalculator(textBeforeCursor);
-
-                        Draw.DrawLine(new Point(textPos.X + size.Width, textPos.Y + 3), 
-                            new Point(textPos.X + size.Width, textPos.Y + size.Height - 3), 
-                            Style.None);
-                    }
-
-                    Draw.DrawSvgIcon(_icons.Edit, 
-                        new Windows.Foundation.Size(IconSize, IconSize), 
-                        rect.X, 
-                        rect.Y + rect.Height / 2 - IconSize / 2);
-                }
-            }
-        }
-
-        private Point GetTextPosition(string placedText, Rectangle rect, Alignment alignment)
-        {
-            var textSize = TextSizeCalculator(placedText);
-
-            float xText = 0f;
-            float yText = 0f;
-
-            switch (alignment)
-            {
-                case Alignment.TopLeft:
-                    xText = rect.Left;
-                    yText = rect.Top;
-                    break;
-                case Alignment.TopCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Top;
-                    break;
-                case Alignment.TopRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Top;
-                    break;
-                case Alignment.CenterLeft:
-                    xText = rect.Left;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.CenterCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.CenterRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.BottomLeft:
-                    xText = 0;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-                case Alignment.BottomCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-                case Alignment.BottomRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-            }
-
-            xText = Math.Max(xText, rect.X);
-            yText = Math.Max(yText, rect.Y);
-
-            return new Point((int)xText, (int)yText);
         }
 
         private void DrawNodes()
@@ -297,7 +187,7 @@ namespace Gwiz.UiControl.WinUi3
             {
                 foreach (var node in Nodes)
                 {
-                    DrawGrid(node);
+                    GridDrawer.DrawGrid(node);
                     DrawSizingIcons(node);
                 }
             }

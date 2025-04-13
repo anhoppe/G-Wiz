@@ -11,7 +11,7 @@ namespace Gwiz.Core
         {
             GridCellInternal = new GridCell[1][];
             Cells[0] = new GridCell[1];
-            Cells[0][0] = new GridCell();
+            Cells[0][0] = new GridCell(false);
         }
 
         public IGridCell[][] Cells
@@ -23,6 +23,8 @@ namespace Gwiz.Core
         }
 
         public List<string> Cols { get; set; } = new();
+
+        public List<string> Editable { get; set; } = new();
 
         public int EditButtonMargin { get; set; } = 10;
 
@@ -38,14 +40,35 @@ namespace Gwiz.Core
             createdGrid.Rows = new(grid.Rows);
 
             createdGrid.GridCellInternal = new GridCell[grid.Cols.Count][];
+
+            bool editable = false;
+            var internalGrid = grid as Grid;
+            
+            if (internalGrid != null)
+            {
+                if (internalGrid.Editable.Contains("all"))
+                {
+                    editable = true;
+                }
+            }
+
             for (int x = 0; x < grid.Cols.Count; x++)
             {
                 createdGrid.Cells[x] = new GridCell[grid.Rows.Count];
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
-                    createdGrid.Cells[x][y] = new GridCell();
+                    bool individualCellEditable = false;
+                    if (internalGrid != null)
+                    {
+                        if (internalGrid.Editable.Contains($"{x},{y}"))
+                        {
+                            individualCellEditable = true;
+                        }
+                    }
+                    createdGrid.Cells[x][y] = new GridCell(editable ? true : individualCellEditable);
                 }
             }
+
 
             return createdGrid;
         }

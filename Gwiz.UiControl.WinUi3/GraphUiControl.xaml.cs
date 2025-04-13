@@ -95,7 +95,7 @@ namespace Gwiz.UiControl.WinUi3
 
         public GraphUiControl()
         {
-            _graphDrawer.Draw = _draw;
+            _graphDrawer.SetDraw(_draw);
 
             this.InitializeComponent();
             this.IsTabStop = true; 
@@ -343,12 +343,19 @@ namespace Gwiz.UiControl.WinUi3
                             {
                                 for (int y = 0; y < _hoveredNode.Grid.Rows.Count; y++)
                                 {
-                                    var cell = _hoveredNode.Grid.Cells[x][y].Rectangle;
+                                    var cell = _hoveredNode.Grid.Cells[x][y];
 
-                                    if (worldPointerPosition.X >= cell.X && 
-                                        worldPointerPosition.X <= cell.X + _graphDrawer.IconSize &&
-                                        worldPointerPosition.Y <= cell.Y + cell.Height / 2 + _graphDrawer.IconSize / 2 && 
-                                        worldPointerPosition.Y >= cell.Y + cell.Height / 2 - _graphDrawer.IconSize / 2)
+                                    if (!cell.Editable)
+                                    {
+                                        continue;
+                                    }
+
+                                    var rect = cell.Rectangle;
+
+                                    if (worldPointerPosition.X >= rect.X && 
+                                        worldPointerPosition.X <= rect.X + _graphDrawer.IconSize &&
+                                        worldPointerPosition.Y <= rect.Y + rect.Height / 2 + _graphDrawer.IconSize / 2 && 
+                                        worldPointerPosition.Y >= rect.Y + rect.Height / 2 - _graphDrawer.IconSize / 2)
                                     {
                                         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
                                         _potentialInteractionState = InteractionState.EditText;

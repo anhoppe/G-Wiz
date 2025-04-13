@@ -311,6 +311,122 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void Grid_WhenEditableIsNotDefined_ThenNoCellIsEditable()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Cols:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+            
+            // Act
+            var graph = _sut.Deserialize(stream);
+            
+            // Assert
+            var template = graph.Templates[0];
+            var grid = Grid.CreateFromTemplateGrid(template.Grid);
+
+            Assert.That(!grid.Cells[0][0].Editable);
+            Assert.That(!grid.Cells[0][1].Editable);
+            Assert.That(!grid.Cells[0][2].Editable);
+            Assert.That(!grid.Cells[1][0].Editable);
+            Assert.That(!grid.Cells[1][1].Editable);
+            Assert.That(!grid.Cells[1][2].Editable);
+            Assert.That(!grid.Cells[2][0].Editable);
+            Assert.That(!grid.Cells[2][1].Editable);
+            Assert.That(!grid.Cells[2][2].Editable);
+        }
+        
+        [Test]
+        public void Grid_WhenEditableAllIsDefined_ThenAllCellsAreEditable()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Cols:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Editable:\n" +
+                "        - all\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+            
+            // Act
+            var graph = _sut.Deserialize(stream);
+            
+            // Assert
+            var template = graph.Templates[0];
+            var grid = Grid.CreateFromTemplateGrid(template.Grid);
+
+            Assert.That(grid.Cells[0][0].Editable);
+            Assert.That(grid.Cells[0][1].Editable);
+            Assert.That(grid.Cells[0][2].Editable);
+            Assert.That(grid.Cells[1][0].Editable);
+            Assert.That(grid.Cells[1][1].Editable);
+            Assert.That(grid.Cells[1][2].Editable);
+            Assert.That(grid.Cells[2][0].Editable);
+            Assert.That(grid.Cells[2][1].Editable);
+            Assert.That(grid.Cells[2][2].Editable);
+        }        
+
+        [Test]
+        public void Grid_WhenEditableDefinedForSpecificCells_ThenThoseCellsAreEditable()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Grid:\n" +
+                "      Rows:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Cols:\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "        - 1\n" +
+                "      Editable:\n" +
+                "        - 0,1\n" + 
+                "        - 1,2\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+            
+            // Act
+            var graph = _sut.Deserialize(stream);
+            
+            // Assert
+            var template = graph.Templates[0];
+            var grid = Grid.CreateFromTemplateGrid(template.Grid);
+
+            Assert.That(!grid.Cells[0][0].Editable);
+            Assert.That(grid.Cells[0][1].Editable);
+            Assert.That(!grid.Cells[0][2].Editable);
+            Assert.That(!grid.Cells[1][0].Editable);
+            Assert.That(!grid.Cells[1][1].Editable);
+            Assert.That(grid.Cells[1][2].Editable);
+            Assert.That(!grid.Cells[2][0].Editable);
+            Assert.That(!grid.Cells[2][1].Editable);
+            Assert.That(!grid.Cells[2][2].Editable);
+        }
+
+        [Test]
         public void Grid_WhenNoGridIsDefined_ThenGridHasOneRowAndOneColWith1()
         {
             // Arrange

@@ -1,10 +1,6 @@
 ﻿using Gwiz.Core.Contract;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using YamlDotNet.Core;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 

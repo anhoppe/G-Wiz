@@ -9,6 +9,11 @@ namespace Gwiz.Core.Contract
     public interface IGridCell
     {
         /// <summary>
+        /// Indicates if the user can edit the cell
+        /// </summary>
+        bool Editable { get; }
+
+        /// <summary>
         /// The editing position of the text when edit mode is enabled
         /// </summary>
         int EditTextPosition { get; set; }

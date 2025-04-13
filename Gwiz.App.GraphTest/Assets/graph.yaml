@@ -12,10 +12,20 @@ Templates:
       Rows:
         - 1
         - 10
+      Editable:
+        - 0,1
   - Name: Note
     BackgroundColor: 100, 255, 255, 0
     LineColor: 255, 0, 0, 0
     Resize: Both
+    Grid:
+      Rows:
+        - 1
+      Cols:
+        - 1
+      Editable:
+        - all
+
   - Name: Frame
     Alignment: CenterLeft
     BackgroundColor: 0, 255, 255, 0
@@ -30,6 +40,8 @@ Templates:
         - 1
         - 1
         - 1
+      Editable:
+        - all
   - Name: Hint
     BackgroundColor: 100, 100, 100, 255
     LineColor: 255, 0, 0, 0
@@ -38,6 +50,9 @@ Templates:
     LineColor: 50, 200, 80, 0
     Shape: Ellipse
     Resize: HorzVert
+    Grid:
+      Editable:
+        - all
 
 Nodes:
   - X: 0

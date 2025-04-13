@@ -7,10 +7,13 @@ namespace Gwiz.Core
     {
         private bool _isEditing;
 
-        public GridCell()
+        public GridCell(bool editable)
         {
             _isEditing = false;
+            Editable = editable;
         }
+
+        public bool Editable { get; }
 
         public int EditTextPosition { get; set; }
 
