@@ -20,6 +20,10 @@ namespace Gwiz.Core.Contract
 
         Shape Shape { get; }
 
+        List<IEdgeTemplate> SourceEdgeTemplates { get; }
+
+        List<IEdgeTemplate> TargetEdgeTemplates { get; }
+
         int Width { get; set; }
 
         int X { get; set; }

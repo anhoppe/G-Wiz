@@ -23,7 +23,12 @@ namespace Gwiz.Core.Contract
     public interface IEdge
     {
         /// <summary>
-        /// Ending symbol of the edge
+        /// The marker at the source of the edge
+        /// </summary>
+        Ending Beginning { get; }
+
+        /// <summary>
+        /// Marker at the end of the edge
         /// </summary>
         Ending Ending { get; }
 

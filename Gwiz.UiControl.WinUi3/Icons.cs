@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using SkiaSharp.Extended.Svg;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -12,6 +13,29 @@ namespace Gwiz.UiControl.WinUi3
             LoadSvgAsync();
         }
 
+        public SKBitmap? AlphaA { get; private set; }
+        
+        public SKBitmap? AlphaB { get; private set; }
+        
+        public SKBitmap? AlphaC { get; private set; }
+        
+        public SKBitmap? AlphaD { get; private set; }
+        
+        public SKBitmap? AlphaE { get; private set; }
+        
+        public SKBitmap? AlphaF { get; private set; }
+        
+        public SKBitmap? AlphaG { get; private set; }
+        
+        public SKBitmap? AlphaH { get; private set; }
+        
+        public SKBitmap? AlphaI { get; private set; }
+        
+        public SKBitmap? AlphaJ { get; private set; }
+
+
+        public SKBitmap? Connection { get; private set; }
+
         public SKBitmap? Edit { get; private set; }
         
         public SKBitmap? ResizeBottomRight { get; private set; }
@@ -19,6 +43,40 @@ namespace Gwiz.UiControl.WinUi3
         public SKBitmap? ResizeHorz { get; private set; }
 
         public SKBitmap? ResizeVert { get; private set; }
+
+        internal SKBitmap? GetAlpha(string icon)
+        {
+            if (icon.Length != 1)
+            {
+                throw new ArgumentException("Currently connection icon must be 1 letter");
+            }
+
+            switch (icon.ToUpper()[0])
+            {
+                case 'A':
+                    return AlphaA;
+                case 'B':
+                    return AlphaB;
+                case 'C':
+                    return AlphaC;
+                case 'D':
+                    return AlphaD;
+                case 'E':
+                    return AlphaE;
+                case 'F':
+                    return AlphaF;
+                case 'G':
+                    return AlphaG;
+                case 'H':
+                    return AlphaH;
+                case 'I':
+                    return AlphaI;
+                case 'J':
+                    return AlphaJ;
+            }
+
+            throw new ArgumentException($"Could not determine the alpha icon for {icon}");
+        }
 
         private static Stream GetEmbeddedStream(string iconName)
         {
@@ -37,6 +95,50 @@ namespace Gwiz.UiControl.WinUi3
 
         private void LoadSvgAsync()
         {
+            using (var stream = GetEmbeddedStream("alpha-a.png"))
+            {
+                AlphaA = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-b.png"))
+            {
+                AlphaB = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-c.png"))
+            {
+                AlphaC = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-d.png"))
+            {
+                AlphaD = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-e.png"))
+            {
+                AlphaE = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-f.png"))
+            {
+                AlphaF = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-g.png"))
+            {
+                AlphaG = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-h.png"))
+            {
+                AlphaH = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-i.png"))
+            {
+                AlphaI = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-j.png"))
+            {
+                AlphaJ = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("transit-connection-variant.png"))
+            {
+                Connection = SKBitmap.Decode(stream);
+            }
             using (var stream = GetEmbeddedStream("text-box-edit-outline.png"))
             {
                 Edit = SKBitmap.Decode(stream);

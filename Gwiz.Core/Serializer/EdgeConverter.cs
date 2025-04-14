@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 
 namespace Gwiz.Core.Serializer
 {
-    internal class EdgeConverter : IYamlTypeConverter
+    internal class EdgeConverter : EdgeConverterBase, IYamlTypeConverter
     {
         public bool Accepts(Type type) => typeof(IEdge).IsAssignableFrom(type);
 
@@ -21,6 +21,9 @@ namespace Gwiz.Core.Serializer
             {
                 switch (key.Value)
                 {
+                    case "Beginning":
+                        edge.Beginning = StringToEnding(parser.Consume<Scalar>().Value);
+                        break;
                     case "Ending":
                         edge.Ending = StringToEnding(parser.Consume<Scalar>().Value);
                         break;
@@ -54,69 +57,6 @@ namespace Gwiz.Core.Serializer
             parser.Consume<MappingEnd>();
 
             return edge;
-        }
-
-        private string EndingToString(Ending value)
-        {
-            return value switch
-            {
-                Ending.None => "None",
-                Ending.OpenArrow => "OpenArrow",
-                Ending.ClosedArrow => "ClosedArrow",
-                Ending.Rhombus => "Rhombus",
-                _ => throw new InvalidEnumArgumentException($"No such ending <{value}>"),
-            };
-        }
-
-        private Ending StringToEnding(string value)
-        {
-            if (value == "None")
-            {
-                return Ending.None;
-            }
-            if (value == "OpenArrow")
-            {
-                return Ending.OpenArrow;
-            }
-            if (value == "ClosedArrow")
-            {
-                return Ending.ClosedArrow;
-            }
-            if (value == "Rhombus")
-            {
-                return Ending.Rhombus;
-            }
-
-            throw new InvalidEnumArgumentException($"No such ending <{value}>");
-        }
-
-        private Style StringToStyle(string value)
-        {
-            if (value == "None")
-            {
-                return Style.None;
-            }
-            if (value == "Dashed")
-            {
-                return Style.Dashed;
-            }
-            if (value == "Dotted")
-            {
-                return Style.Dotted;
-            }
-
-            throw new InvalidEnumArgumentException($"No such style <{value}>");
-        }
-
-        private string StyleToString(Style value)
-        {
-            return value switch
-            {
-                Style.None => "None",
-                Style.Dashed => "Dashed",
-                Style.Dotted => "Dotted",
-                _ => throw new InvalidEnumArgumentException($"No such style <{value}>"),
-            };
         }
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
@@ -153,6 +93,47 @@ namespace Gwiz.Core.Serializer
             serializer(edge.ToLabel);
 
             emitter.Emit(new MappingEnd());
+        }
+
+        private string EndingToString(Ending value)
+        {
+            return value switch
+            {
+                Ending.None => "None",
+                Ending.OpenArrow => "OpenArrow",
+                Ending.ClosedArrow => "ClosedArrow",
+                Ending.Rhombus => "Rhombus",
+                _ => throw new InvalidEnumArgumentException($"No such ending <{value}>"),
+            };
+        }
+
+        private Style StringToStyle(string value)
+        {
+            if (value == "None")
+            {
+                return Style.None;
+            }
+            if (value == "Dashed")
+            {
+                return Style.Dashed;
+            }
+            if (value == "Dotted")
+            {
+                return Style.Dotted;
+            }
+
+            throw new InvalidEnumArgumentException($"No such style <{value}>");
+        }
+
+        private string StyleToString(Style value)
+        {
+            return value switch
+            {
+                Style.None => "None",
+                Style.Dashed => "Dashed",
+                Style.Dotted => "Dotted",
+                _ => throw new InvalidEnumArgumentException($"No such style <{value}>"),
+            };
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace Gwiz.Core
 {
@@ -13,9 +14,23 @@ namespace Gwiz.Core
 
         public List<ITemplate> Templates { get; set; } = new ();
 
+        internal List<EdgeTemplate> EdgeTemplates { get; } = new ();
+
         public void AddEdge(INode from, INode to)
         {
             Edges.Add(CreateEdge(from, to, Ending.None, Style.None));
+        }
+
+        public void AddEdge(INode from, INode to, IEdgeTemplate edgeTemplate)
+        {
+            var edge = CreateEdge(from, to);
+
+            edge.Beginning = edgeTemplate.Beginning;
+            edge.Ending = edgeTemplate.Ending;
+            edge.Style = edgeTemplate.Style;
+            edge.Text = edgeTemplate.Text;
+
+            Edges.Add(edge);
         }
 
         public void AddEdge(INode from, INode to, Ending ending, Style style)
@@ -41,6 +56,9 @@ namespace Gwiz.Core
             node.AssignTemplate(template);
 
             node.UpdateableGrid = Grid.CreateFromTemplateGrid(template.Grid);
+
+            AssignEdgeTemplates(templateName, node);
+
             Nodes.Add(node);
 
             return node;
@@ -55,6 +73,21 @@ namespace Gwiz.Core
                 if (nodeInternal != null)
                 {
                     nodeInternal.Update();
+                }
+            }
+        }
+
+        private void AssignEdgeTemplates(string templateName, Node node)
+        {
+            foreach (var edgeTemplate in EdgeTemplates)
+            {
+                if (edgeTemplate.Source == templateName)
+                {
+                    node.SourceEdgeTemplates.Add(edgeTemplate);
+                }
+                if (edgeTemplate.Target == templateName)
+                {
+                    node.TargetEdgeTemplates.Add(edgeTemplate);
                 }
             }
         }

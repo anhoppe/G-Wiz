@@ -88,6 +88,10 @@ namespace Gwiz.Core
             }
         }
 
+        public List<IEdgeTemplate> SourceEdgeTemplates { get; } = new();
+
+        public List<IEdgeTemplate> TargetEdgeTemplates { get; } = new();
+
         internal void AssignTemplate(ITemplate template)
         {
             Alignment = template.Alignment;

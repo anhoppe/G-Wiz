@@ -9,11 +9,22 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="icons\alpha-a.png" />
+    <Content Remove="icons\alpha-b.png" />
+    <Content Remove="icons\alpha-c.png" />
+    <Content Remove="icons\alpha-d.png" />
+    <Content Remove="icons\alpha-e.png" />
+    <Content Remove="icons\alpha-f.png" />
+    <Content Remove="icons\alpha-g.png" />
+    <Content Remove="icons\alpha-h.png" />
+    <Content Remove="icons\alpha-i.png" />
+    <Content Remove="icons\alpha-j.png" />
     <Content Remove="icons\drag-horizontal-variant.png" />
     <Content Remove="icons\drag-vertical-variant.png" />
     <Content Remove="icons\resize-bottom-right.png" />
     <Content Remove="icons\rhombus-outline.png" />
     <Content Remove="icons\text-box-edit-outline.png" />
+    <Content Remove="icons\transit-connection-variant.png" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="icons\drag-horizontal-variant.svg" />
@@ -22,6 +33,16 @@
     <None Remove="icons\resize-bottom-right.svg" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="icons\alpha-a.png" />
+    <EmbeddedResource Include="icons\alpha-b.png" />
+    <EmbeddedResource Include="icons\alpha-c.png" />
+    <EmbeddedResource Include="icons\alpha-d.png" />
+    <EmbeddedResource Include="icons\alpha-e.png" />
+    <EmbeddedResource Include="icons\alpha-f.png" />
+    <EmbeddedResource Include="icons\alpha-g.png" />
+    <EmbeddedResource Include="icons\alpha-h.png" />
+    <EmbeddedResource Include="icons\alpha-i.png" />
+    <EmbeddedResource Include="icons\alpha-j.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.svg" />
     <EmbeddedResource Include="icons\drag-vertical-variant.png" />
@@ -54,6 +75,10 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Gwiz.UiControl.WinUi3.Test" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icons\transit-connection-variant.png" />
   </ItemGroup>
   
 </Project>

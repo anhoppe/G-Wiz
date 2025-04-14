@@ -1,5 +1,8 @@
 ﻿namespace Gwiz.Core.Contract
 {
+    /// <summary>
+    /// Represents the entire graph with instances and tempates
+    /// </summary>
     public interface IGraph
     {
         List<IEdge> Edges { get; }
@@ -11,6 +14,8 @@
         INode AddNode(string templateName);
         
         void AddEdge(INode from, INode to);
+
+        void AddEdge(INode from, INode to, IEdgeTemplate edgeTemplate);
 
         void AddEdge(INode from, INode to, Ending ending, Style style);
 

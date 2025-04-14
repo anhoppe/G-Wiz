@@ -1,9 +1,7 @@
 ﻿using Gwiz.Core.Contract;
 using Gwiz.Core.Serializer;
-using Newtonsoft.Json.Bson;
 using NUnit.Framework;
 using System.Drawing;
-using System.IO;
 using System.Text;
 using YamlDotNet.Core;
 
@@ -53,6 +51,55 @@ namespace Gwiz.Core.Test.Serializer
             // Assert
             var node = result.Nodes.First();
             Assert.That(node.Alignment, Is.EqualTo(Alignment.BottomCenter));
+        }
+
+        [Test]
+        public void EdgeBeginning_WhenEdgeBeginningHasUnknwonSpecifier_ThenExceptionIsThrown()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Beginning: InvalidEndingId\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act / Assert
+            Assert.Throws<YamlException>(() => _sut.Deserialize(stream));
+        }
+
+        [Test]
+        public void EdgeBeginning_WhenEdgeBeginningSpecified_ThenEdgeHasCorrectBeginningIdentifierSet()
+        {
+            // Arrange
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "  - Id: bar\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Beginning: OpenArrow\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Beginning: ClosedArrow\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    Beginning: Rhombus\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            Assert.That(graph.Edges[0].Beginning, Is.EqualTo(Ending.OpenArrow));
+            Assert.That(graph.Edges[1].Beginning, Is.EqualTo(Ending.ClosedArrow));
+            Assert.That(graph.Edges[2].Beginning, Is.EqualTo(Ending.Rhombus));
         }
 
         [Test]
@@ -192,6 +239,103 @@ namespace Gwiz.Core.Test.Serializer
             // Assert
             Assert.That(graph.Edges[0].Style, Is.EqualTo(Style.Dashed));
             Assert.That(graph.Edges[1].Style, Is.EqualTo(Style.None));
+        }
+
+        [Test]
+        public void EdgeTemplate_WhenEdgeTemplateDefined_ThenEdgeTemplatesAreAvailableInNodes()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "  - Name: Bar\n" +
+                "EdgeTemplates:\n" +
+                "  - Source: Foo\n" +
+                "    Target: Bar\n" +
+                "Nodes:\n" +
+                "  - Id: Foo\n" +
+                "    Template: Foo\n" +
+                "  - Id: Bar\n" +
+                "    Template: Bar\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var node1 = graph.Nodes[0];
+            var node2 = graph.Nodes[1];
+
+            Assert.That(node1.SourceEdgeTemplates.Count, Is.EqualTo(1));
+            Assert.That(node1.TargetEdgeTemplates.Count, Is.EqualTo(0));
+            Assert.That(node2.SourceEdgeTemplates.Count, Is.EqualTo(0));
+            Assert.That(node2.TargetEdgeTemplates.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void EdgeTemplate_WhenEdgeTemplateDefinesIcon_ThenIconIsInNodesEdgeTemplates()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "  - Name: Bar\n" +
+                "EdgeTemplates:\n" +
+                "  - Source: Foo\n" +
+                "    Target: Bar\n" +
+                "    Icon: F\n" +
+                "Nodes:\n" +
+                "  - Id: Foo\n" +
+                "    Template: Foo\n" +
+                "  - Id: Bar\n" +
+                "    Template: Bar\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var node1 = graph.Nodes[0];
+            var node2 = graph.Nodes[1];
+
+            Assert.That(node1.SourceEdgeTemplates[0].Icon, Is.EqualTo("F"));
+            Assert.That(node2.TargetEdgeTemplates[0].Icon, Is.EqualTo("F"));
+        }
+
+        [Test]
+        public void EdgeTemplate_WhenEdgeTemplateDefinesParameters_ThenParametersAreInNodesEdgeTemplates()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "EdgeTemplates:\n" +
+                "  - Source: Foo\n" +
+                "    Target: Bar\n" +
+                "    Icon: F\n" +
+                "    Text: Bar\n" +
+                "    Beginning: Rhombus\n" +
+                "    Ending: ClosedArrow\n" +
+                "    Style: Dotted\n" +
+                "Nodes:\n" +
+                "  - Id: Foo\n" +
+                "    Template: Foo\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var node = graph.Nodes[0];
+
+            Assert.That(node.SourceEdgeTemplates[0].Icon, Is.EqualTo("F"));
+            Assert.That(node.SourceEdgeTemplates[0].Text, Is.EqualTo("Bar"));
+            Assert.That(node.SourceEdgeTemplates[0].Beginning, Is.EqualTo(Ending.Rhombus));
+            Assert.That(node.SourceEdgeTemplates[0].Ending, Is.EqualTo(Ending.ClosedArrow));
+            Assert.That(node.SourceEdgeTemplates[0].Style, Is.EqualTo(Style.Dotted));
         }
 
         [Test]

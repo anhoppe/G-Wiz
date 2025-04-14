@@ -54,6 +54,28 @@ Templates:
       Editable:
         - all
 
+EdgeTemplates:
+  - Source: UseCase
+    Target: UseCase
+    Ending: OpenArrow
+    Text: <<extends>>
+    Icon: E
+    Style: Dotted
+  - Source: UseCase
+    Target: UseCase
+    Ending: OpenArrow
+    Text: <<includes>>
+    Icon: I
+    Style: Dotted
+  - Source: Class
+    Target: Class
+    Beginning: Rhombus
+    Icon: A
+  - Source: Class
+    Target: Class
+    Ending: ClosedArrow
+    Icon: E
+
 Nodes:
   - X: 0
     Y: 0
@@ -76,6 +98,12 @@ Nodes:
       - Row: 1
         Col: 0
         Text: Barbuz
+  - X: 300
+    Y: 160
+    Width: 100
+    Height: 100
+    Template: Class
+    Id: Bar23
   - X: 200
     Y: 200
     Width: 200
@@ -123,6 +151,18 @@ Nodes:
         Col: 0
         Text: FooBuz
     Id: UC2
+  - X: 900
+    Y: 600
+    Width: 200
+    Height: 120
+    Template: UseCase
+    Id: UC3
+  - X: 900
+    Y: 800
+    Width: 200
+    Height: 120
+    Template: UseCase
+    Id: UC4
 
 Edges:
   - From: Foo

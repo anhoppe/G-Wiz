@@ -143,7 +143,6 @@ namespace Gwiz.UiControl.WinUi3.Test
             _drawMock.Verify(m => m.DrawClippedText("foo", rect, expectedTextPos, It.IsAny<Color>()), "Expected the text to be positioned at the grid coordinates becase the text is larger then the grid cell");
         }
 
-
         private Mock<IGrid> MockGrid(string text, Rectangle rect, int editPosition = -1)
         {
             var gridMock = new Mock<IGrid>();

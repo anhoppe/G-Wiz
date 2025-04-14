@@ -1,5 +1,4 @@
 using Gwiz.Core.Contract;
-using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,8 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using SkiaSharp.Views.Windows;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Foundation;
@@ -23,6 +21,8 @@ namespace Gwiz.UiControl.WinUi3
     public enum InteractionState
     {
         None,
+        CreateEdgeBegin,
+        CreateEdgeFinish,
         DraggingNode,
         DraggingView,
         EditText,
@@ -73,6 +73,10 @@ namespace Gwiz.UiControl.WinUi3
 
         private Draw _draw = new Draw();
 
+        private IEdgeTemplate? _edgeCreationSourceTemplate;
+        
+        private INode? _edgeCreationTargetNode;
+
         private IGridCell? _editGridCell;
 
         private GraphDrawer _graphDrawer = new();
@@ -93,6 +97,7 @@ namespace Gwiz.UiControl.WinUi3
 
         private Point _scrollStartPosition = new Point(0, 0);
 
+
         public GraphUiControl()
         {
             _graphDrawer.SetDraw(_draw);
@@ -104,36 +109,20 @@ namespace Gwiz.UiControl.WinUi3
 
         }
 
-        // Edges Dependency Property
-        public static readonly DependencyProperty EdgesProperty =
+        // Graph Dependency Property
+        public static readonly DependencyProperty GraphProperty =
         DependencyProperty.Register(
-            nameof(Edges),
-            typeof(IList<IEdge>),
+            nameof(Graph),
+            typeof(IGraph),
             typeof(GraphUiControl),
-            new PropertyMetadata(new List<IEdge>(), OnGraphDataChanged)
+            new PropertyMetadata(null, OnGraphDataChanged)
         );
 
-        public List<IEdge> Edges
+        public IGraph Graph
         {
-            get => (List<IEdge>)GetValue(EdgesProperty);
-            set => SetValue(EdgesProperty, value);
+            get => (IGraph)GetValue(GraphProperty);
+            set => SetValue(GraphProperty, value);
         }
-
-        // Nodes Dependency Property
-        public static readonly DependencyProperty NodesProperty =
-        DependencyProperty.Register(
-            nameof(Nodes),
-            typeof(IList<INode>),
-            typeof(GraphUiControl),
-            new PropertyMetadata(new List<INode>(), OnGraphDataChanged)
-        );
-
-        public List<INode> Nodes
-        {
-            get => (List<INode>)GetValue(NodesProperty);
-            set => SetValue(NodesProperty, value);
-        }
-
 
         private void DrawGraph(object sender, SKPaintSurfaceEventArgs e)
         {
@@ -142,7 +131,6 @@ namespace Gwiz.UiControl.WinUi3
             canvas.Translate(-(float)_scrollPosition.X, -(float)_scrollPosition.Y);
             _draw.DrawingSession = e.Surface.Canvas;
             _graphDrawer.DrawGraph();
-
         }
 
         [DllImport("user32.dll")]
@@ -180,7 +168,7 @@ namespace Gwiz.UiControl.WinUi3
         private void Invalidate()
         {
             _bounds.Reset();
-            foreach (var node in Nodes)
+            foreach (var node in Graph.Nodes)
             {
                 _bounds.Add(node.X, node.Y, node.Width, node.Height);
             }
@@ -309,6 +297,11 @@ namespace Gwiz.UiControl.WinUi3
 
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
+            if (Graph == null)
+            {
+                return;
+            }
+
             var screenPointerPosition = e.GetCurrentPoint(this).Position;
             var worldPointerPosition = screenPointerPosition;
             worldPointerPosition.X += _scrollPosition.X;
@@ -325,9 +318,20 @@ namespace Gwiz.UiControl.WinUi3
                     // Iterate backwards to honor the drawing order defined by the input yaml / order of adding
                     _hoveredNode = null;
                     _editGridCell = null;
-                    for (int i = Nodes.Count - 1; i >= 0; i--)
+                    for (int i = Graph.Nodes.Count - 1; i >= 0; i--)
                     {
-                        var node = Nodes[i];
+                        var node = Graph.Nodes[i];
+
+                        // Check if mouse is over source edge template icon
+                        _edgeCreationSourceTemplate = _graphDrawer.GetSourceEdgeTemplateAtPosition(node, (int)worldPointerPosition.X, (int)worldPointerPosition.Y);
+                        if (_edgeCreationSourceTemplate != null)
+                        {
+                            _hoveredNode = node;
+                            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+                            _potentialInteractionState = InteractionState.CreateEdgeBegin;
+                            break;
+                        }
+
 
                         bool isOverEditButton = false;
 
@@ -420,6 +424,30 @@ namespace Gwiz.UiControl.WinUi3
                     }
                     break;
 
+                case InteractionState.CreateEdgeBegin:
+                    if (_hoveredNode == null)
+                    {
+                        throw new InvalidOperationException("Cannot begin edge creation when no node is active");
+                    }
+
+                    _graphDrawer.PreparePreviewLine(_hoveredNode, (int)worldPointerPosition.X, (int)worldPointerPosition.Y);
+                    
+                    // Check if mouse cursor is over a target edge template
+                    foreach (var node in Graph.Nodes)
+                    {
+                        var edgeTemplate = _graphDrawer.GetSourceEdgeTemplateAtPosition(node, (int)worldPointerPosition.X, (int) worldPointerPosition.Y);
+
+                        if (edgeTemplate != null)
+                        {
+                            _potentialInteractionState = InteractionState.CreateEdgeFinish;
+                            _edgeCreationTargetNode = node;
+
+                            break;
+                        }
+                    }
+                    
+                    Invalidate();
+                    break;
                 case InteractionState.DraggingNode:
                     if (_hoveredNode == null)
                     {
@@ -484,6 +512,10 @@ namespace Gwiz.UiControl.WinUi3
 
         private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (_currentInteractionState == InteractionState.CreateEdgeBegin)
+            {
+                _graphDrawer.EdgeCreationActiveSourceTemplate = null;
+            }
             if (_currentInteractionState == InteractionState.EditText)
             {
                 StopEditing();
@@ -496,6 +528,26 @@ namespace Gwiz.UiControl.WinUi3
             _interactionStartPosition.X += _scrollPosition.X;
             _interactionStartPosition.Y += _scrollPosition.Y;
 
+            if (_currentInteractionState == InteractionState.CreateEdgeFinish)
+            {
+                if (_hoveredNode == null)
+                {
+                    throw new InvalidOperationException("Cannot create edge because source node is not set");
+                }
+                if (_edgeCreationTargetNode == null)
+                {
+                    throw new InvalidOperationException("Cannot create edge because target node is not set");
+                }
+
+                Graph.AddEdge(_hoveredNode, _edgeCreationTargetNode, _edgeCreationSourceTemplate);
+                
+                _currentInteractionState = InteractionState.None;
+                Invalidate();
+            }
+            if (_currentInteractionState == InteractionState.CreateEdgeBegin)
+            {
+                _graphDrawer.EdgeCreationActiveSourceTemplate = _edgeCreationSourceTemplate;
+            }
             if (_currentInteractionState == InteractionState.DraggingView)
             {
                 _scrollStartPosition = _interactionStartPosition;
@@ -512,11 +564,12 @@ namespace Gwiz.UiControl.WinUi3
 
         private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            if (_currentInteractionState != InteractionState.EditText)
+            if (_currentInteractionState != InteractionState.EditText &&
+                _currentInteractionState != InteractionState.CreateEdgeBegin)
             {
                 _currentInteractionState = InteractionState.None;
             }
-            else
+            else if (_currentInteractionState == InteractionState.EditText)
             {
                 StartEditing();
             }
@@ -564,8 +617,8 @@ namespace Gwiz.UiControl.WinUi3
         private void UpdateGraphDrawer()
         {
             _scrollPosition = new(0, 0);
-            _graphDrawer.Edges = Edges;
-            _graphDrawer.Nodes = Nodes;
+            _graphDrawer.Edges = Graph.Edges;
+            _graphDrawer.Nodes = Graph.Nodes;
         }
     }
 }

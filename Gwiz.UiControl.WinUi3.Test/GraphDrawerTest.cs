@@ -94,6 +94,39 @@ namespace Gwiz.UiControl.WinUi3.Test
         }
 
         [Test]
+        public void Edges_DrawEdgeWithRhombusBeginning_RhombusDrawnAsExpected()
+        {
+            // Arrange
+            var edgeMock = new Mock<IEdge>();
+
+            var from = new Point(10, 30);
+            var to = new Point(10, 0);
+            edgeMock.SetupGet(x => x.FromPosition).Returns(from);
+            edgeMock.SetupGet(x => x.ToPosition).Returns(to);
+            edgeMock.Setup(p => p.Beginning).Returns(Ending.Rhombus);
+
+            _sut.Edges = [edgeMock.Object];
+
+            var expectedEndPoint1 = new Point(2, 17);
+            var expectedEndPoint2 = new Point(17, 17);
+            var expectedModifiedFrom = new Point(10, 4);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+
+            // Assert correct Rhombus head
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint2), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint1), It.Is<Point>(p => p == expectedModifiedFrom), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedModifiedFrom), Style.None));
+
+            // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedModifiedFrom), It.Is<Point>(p => p == to), Style.None));
+        }
+
+        [Test]
         public void Edges_DrawEdgeWithRhombusEnding_RhombusDrawnAsExpected()
         {
             // Arrange
@@ -125,6 +158,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
             _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedModifiedTo), Style.None));
         }
+
 
         [Test]
         public void EdgeLabels_WhenEdgeHasFromToLabelsDefined_ThenTheLabelsAreDrawn()
@@ -201,6 +235,151 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             var expectedTextPos = new Point(25, 0);
             _drawMock.Verify(m => m.DrawText("foo", expectedTextPos, It.IsAny<Color>()));
+        }
+
+        [Test]
+        public void GetSourceEdgeTemplateAtPosition_WhenMouseisOverSourceEdgeTemplates_ThenCorrectEdgeTemplateIsReturned()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            var edgeTemplate1Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate1Mock.Setup(p => p.Icon).Returns("F");
+            
+            var edgeTemplate2Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate2Mock.Setup(p => p.Icon).Returns("B");
+
+            nodeMock.Setup(p => p.SourceEdgeTemplates).Returns(new List<IEdgeTemplate>() 
+            {
+                edgeTemplate1Mock.Object,
+                edgeTemplate2Mock.Object
+            });
+
+            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.Y).Returns(0);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            _sut.Nodes.Add(nodeMock.Object);
+
+            // Act
+            var result = _sut.GetSourceEdgeTemplateAtPosition(nodeMock.Object, 3, 38);
+
+            // Assert
+            Assert.That(edgeTemplate1Mock.Object == result);
+        }
+
+        [Test]
+        public void NodeConnections_WhenNodeHasSourceEdgeTemplates_ThenCorrectIconsAreDrawn()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            var edgeTemplate1Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate1Mock.Setup(p => p.Icon).Returns("F");
+
+            var edgeTemplate2Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate2Mock.Setup(p => p.Icon).Returns("B");
+
+            nodeMock.Setup(p => p.SourceEdgeTemplates).Returns(new List<IEdgeTemplate>()
+            {
+                edgeTemplate1Mock.Object,
+                edgeTemplate2Mock.Object
+            });
+
+            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.Y).Returns(0);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            _sut.Nodes.Add(nodeMock.Object);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 0, 5), "Expected is the connection icon on top");
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 0, 35), "Expected F icon for 1st source");
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 0, 65), "Expected B icon for 2nd source");
+        }
+
+
+        [Test]
+        public void NodeConnections_WhenEdgeCreationActiveSourceTemplateIsSet_ThenCorrectTargetIconIsDrawnd()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            var edgeTemplate1Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate1Mock.Setup(p => p.Icon).Returns("F");
+
+            var edgeTemplate2Mock = new Mock<IEdgeTemplate>();
+            edgeTemplate2Mock.Setup(p => p.Icon).Returns("B");
+
+            nodeMock.Setup(p => p.TargetEdgeTemplates).Returns(new List<IEdgeTemplate>()
+            {
+                edgeTemplate1Mock.Object,
+                edgeTemplate2Mock.Object
+            });
+
+            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.Y).Returns(0);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            _sut.Nodes.Add(nodeMock.Object);
+
+            _sut.EdgeCreationActiveSourceTemplate = edgeTemplate2Mock.Object;
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 0, 35), Times.Once, "Expected B icon is drawn as target because it is selected as source");
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never, "That the method is only called once");
+        }
+
+        [Test]
+        public void PreparePreviewLine_WhenEdgeCreationActiveIsNotEnabled_ThenPreviewLineIsNotDrawn()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            nodeMock.Setup(p => p.X).Returns(0);
+            nodeMock.Setup(p => p.Y).Returns(0);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            // Act
+            _sut.PreparePreviewLine(nodeMock.Object, 200, 300);
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedStart = new Point(50, 50);
+            var expectedEnd = new Point(200, 300);
+            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted), Times.Never);
+        }
+
+        [Test]
+        public void PreparePreviewLine_WhenPreviewLineIsPreparedAndGraphisDrawn_ThenPreviewLineIsDrawnFromNodeCenterToPosition()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            nodeMock.Setup(p => p.X).Returns(0);
+            nodeMock.Setup(p => p.Y).Returns(0);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            // Act
+            _sut.EdgeCreationActiveSourceTemplate = Mock.Of<IEdgeTemplate>();
+            _sut.PreparePreviewLine(nodeMock.Object, 200, 300);
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedStart = new Point(50, 50);
+            var expectedEnd = new Point(200, 300);
+            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted));
         }
 
         [Test]

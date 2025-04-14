@@ -18,6 +18,8 @@ namespace Gwiz.Core.Serializer
 
             parser.Consume<MappingStart>();
 
+            List<EdgeTemplate> edgeTemplates = new();
+
             while (parser.TryConsume<Scalar>(out var key))
             {
                 switch (key.Value)
@@ -34,10 +36,15 @@ namespace Gwiz.Core.Serializer
                         var templates = (List<Template>)(rootDeserializer(typeof(List<Template>)) ?? new List<Template>());
                         graph.Templates = templates.Cast<ITemplate>().ToList();
                         break;
+                    case "EdgeTemplates":
+                        edgeTemplates = (List<EdgeTemplate>)(rootDeserializer(typeof(List<EdgeTemplate>)) ?? new List<EdgeTemplate>());
+                        break;
                 }
             }
 
             parser.Consume<MappingEnd>();
+
+            ResolveSourceTargetEdgeTemplatesInNodes(graph, edgeTemplates);
 
             return graph;
         }
@@ -64,6 +71,29 @@ namespace Gwiz.Core.Serializer
             }
 
             emitter.Emit(new MappingEnd());
+        }
+
+        private static void ResolveSourceTargetEdgeTemplatesInNodes(Graph graph, List<EdgeTemplate> edgeTemplates)
+        {
+            foreach (var node in graph.Nodes)
+            {
+                var internalNode = node as Node;
+
+                if (internalNode != null)
+                {
+                    foreach (var edgeTemplate in edgeTemplates)
+                    {
+                        if (internalNode.TemplateName == edgeTemplate.Source)
+                        {
+                            internalNode.SourceEdgeTemplates.Add(edgeTemplate);
+                        }
+                        if (internalNode.TemplateName == edgeTemplate.Target)
+                        {
+                            internalNode.TargetEdgeTemplates.Add(edgeTemplate);
+                        }
+                    }
+                }
+            }
         }
     }
 }

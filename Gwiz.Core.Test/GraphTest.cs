@@ -1,13 +1,7 @@
 ﻿using Gwiz.Core.Contract;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gwiz.Core.Test
 {
@@ -78,6 +72,55 @@ namespace Gwiz.Core.Test
         }
 
         [Test]
+        public void AddNode_WhenEdgeTemplateIsDefined_ThenNodeReferencesEdgeTemplate()
+        {
+            // Arrange
+            var edgeTeamplates = new List<EdgeTemplate>()
+            {
+            };
+
+            var sut = new Graph();
+
+            sut.Templates.Add(new Template()
+            {
+                Name = "foo",
+
+                Grid = new Grid()
+                {
+                    Cols = new List<string>() { "1" },
+                    Rows = new List<string>() { "1" }
+                }
+            });
+
+            sut.Templates.Add(new Template()
+            {
+                Name = "bar",
+
+                Grid = new Grid()
+                {
+                    Cols = new List<string>() { "1" },
+                    Rows = new List<string>() { "1" }
+                }
+            });
+
+            sut.EdgeTemplates.Add(new EdgeTemplate()
+            {
+                Source = "foo",
+                Target = "bar",
+            });
+
+            // Act
+            var node1 = sut.AddNode("foo");
+            var node2 = sut.AddNode("bar");
+
+            // Assert
+            Assert.That(node1.SourceEdgeTemplates.Count, Is.EqualTo(1));
+            Assert.That(node1.TargetEdgeTemplates.Count, Is.EqualTo(0));
+            Assert.That(node2.SourceEdgeTemplates.Count, Is.EqualTo(0));
+            Assert.That(node2.TargetEdgeTemplates.Count, Is.EqualTo(1));
+         }
+
+        [Test]
         public void AddEdge_WhenAddingEdgeWithNodes_ThenEdgeHasFromAndToSet()
         {
             // Arrange
@@ -122,6 +165,38 @@ namespace Gwiz.Core.Test
             Assert.That(edge.FromLabel, Is.EqualTo("foo"));
             Assert.That(edge.ToLabel, Is.EqualTo("bar"));
             Assert.That(edge.LabelOffsetPerCent, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void AddEdge_WhenAddingEdgeUsingTemplate_ThenTheEdgeHasParametersFromTemplate()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            var sut = new Graph()
+            {
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            var edgeTemplateMock = new Mock<IEdgeTemplate>();
+            edgeTemplateMock.Setup(p => p.Beginning).Returns(Ending.ClosedArrow);
+            edgeTemplateMock.Setup(p => p.Ending).Returns(Ending.Rhombus);
+            edgeTemplateMock.Setup(p => p.Style).Returns(Style.Dashed);
+            edgeTemplateMock.Setup(p => p.Text).Returns("buz");
+
+            // Act
+            sut.AddEdge(node1Mock.Object, node2Mock.Object, edgeTemplateMock.Object);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0];
+            Assert.That(edge.Beginning, Is.EqualTo(Ending.ClosedArrow));
+            Assert.That(edge.Ending, Is.EqualTo(Ending.Rhombus));
+            Assert.That(edge.Style, Is.EqualTo(Style.Dashed));
+            Assert.That(edge.Text, Is.EqualTo("buz"));
+
         }
     }
 }
