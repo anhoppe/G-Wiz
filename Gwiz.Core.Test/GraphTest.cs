@@ -27,6 +27,37 @@ namespace Gwiz.Core.Test
         }
 
         [Test]
+        public void AddNode_WhenAddingNode_ThenSourceAndTargetTemplatesAreAssigned()
+        {
+            var sut = new Graph();
+            sut.Templates.Add(new Template()
+            {
+                Name = "foo",
+            });
+            sut.Templates.Add(new Template()
+            {
+                Name = "bar",
+            });
+
+            var edgeTemplate = new EdgeTemplate()
+            {
+                Source = "foo",
+                Target = "bar"
+            };
+
+            sut.EdgeTemplates.Add(edgeTemplate);
+
+            // Act
+            var fooNode = sut.AddNode("foo");
+            var barNode = sut.AddNode("bar");
+
+            Assert.That(fooNode.SourceEdgeTemplates.Contains(edgeTemplate));
+            Assert.That(fooNode.TargetEdgeTemplates.Count == 0);
+            Assert.That(barNode.SourceEdgeTemplates.Count == 0);
+            Assert.That(barNode.TargetEdgeTemplates.Contains(edgeTemplate));
+        }
+
+        [Test]
         public void AddNode_WhenAddingNodeWithTemplate_ThenTemplateIsAssignedToNode()
         {
             var sut = new Graph();

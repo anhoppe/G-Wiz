@@ -274,6 +274,32 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void EdgeTemplate_WhenEdgeTemplateDefined_ThenEdgeTemplatesAreAvailableInGraph()
+        {
+            // Arrange
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "  - Name: Bar\n" +
+                "EdgeTemplates:\n" +
+                "  - Source: Foo\n" +
+                "    Target: Bar\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream) as Graph;
+
+            // Assert
+            Assert.That(graph != null);
+
+            if (graph != null)
+            {
+                Assert.That(graph.EdgeTemplates.Count == 1);
+            }
+        }
+
+        [Test]
         public void EdgeTemplate_WhenEdgeTemplateDefinesIcon_ThenIconIsInNodesEdgeTemplates()
         {
             // Arrange

@@ -534,6 +534,10 @@ namespace Gwiz.UiControl.WinUi3
                 {
                     throw new InvalidOperationException("Cannot create edge because source node is not set");
                 }
+                if (_edgeCreationSourceTemplate == null)
+                {
+                    throw new InvalidOperationException("Cannot create edge because source template is not set");
+                }
                 if (_edgeCreationTargetNode == null)
                 {
                     throw new InvalidOperationException("Cannot create edge because target node is not set");

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace Gwiz.Core
 {
@@ -14,7 +13,7 @@ namespace Gwiz.Core
 
         public List<ITemplate> Templates { get; set; } = new ();
 
-        internal List<EdgeTemplate> EdgeTemplates { get; } = new ();
+        internal List<EdgeTemplate> EdgeTemplates { get; set; } = new ();
 
         public void AddEdge(INode from, INode to)
         {
