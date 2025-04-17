@@ -51,7 +51,11 @@ namespace Gwiz.Core
                 throw new KeyNotFoundException($"Template {templateName} not found");
             }
 
-            var node = new Node();
+            var node = new Node()
+            {
+                Id = Guid.NewGuid().ToString(),
+            };
+
             node.AssignTemplate(template);
 
             node.UpdateableGrid = Grid.CreateFromTemplateGrid(template.Grid);
@@ -108,7 +112,9 @@ namespace Gwiz.Core
 
             return new Edge()
             {
+                FromId = from.Id,
                 FromInternal = fromInternal,
+                ToId = to.Id,
                 ToInternal = toInternal,
             };
         }

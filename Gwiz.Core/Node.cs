@@ -99,6 +99,7 @@ namespace Gwiz.Core
             LineColor = template.LineColor;
             Resize = template.Resize;
             Shape = template.Shape;
+            TemplateName = template.Name;
             UpdateableGrid = Core.Grid.CreateFromTemplateGrid(template.Grid);
         }
 

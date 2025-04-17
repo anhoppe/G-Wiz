@@ -32,7 +32,18 @@ namespace Gwiz.UiControl.WinUi3
         public SKBitmap? AlphaI { get; private set; }
         
         public SKBitmap? AlphaJ { get; private set; }
-
+        
+        public SKBitmap? AlphaU { get; private set; }
+        
+        public SKBitmap? AlphaV { get; private set; }
+        
+        public SKBitmap? AlphaW { get; private set; }
+        
+        public SKBitmap? AlphaX { get; private set; }
+        
+        public SKBitmap? AlphaY { get; private set; }
+        
+        public SKBitmap? AlphaZ { get; private set; }
 
         public SKBitmap? Connection { get; private set; }
 
@@ -73,6 +84,18 @@ namespace Gwiz.UiControl.WinUi3
                     return AlphaI;
                 case 'J':
                     return AlphaJ;
+                case 'U':
+                    return AlphaU;
+                case 'V':
+                    return AlphaV;
+                case 'W':
+                    return AlphaW;
+                case 'X':
+                    return AlphaX;
+                case 'Y':
+                    return AlphaY;
+                case 'Z':
+                    return AlphaZ;
             }
 
             throw new ArgumentException($"Could not determine the alpha icon for {icon}");
@@ -134,6 +157,30 @@ namespace Gwiz.UiControl.WinUi3
             using (var stream = GetEmbeddedStream("alpha-j.png"))
             {
                 AlphaJ = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-u.png"))
+            {
+                AlphaU = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-v.png"))
+            {
+                AlphaV = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-w.png"))
+            {
+                AlphaW = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-x.png"))
+            {
+                AlphaX = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-y.png"))
+            {
+                AlphaY = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-z.png"))
+            {
+                AlphaZ = SKBitmap.Decode(stream);
             }
             using (var stream = GetEmbeddedStream("transit-connection-variant.png"))
             {

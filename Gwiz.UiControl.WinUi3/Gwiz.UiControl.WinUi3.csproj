@@ -19,6 +19,12 @@
     <Content Remove="icons\alpha-h.png" />
     <Content Remove="icons\alpha-i.png" />
     <Content Remove="icons\alpha-j.png" />
+    <Content Remove="icons\alpha-u.png" />
+    <Content Remove="icons\alpha-v.png" />
+    <Content Remove="icons\alpha-w.png" />
+    <Content Remove="icons\alpha-x.png" />
+    <Content Remove="icons\alpha-y.png" />
+    <Content Remove="icons\alpha-z.png" />
     <Content Remove="icons\drag-horizontal-variant.png" />
     <Content Remove="icons\drag-vertical-variant.png" />
     <Content Remove="icons\resize-bottom-right.png" />
@@ -43,6 +49,12 @@
     <EmbeddedResource Include="icons\alpha-h.png" />
     <EmbeddedResource Include="icons\alpha-i.png" />
     <EmbeddedResource Include="icons\alpha-j.png" />
+    <EmbeddedResource Include="icons\alpha-u.png" />
+    <EmbeddedResource Include="icons\alpha-v.png" />
+    <EmbeddedResource Include="icons\alpha-w.png" />
+    <EmbeddedResource Include="icons\alpha-x.png" />
+    <EmbeddedResource Include="icons\alpha-y.png" />
+    <EmbeddedResource Include="icons\alpha-z.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.svg" />
     <EmbeddedResource Include="icons\drag-vertical-variant.png" />

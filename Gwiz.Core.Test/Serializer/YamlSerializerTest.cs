@@ -749,6 +749,41 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void Serialization_WhenGraphIsSerialized_ThenTheSerializationContainsExpectedAttributes()
+        {
+            var yaml =
+                "Templates:\n" +
+                "  - Name: Foo\n" +
+                "    Shape: Ellipse\n" +
+                "Nodes:\n" +
+                "  - X: 10\n" +
+                "    Y: 20\n" +
+                "    Template: Foo\n" +
+                "    Id: 1\n" +
+                "  - X: 10\n" +
+                "    Y: 20\n" +
+                "    Template: Foo\n" +
+                "    Id: 2\n" +
+                "Edges:\n" +
+                "  - From: 1\n" +
+                "    To: 2\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+            var graph = _sut.Deserialize(stream);
+
+            // Act
+            using var outStream = new MemoryStream();
+            _sut.Serialize(outStream, graph);
+
+            // Assert
+            byte[] buffer = outStream.ToArray();
+            string resultingStr = Encoding.UTF8.GetString(buffer);
+
+            Assert.That(resultingStr.Contains("From: 1"));
+            Assert.That(resultingStr.Contains("To: 2"));
+        }
+
+        [Test]
         public void Shape_WhenEllipseIsDefinedForNodeTemplate_ThenNodeHasShape()
         {
             // Arrange

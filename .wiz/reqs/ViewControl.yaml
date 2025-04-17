@@ -1,0 +1,84 @@
+Nodes:
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 670
+  Id: 66549f3a-cc52-494f-af3f-a9dfacf5c2d4
+  Template: Boundary
+  Width: 1011
+  X: -272
+  Y: -19
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 80
+  Id: b8c88320-600f-4dbf-8493-ea594b73d26c
+  Template: Actor
+  Width: 80
+  X: -445
+  Y: 61
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 80
+  Id: d9f332f6-5c4e-4014-990a-287a8893af6f
+  Template: Actor
+  Width: 80
+  X: -491
+  Y: 383
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Foo
+  Height: 116
+  Id: 9860079d-9d76-4bdf-aa06-0d8967177ac2
+  Template: UseCase
+  Width: 180
+  X: 402
+  Y: 71
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Bar
+  Height: 120
+  Id: d9b4309e-da84-44d3-ab4f-885d759be47a
+  Template: UseCase
+  Width: 180
+  X: 430
+  Y: 362
+Edges:
+- Ending: OpenArrow
+  From: b8c88320-600f-4dbf-8493-ea594b73d26c
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 9860079d-9d76-4bdf-aa06-0d8967177ac2
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d9f332f6-5c4e-4014-990a-287a8893af6f
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: d9b4309e-da84-44d3-ab4f-885d759be47a
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d9b4309e-da84-44d3-ab4f-885d759be47a
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 9860079d-9d76-4bdf-aa06-0d8967177ac2
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 9860079d-9d76-4bdf-aa06-0d8967177ac2
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 9860079d-9d76-4bdf-aa06-0d8967177ac2
+  ToLabel: ''

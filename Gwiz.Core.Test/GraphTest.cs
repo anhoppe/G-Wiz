@@ -9,21 +9,91 @@ namespace Gwiz.Core.Test
     public class GraphTest
     {
         [Test]
-        public void AddNode_WhenAddingSingleNode_ThenNodeInGraph()
+        public void AddEdge_WhenAddingEdgeUsingTemplate_ThenTheEdgeHasParametersFromTemplate()
         {
             // Arrange
-            var sut = new Graph();
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
 
-            sut.Templates.Add(new Template()
+            var sut = new Graph()
             {
-                Name = "foo"
-            });
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            var edgeTemplateMock = new Mock<IEdgeTemplate>();
+            edgeTemplateMock.Setup(p => p.Beginning).Returns(Ending.ClosedArrow);
+            edgeTemplateMock.Setup(p => p.Ending).Returns(Ending.Rhombus);
+            edgeTemplateMock.Setup(p => p.Style).Returns(Style.Dashed);
+            edgeTemplateMock.Setup(p => p.Text).Returns("buz");
 
             // Act
-            var node = sut.AddNode("foo");
+            sut.AddEdge(node1Mock.Object, node2Mock.Object, edgeTemplateMock.Object);
 
             // Assert
-            Assert.That(sut.Nodes.Count, Is.EqualTo(1));
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0];
+            Assert.That(edge.Beginning, Is.EqualTo(Ending.ClosedArrow));
+            Assert.That(edge.Ending, Is.EqualTo(Ending.Rhombus));
+            Assert.That(edge.Style, Is.EqualTo(Style.Dashed));
+            Assert.That(edge.Text, Is.EqualTo("buz"));
+
+        }
+
+        [Test]
+        public void AddEdge_WhenAddingEdgeWithFromToLabelsAndOffset_ThenEdgeHasFromAndToLabelsSet()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            var sut = new Graph()
+            {
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            // Act
+            sut.AddEdge(node1Mock.Object, node2Mock.Object, "foo", "bar", 7);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0];
+            Assert.That(edge.FromLabel, Is.EqualTo("foo"));
+            Assert.That(edge.ToLabel, Is.EqualTo("bar"));
+            Assert.That(edge.LabelOffsetPerCent, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void AddEdge_WhenAddingEdgeWithNodes_ThenEdgeHasFromAndToSet()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            node1Mock.Setup(p => p.Id).Returns("node1");
+            node2Mock.Setup(p => p.Id).Returns("node2");
+
+            var sut = new Graph()
+            {
+                Nodes = [node1Mock.Object, node2Mock.Object],
+            };
+
+            // Act
+            sut.AddEdge(node1Mock.Object, node2Mock.Object);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+
+            var edge = sut.Edges[0] as Edge;
+            if (edge == null)
+            {
+                throw new NullReferenceException();
+            }
+            Assert.That(edge.From, Is.EqualTo(node1Mock.Object));
+            Assert.That(edge.To, Is.EqualTo(node2Mock.Object));
+            Assert.That(edge.FromId, Is.EqualTo("node1"));
+            Assert.That(edge.ToId, Is.EqualTo("node2"));
         }
 
         [Test]
@@ -58,7 +128,7 @@ namespace Gwiz.Core.Test
         }
 
         [Test]
-        public void AddNode_WhenAddingNodeWithTemplate_ThenTemplateIsAssignedToNode()
+        public void AddNode_WhenAddingNode_ThenTheNodeHasAnId()
         {
             var sut = new Graph();
             sut.Templates.Add(new Template()
@@ -73,9 +143,7 @@ namespace Gwiz.Core.Test
             var node = sut.AddNode("foo");
 
             // Assert
-            Assert.That(node.BackgroundColor, Is.EqualTo(Color.Red));
-            Assert.That(node.LineColor, Is.EqualTo(Color.Blue));
-            Assert.That(node.Resize, Is.EqualTo(Resize.HorzVertBoth));
+            Assert.That(!string.IsNullOrEmpty(node.Id));
         }
 
         [Test]
@@ -93,15 +161,58 @@ namespace Gwiz.Core.Test
                     Rows = new List<string>() { "1", "2" }
                 }
             });
-         
+
             // Act
             var node = sut.AddNode("foo");
-            
+
             // Assert
             Assert.That(node.Grid.Cols.Count, Is.EqualTo(2));
             Assert.That(node.Grid.Rows.Count, Is.EqualTo(2));
         }
 
+        [Test]
+        public void AddNode_WhenAddingNodeWithTemplate_ThenTemplateIsAssignedToNode()
+        {
+            var sut = new Graph();
+            sut.Templates.Add(new Template()
+            {
+                Name = "foo",
+                BackgroundColor = Color.Red,
+                LineColor = Color.Blue,
+                Resize = Resize.HorzVertBoth,
+            });
+
+            // Act
+            var node = sut.AddNode("foo") as Node;
+
+            // Assert
+            if (node == null)
+            {
+                throw new NullReferenceException();
+            }
+            Assert.That(node.BackgroundColor, Is.EqualTo(Color.Red));
+            Assert.That(node.LineColor, Is.EqualTo(Color.Blue));
+            Assert.That(node.Resize, Is.EqualTo(Resize.HorzVertBoth));
+            Assert.That(node.TemplateName, Is.EqualTo("foo"));
+        }
+
+        [Test]
+        public void AddNode_WhenAddingSingleNode_ThenNodeInGraph()
+        {
+            // Arrange
+            var sut = new Graph();
+
+            sut.Templates.Add(new Template()
+            {
+                Name = "foo"
+            });
+
+            // Act
+            var node = sut.AddNode("foo");
+
+            // Assert
+            Assert.That(sut.Nodes.Count, Is.EqualTo(1));
+        }
         [Test]
         public void AddNode_WhenEdgeTemplateIsDefined_ThenNodeReferencesEdgeTemplate()
         {
@@ -150,84 +261,5 @@ namespace Gwiz.Core.Test
             Assert.That(node2.SourceEdgeTemplates.Count, Is.EqualTo(0));
             Assert.That(node2.TargetEdgeTemplates.Count, Is.EqualTo(1));
          }
-
-        [Test]
-        public void AddEdge_WhenAddingEdgeWithNodes_ThenEdgeHasFromAndToSet()
-        {
-            // Arrange
-            var node1Mock = new Mock<IUpdatableNode>();
-            var node2Mock = new Mock<IUpdatableNode>();
-
-            var sut = new Graph()
-            {
-                Nodes = [node1Mock.Object, node2Mock.Object],
-            };
-
-            // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object);
-
-            // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0];
-            Assert.That(edge.From, Is.EqualTo(node1Mock.Object));
-            Assert.That(edge.To, Is.EqualTo(node2Mock.Object));
-        }
-
-        [Test]
-        public void AddEdge_WhenAddingEdgeWithFromToLabelsAndOffset_ThenEdgeHasFromAndToLabelsSet()
-        {
-            // Arrange
-            var node1Mock = new Mock<IUpdatableNode>();
-            var node2Mock = new Mock<IUpdatableNode>();
-
-            var sut = new Graph()
-            {
-                Nodes = [node1Mock.Object, node2Mock.Object],
-            };
-
-            // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object, "foo", "bar", 7);
-
-            // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0];
-            Assert.That(edge.FromLabel, Is.EqualTo("foo"));
-            Assert.That(edge.ToLabel, Is.EqualTo("bar"));
-            Assert.That(edge.LabelOffsetPerCent, Is.EqualTo(7));
-        }
-
-        [Test]
-        public void AddEdge_WhenAddingEdgeUsingTemplate_ThenTheEdgeHasParametersFromTemplate()
-        {
-            // Arrange
-            var node1Mock = new Mock<IUpdatableNode>();
-            var node2Mock = new Mock<IUpdatableNode>();
-
-            var sut = new Graph()
-            {
-                Nodes = [node1Mock.Object, node2Mock.Object],
-            };
-
-            var edgeTemplateMock = new Mock<IEdgeTemplate>();
-            edgeTemplateMock.Setup(p => p.Beginning).Returns(Ending.ClosedArrow);
-            edgeTemplateMock.Setup(p => p.Ending).Returns(Ending.Rhombus);
-            edgeTemplateMock.Setup(p => p.Style).Returns(Style.Dashed);
-            edgeTemplateMock.Setup(p => p.Text).Returns("buz");
-
-            // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object, edgeTemplateMock.Object);
-
-            // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0];
-            Assert.That(edge.Beginning, Is.EqualTo(Ending.ClosedArrow));
-            Assert.That(edge.Ending, Is.EqualTo(Ending.Rhombus));
-            Assert.That(edge.Style, Is.EqualTo(Style.Dashed));
-            Assert.That(edge.Text, Is.EqualTo("buz"));
-
-        }
     }
 }

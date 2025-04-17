@@ -58,18 +58,18 @@ namespace Gwiz.Core.Serializer
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
-            if(value is not Node node)
+            if (value is not Node node)
             {
                 throw new ArgumentException("Expected a Node instance.", nameof(value));
             }
 
             emitter.Emit(new MappingStart());
 
-            if (node.Content.Any())
-            {
-                emitter.Emit(new Scalar("Content"));
-                serializer(node.Content);
-            }
+            // Convert the grid to content
+            List<Content> content = ConvertGridToContent(node);
+
+            emitter.Emit(new Scalar("Content"));
+            serializer(content);
 
             emitter.Emit(new Scalar("Height"));
             serializer(node.Height);
@@ -88,8 +88,32 @@ namespace Gwiz.Core.Serializer
 
             emitter.Emit(new Scalar("Y"));
             serializer(node.Y);
-            
+
             emitter.Emit(new MappingEnd());
+        }
+
+        private static List<Content> ConvertGridToContent(Node node)
+        {
+            var content = new List<Content>();
+            for (int y = 0; y < node.Grid.Rows.Count; y++)
+            {
+                for (int x = 0; x < node.Grid.Cols.Count; x++)
+                {
+                    var cell = node.Grid.Cells[x][y];
+
+                    if (cell != null)
+                    {
+                        content.Add(new Content
+                        {
+                            Col = x,
+                            Row = y,
+                            Text = cell.Text,
+                        });
+                    }
+                }
+            }
+
+            return content;
         }
     }
 }
