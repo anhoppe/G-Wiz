@@ -9,15 +9,21 @@ namespace Gwiz.Core
 {
     internal class Node : IUpdatableNode
     {
-        private int _height;
-
         private IUpdatableGrid _grid = new Grid();
 
+        private int _height;
+
+        private bool _selected;
+        
         private int _width;
 
         private int _x;
 
         private int _y;
+
+        public event EventHandler<IUpdatableNode> NodeChanged = delegate { };
+
+        public event EventHandler<bool> SelectedChanged;
 
         public Alignment Alignment { get; set; } = Alignment.CenterCenter;
 
@@ -47,7 +53,21 @@ namespace Gwiz.Core
 
         public Resize Resize { get; set; } = Resize.None;
 
+        public bool Select 
+        { 
+            get => _selected;
+            set
+            {
+                _selected = value;
+                SelectedChanged?.Invoke(this, _selected);
+            }
+        }
+
         public Shape Shape { get; set; } = Shape.Rectangle;
+
+        public List<IEdgeTemplate> SourceEdgeTemplates { get; } = new();
+
+        public List<IEdgeTemplate> TargetEdgeTemplates { get; } = new();
 
         public int Width
         {
@@ -78,9 +98,6 @@ namespace Gwiz.Core
                 NodeChanged?.Invoke(this, this);
             }
         }
-
-        public event EventHandler<IUpdatableNode> NodeChanged = delegate { };
-
         internal List<Content> Content { get; set; } = new List<Content>();
 
         internal string TemplateName { get; set; } = string.Empty;
@@ -94,13 +111,6 @@ namespace Gwiz.Core
                 _grid.RegisterParentNodeChanged(this);
             }
         }
-
-        public bool Select { get ; set ; }
-
-        public List<IEdgeTemplate> SourceEdgeTemplates { get; } = new();
-
-        public List<IEdgeTemplate> TargetEdgeTemplates { get; } = new();
-
         public bool IsOver(Point position)
         {
             return (position.X >= X &&

@@ -20,6 +20,8 @@ namespace Gwiz.Core
 
         private IUpdatableNode _to = new Node();
 
+        public event EventHandler<bool> SelectedChanged;
+
         public Ending Beginning { get; internal set; } = Ending.None;
 
         public Ending Ending { get; internal set; } = Ending.None;
