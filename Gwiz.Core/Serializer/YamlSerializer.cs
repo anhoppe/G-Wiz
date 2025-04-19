@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
+using System;
 
 namespace Gwiz.Core.Serializer
 {
@@ -31,6 +32,7 @@ namespace Gwiz.Core.Serializer
             ResolveTemplatesInNodes(graph);
             ResolveNodeReferencesInEdges(graph);
             ResolveGridContentInNodes(graph);
+            UpdateEdges(graph);
 
             return graph;
         }
@@ -61,6 +63,19 @@ namespace Gwiz.Core.Serializer
                 if (!template.Grid.Rows.Any())
                 {
                     template.Grid.Rows.Add("1");
+                }
+            }
+        }
+
+        private void UpdateEdges(IGraph graph)
+        {
+            foreach (var edge in graph.Edges)
+            {
+                var internalEdge = edge as Edge;
+
+                if (internalEdge != null)
+                {
+                    internalEdge.UpdateEdge();
                 }
             }
         }

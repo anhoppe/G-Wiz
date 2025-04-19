@@ -13,8 +13,8 @@ namespace Gwiz.UiControl.WinUi3
 
         void DrawEllipse(Rectangle rect, Color color);
         
-        void DrawLine(Point from, Point to, Style style);
-
+        void DrawLine(Point from, Point to, Style style, Color color, float strokeWidth);
+        
         void DrawRectangle(Rectangle rect, Color color, float strokeWidth);
 
         void DrawSvgIcon(SKBitmap? icon, Windows.Foundation.Size size, float x, float y);

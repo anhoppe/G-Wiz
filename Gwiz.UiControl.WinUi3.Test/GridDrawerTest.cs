@@ -95,7 +95,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             var expecteCursorLineStartPoint = new Point(50, 3); // -3 is the offset for the cursor line
             var expecteCursorLineEndPoint = new Point(50, 10 - 3);
-            _drawMock.Verify(m => m.DrawLine(expecteCursorLineStartPoint, expecteCursorLineEndPoint, Style.None));
+            _drawMock.Verify(m => m.DrawLine(expecteCursorLineStartPoint, expecteCursorLineEndPoint, Style.None, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
         [Test]

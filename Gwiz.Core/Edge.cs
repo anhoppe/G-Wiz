@@ -4,6 +4,7 @@ using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
 using Microsoft.VisualBasic;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Xml.Linq;
 
@@ -11,6 +12,10 @@ namespace Gwiz.Core
 {
     internal class Edge : IEdge
     {
+        private const float Eps = 0.001f;
+
+        private const int SelectionDistanceThreshold = 3;
+
         private IUpdatableNode _from = new Node();
 
         private IUpdatableNode _to = new Node();
@@ -43,7 +48,11 @@ namespace Gwiz.Core
 
         public Point FromPosition { get; set; }
 
+        public bool Highlight { get; set; }
+
         public float LabelOffsetPerCent { get; set; }
+
+        public bool Select { get; set; }
 
         public Style Style { get; set; } = Style.None;
 
@@ -69,7 +78,28 @@ namespace Gwiz.Core
 
         public Point ToPosition { get; set; }
 
-        private void UpdateEdge()
+        public bool IsOver(Point position)
+        {
+            var fromPos = new Point2D(FromPosition.X, FromPosition.Y);
+            var toPos = new Point2D(ToPosition.X, ToPosition.Y);
+
+            var vec = fromPos - toPos;
+            
+            if (vec.Length < Eps)
+            {
+                return false;
+            }
+
+            var point = new Point2D(position.X, position.Y);
+            var line = new Line2D(fromPos, toPos);
+
+            var closesPoint = line.ClosestPointTo(point, true);
+
+            vec = closesPoint - point;
+            return vec.Length < SelectionDistanceThreshold;
+        }
+
+        internal void UpdateEdge()
         {
             var centerFromNode = new Point2D(From.X + From.Width / 2, From.Y + From.Height / 2);
             var centerToNode = new Point2D(To.X + To.Width / 2, To.Y + To.Height / 2);

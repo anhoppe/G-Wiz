@@ -72,13 +72,15 @@ namespace Gwiz.UiControl.WinUi3
 
                             Draw.DrawLine(new Point(textPos.X + size.Width, textPos.Y + 3),
                                 new Point(textPos.X + size.Width, textPos.Y + size.Height - 3),
-                                Style.None);
+                                Style.None,
+                                Color.Black,
+                                2);
                         }
 
                         Draw.DrawSvgIcon(Icons.Edit,
-                            new Windows.Foundation.Size(IconSize, IconSize),
+                            new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
                             rect.X,
-                            rect.Y + rect.Height / 2 - IconSize / 2);
+                            rect.Y + rect.Height / 2 - Design.IconSize / 2);
                     }
                 }
             }

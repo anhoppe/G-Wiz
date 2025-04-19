@@ -7,8 +7,6 @@ namespace Gwiz.UiControl.WinUi3
 {
     internal class Draw : IDraw
     {
-        private static readonly SKColor LineColor = SKColors.Black;
-
         internal SKCanvas? DrawingSession { private get; set; }
 
         public void Clear()
@@ -28,13 +26,13 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
+            using (var paint = new SKPaint { Color = color.ToSKColor(), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
             {
                 DrawingSession.DrawOval(rect.ToSKRect(), paint);
             }
         }
 
-        public void DrawLine(Point from, Point to, Style style)
+        public void DrawLine(Point from, Point to, Style style, Color color, float strokeWidth)
         {
             if (DrawingSession == null)
             {
@@ -43,9 +41,9 @@ namespace Gwiz.UiControl.WinUi3
 
             using (var paint = new SKPaint
             {
-                Color = LineColor,
+                Color = color.ToSKColor(),
                 Style = SKPaintStyle.Stroke,
-                StrokeWidth = 2
+                StrokeWidth = strokeWidth
             })
             {
                 switch (style)
@@ -68,7 +66,7 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            using (var paint = new SKPaint { Color = ConvertColor(color), Style = SKPaintStyle.Stroke, StrokeWidth = 2 })
+            using (var paint = new SKPaint { Color = color.ToSKColor(), Style = SKPaintStyle.Stroke, StrokeWidth = strokeWidth })
             {
                 DrawingSession.DrawRect(rect.ToSKRect(), paint);
             }
@@ -148,7 +146,7 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            using (var paint = new SKPaint { Color = ConvertColor(backgroundColor), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
+            using (var paint = new SKPaint { Color = backgroundColor.ToSKColor(), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
             {
                 DrawingSession.DrawOval(rect.ToSKRect(), paint);
             }
@@ -161,12 +159,10 @@ namespace Gwiz.UiControl.WinUi3
                 throw new NullReferenceException("Draw.DrawingSession not set");
             }
 
-            using (var paint = new SKPaint { Color = ConvertColor(backgroundColor), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
+            using (var paint = new SKPaint { Color = backgroundColor.ToSKColor(), Style = SKPaintStyle.Fill, StrokeWidth = 1 })
             {
                 DrawingSession.DrawRect(rect.ToSKRect(), paint);
             }
         }
-
-        private static SKColor ConvertColor(Color color) => new SKColor(color.R, color.G, color.B, color.A);
     }
 }

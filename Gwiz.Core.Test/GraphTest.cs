@@ -213,6 +213,7 @@ namespace Gwiz.Core.Test
             // Assert
             Assert.That(sut.Nodes.Count, Is.EqualTo(1));
         }
+
         [Test]
         public void AddNode_WhenEdgeTemplateIsDefined_ThenNodeReferencesEdgeTemplate()
         {
@@ -260,6 +261,52 @@ namespace Gwiz.Core.Test
             Assert.That(node1.TargetEdgeTemplates.Count, Is.EqualTo(0));
             Assert.That(node2.SourceEdgeTemplates.Count, Is.EqualTo(0));
             Assert.That(node2.TargetEdgeTemplates.Count, Is.EqualTo(1));
-         }
+        }
+
+        [Test]
+        public void Remove_WhenEdgeIsRemoved_ThenEdgeRemovedFromGraph()
+        {
+            // Arrange
+            var edge1 = new Mock<IEdge>();
+            var edge2 = new Mock<IEdge>();
+
+            var sut = new Graph()
+            {
+                Edges = [edge1.Object, edge2.Object],
+            };
+
+            // Act
+            sut.Remove(edge1.Object);
+
+            // Assert
+            Assert.That(sut.Edges.Count, Is.EqualTo(1));
+            Assert.That(sut.Edges[0], Is.EqualTo(edge2.Object));
+        }
+
+        [Test]
+        public void Remove_WhenNodeIsRemoved_thenNodeAndConnectedEdgesAreRemoved()
+        {
+            // Arrange
+            var node = new Mock<INode>();
+
+            var edge1 = new Mock<IEdge>();
+            var edge2 = new Mock<IEdge>();
+
+            edge1.Setup(p => p.From).Returns(node.Object);
+            edge2.Setup(p => p.To).Returns(node.Object);
+
+            var sut = new Graph()
+            {
+                Edges = [edge1.Object, edge2.Object],
+                Nodes = [node.Object],
+            };
+
+            // Act
+            sut.Remove(node.Object);
+
+            // Assert
+            Assert.That(!sut.Nodes.Any());
+            Assert.That(!sut.Edges.Any());
+        }
     }
 }

@@ -78,7 +78,7 @@ namespace Gwiz.UiControl.WinUi3
 
             if (EdgeCreationActiveSourceTemplate != null)
             {
-                Draw.DrawLine(_previewLineFrom, _previewLineTo, Style.Dotted);
+                Draw.DrawLine(_previewLineFrom, _previewLineTo, Style.Dotted, Color.Black, 2);
             }
 
             DrawEdges();
@@ -95,7 +95,7 @@ namespace Gwiz.UiControl.WinUi3
             }
 
             // If the mouse x position is not in range we can also hit no source
-            if (xPos < node.X - IconSize || xPos > node.X)
+            if (xPos < node.X - Design.IconSize || xPos > node.X)
             {
                 return null;
             }
@@ -106,9 +106,9 @@ namespace Gwiz.UiControl.WinUi3
 
             foreach (var edgeTemplate in node.SourceEdgeTemplates)
             {
-                int startY = node.Y + node.Height / 2 - (iconCount * IconSize) / 2 + IconSize * count++;
+                int startY = node.Y + node.Height / 2 - (iconCount * Design.IconSize) / 2 + Design.IconSize * count++;
 
-                if (startY < yPos && startY + IconSize > yPos) 
+                if (startY < yPos && startY + Design.IconSize > yPos) 
                 {
                     return edgeTemplate;
                 }
@@ -131,16 +131,50 @@ namespace Gwiz.UiControl.WinUi3
             GridDrawer.Draw = draw;
         }
 
+        private void DrawEdgeCreationIcons(INode node)
+        {
+            if (EdgeCreationActiveSourceTemplate == null)
+            {
+                var iconCount = node.SourceEdgeTemplates.Count;
+
+                if (iconCount > 0)
+                {
+                    // Icon count is increased by one because the additional connection icon is drawn when source icons are available
+                    iconCount++;
+
+                    int startY = node.Y + node.Height / 2 - (iconCount * Design.IconSize) / 2;
+
+                    // First icon is always the connection icon to demonstrate that the alpha buttons can be used to select a connection type
+                    Draw.DrawSvgIcon(_icons.Connection, new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
+                    startY += Design.IconSize;
+
+                    foreach (var edgeTemplate in node.SourceEdgeTemplates)
+                    {
+                        Draw.DrawSvgIcon(_icons.GetAlpha(edgeTemplate.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
+                        startY += Design.IconSize;
+                    }
+                }
+            }
+            else if (node.TargetEdgeTemplates.Contains(EdgeCreationActiveSourceTemplate))
+            {
+                int startY = node.Y + node.Height / 2 - Design.IconSize / 2;
+                Draw.DrawSvgIcon(_icons.GetAlpha(EdgeCreationActiveSourceTemplate.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
+            }
+        }
+
         private void DrawEdges()
         {
             if (Edges != null)
             {
                 foreach (var edge in Edges)
                 {
-                    var modifiedStartPosition = DrawEdgeModifier(edge, true);
-                    var modifiedEndingPosition = DrawEdgeModifier(edge, false);
+                    var color = edge.Highlight ? Design.HighlightColor : edge.Select ? Design.SelectionColor : Design.DefaultLineColor;
+                    int strokeWidth = edge.Highlight ? Design.HighlightStrokeWidth : edge.Select ? Design.SelectionStrokeWidth : Design.DefaulEdgeStrokeWidth;
+                    
+                    var modifiedStartPosition = DrawEdgeModifier(edge, true, color, strokeWidth);
+                    var modifiedEndingPosition = DrawEdgeModifier(edge, false, color, strokeWidth);
 
-                    Draw.DrawLine(modifiedStartPosition, modifiedEndingPosition, edge.Style);
+                    Draw.DrawLine(modifiedStartPosition, modifiedEndingPosition, edge.Style, color, strokeWidth);
 
                     if (!string.IsNullOrEmpty(edge.FromLabel))
                     {
@@ -161,7 +195,7 @@ namespace Gwiz.UiControl.WinUi3
             }
         }
 
-        private Point DrawEdgeModifier(IEdge edge, bool isSourceModifier)
+        private Point DrawEdgeModifier(IEdge edge, bool isSourceModifier, Color color, int strokeWidth)
         {
             var modifiedEdgePosition = isSourceModifier ? edge.FromPosition : edge.ToPosition;
 
@@ -181,17 +215,17 @@ namespace Gwiz.UiControl.WinUi3
             var arrowLine1 = directionVec.Rotate(Angle.FromDegrees(ArrowAngleDeg));
             arrowLine1 *= ArrowHeadLen;
             var arrowHead1 = new Point((int)(toPos.X - arrowLine1.X), (int)(toPos.Y - arrowLine1.Y));
-            Draw.DrawLine(toPos, arrowHead1, Style.None);
+            Draw.DrawLine(toPos, arrowHead1, Style.None, color, strokeWidth);
 
             var arrowLine2 = directionVec.Rotate(Angle.FromDegrees(-ArrowAngleDeg));
             arrowLine2 *= ArrowHeadLen;
             var arrowHead2 = new Point((int)(toPos.X - arrowLine2.X), (int)(toPos.Y - arrowLine2.Y));
-            Draw.DrawLine(toPos, arrowHead2, Style.None);
+            Draw.DrawLine(toPos, arrowHead2, Style.None, color, strokeWidth);
 
             if (marker == Ending.ClosedArrow)
             {
                 // 'Close' the arrow
-                Draw.DrawLine(arrowHead1, arrowHead2, Style.None);
+                Draw.DrawLine(arrowHead1, arrowHead2, Style.None, color, strokeWidth);
 
                 // Calculate the modified ending position (which is the middle of the arrow head closing line)
                 var vec = arrowHead2.ToMathNetPoint() - arrowHead1.ToMathNetPoint();
@@ -204,8 +238,8 @@ namespace Gwiz.UiControl.WinUi3
 
                 directionVec *= len * 2;
                 var rhombusPoint = new Point((int)(toPos.X - directionVec.X), (int)(toPos.Y - directionVec.Y));
-                Draw.DrawLine(arrowHead1, rhombusPoint, Style.None);
-                Draw.DrawLine(arrowHead2, rhombusPoint, Style.None);
+                Draw.DrawLine(arrowHead1, rhombusPoint, Style.None, color, strokeWidth);
+                Draw.DrawLine(arrowHead2, rhombusPoint, Style.None, color, strokeWidth);
 
                 modifiedEdgePosition = new Point((int)rhombusPoint.X, (int)rhombusPoint.Y);
             }
@@ -218,22 +252,22 @@ namespace Gwiz.UiControl.WinUi3
             // Draw the resize all icon
             if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
             {
-                Draw.DrawSvgIcon(_icons.ResizeBottomRight, new Windows.Foundation.Size(IconSize, IconSize), node.X + node.Width - IconSize, node.Y + node.Height - IconSize);
+                Draw.DrawSvgIcon(_icons.ResizeBottomRight, new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X + node.Width - Design.IconSize, node.Y + node.Height - Design.IconSize);
             }
 
             if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
             {
                 // Draw the resize horz icon
                 Draw.DrawSvgIcon(_icons.ResizeHorz,
-                    new Windows.Foundation.Size(IconSize, IconSize),
-                    node.X + node.Width - (int)(IconSize * 0.75),
-                    node.Y + node.Height / 2 - IconSize / 2);
+                    new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
+                    node.X + node.Width - (int)(Design.IconSize * 0.75),
+                    node.Y + node.Height / 2 - Design.IconSize / 2);
 
                 // Draw the resize vert icon
                 Draw.DrawSvgIcon(_icons.ResizeVert,
-                    new Windows.Foundation.Size(IconSize, IconSize),
-                    node.X + node.Width / 2 - IconSize / 2,
-                    node.Y + node.Height - (int)(IconSize * 0.75));
+                    new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
+                    node.X + node.Width / 2 - Design.IconSize / 2,
+                    node.Y + node.Height - (int)(Design.IconSize * 0.75));
             }
         }
 
@@ -245,36 +279,22 @@ namespace Gwiz.UiControl.WinUi3
                 {
                     GridDrawer.DrawGrid(node);
                     DrawSizingIcons(node);
-
-
-                    if (EdgeCreationActiveSourceTemplate == null)
-                    {
-                        var iconCount = node.SourceEdgeTemplates.Count;
-
-                        if (iconCount > 0)
-                        {
-                            // Icon count is increased by one because the additional connection icon is drawn when source icons are available
-                            iconCount++;
-
-                            int startY = node.Y + node.Height / 2 - (iconCount * IconSize) / 2;
-
-                            // First icon is always the connection icon to demonstrate that the alpha buttons can be used to select a connection type
-                            Draw.DrawSvgIcon(_icons.Connection, new Windows.Foundation.Size(IconSize, IconSize), node.X - IconSize, startY);
-                            startY += IconSize;
-
-                            foreach (var edgeTemplate in node.SourceEdgeTemplates)
-                            {
-                                Draw.DrawSvgIcon(_icons.GetAlpha(edgeTemplate.Icon), new Windows.Foundation.Size(IconSize, IconSize), node.X - IconSize, startY);
-                                startY += IconSize;
-                            }
-                        }
-                    }
-                    else if (node.TargetEdgeTemplates.Contains(EdgeCreationActiveSourceTemplate))
-                    {
-                        int startY = node.Y + node.Height / 2 - IconSize / 2;
-                        Draw.DrawSvgIcon(_icons.GetAlpha(EdgeCreationActiveSourceTemplate.Icon), new Windows.Foundation.Size(IconSize, IconSize), node.X - IconSize, startY);
-                    }
+                    DrawEdgeCreationIcons(node);
+                    DrawNodeSlection(node);
                 }
+            }
+        }
+
+        private void DrawNodeSlection(INode node)
+        {
+            if (node.Select)
+            {
+                var rect = new Rectangle(node.X - Design.SelectionMargin - Design.SelectionStrokeWidth,
+                    node.Y - Design.SelectionMargin - Design.SelectionStrokeWidth,
+                    node.Width + Design.SelectionMargin * 2 + Design.SelectionStrokeWidth * 2,
+                    node.Height + Design.SelectionMargin * 2 + Design.SelectionStrokeWidth * 2);
+
+                Draw.DrawRectangle(rect, Design.SelectionColor, Design.SelectionStrokeWidth);
             }
         }
 

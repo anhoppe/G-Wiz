@@ -2,7 +2,7 @@
 
 namespace Gwiz.Core.Contract
 {
-    public interface INode
+    public interface INode : ISelectable
     {
         Alignment Alignment { get; }
 

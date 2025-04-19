@@ -3,6 +3,7 @@ using Gwiz.Core.Serializer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Xml.Linq;
 
 namespace Gwiz.Core
 {
@@ -32,6 +33,12 @@ namespace Gwiz.Core
                 _height = value;
                 NodeChanged?.Invoke(this, this);
             }
+        }
+
+        public bool Highlight
+        {
+            get => false;
+            set => throw new NotSupportedException("Cannot highlight node");
         }
 
         public string Id { get; set; } = string.Empty;
@@ -88,9 +95,19 @@ namespace Gwiz.Core
             }
         }
 
+        public bool Select { get ; set ; }
+
         public List<IEdgeTemplate> SourceEdgeTemplates { get; } = new();
 
         public List<IEdgeTemplate> TargetEdgeTemplates { get; } = new();
+
+        public bool IsOver(Point position)
+        {
+            return (position.X >= X &&
+                position.X <= X + Width &&
+                position.Y >= Y &&
+                position.Y <= Y + Height);
+        }
 
         internal void AssignTemplate(ITemplate template)
         {

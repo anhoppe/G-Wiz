@@ -1,12 +1,64 @@
 ﻿using Gwiz.Core.Contract;
 using Moq;
 using NUnit.Framework;
+using System.Drawing;
 
 namespace Gwiz.Core.Test
 {
     [TestFixture]
     public class EdgeTest
     {
+        [Test]
+        public void IsOver_WhenPointOverLine_ThenIsOverReturnsTrue()
+        {
+            // Arrange
+            Edge edge = new Edge()
+            {
+                FromPosition = new Point(0, 0),
+                ToPosition = new Point(0, 100),
+            };
+
+            // Act
+            bool isOver = edge.IsOver(new Point(2, 50));
+
+            // Assert
+            Assert.That(isOver);
+        }
+
+        [Test]
+        public void IsOver_WhenPointTooFarAwayFromLine_ThenIsOverReturnsFalse()
+        {
+            // Arrange
+            Edge edge = new Edge()
+            {
+                FromPosition = new Point(0, 0),
+                ToPosition = new Point(0, 100),
+            };
+
+            // Act
+            bool isOver = edge.IsOver(new Point(10, 50));
+
+            // Assert
+            Assert.That(!isOver);
+        }
+
+        [Test]
+        public void IsOver_WhenStartAndEndIdentical_ThenIsOverReturnsFalse()
+        {
+            // Arrange
+            Edge edge = new Edge()
+            {
+                FromPosition = new Point(0, 0),
+                ToPosition = new Point(0, 0),
+            };
+
+            // Act
+            bool isOver = edge.IsOver(new Point(0, 0));
+
+            // Assert
+            Assert.That(!isOver);
+        }
+
         [Test]
         public void UpdateEdge_WhenToNodeChanged_ThenEdgeUpdated()
         {

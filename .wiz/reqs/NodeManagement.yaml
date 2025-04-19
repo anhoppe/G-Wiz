@@ -1,1 +1,262 @@
 Nodes:
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 856
+  Id: 7250c218-b017-4957-81f1-aadf183ee1b5
+  Template: Boundary
+  Width: 1330
+  X: -691
+  Y: -410
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 80
+  Id: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  Template: Actor
+  Width: 80
+  X: -861
+  Y: -166
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Select Nodes / Edges
+  Height: 83
+  Id: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  Template: UseCase
+  Width: 213
+  X: -321
+  Y: -137
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Delete Nodes / Edges
+  Height: 80
+  Id: 9cf1668b-5eb5-428b-97bd-3d450b75ff43
+  Template: UseCase
+  Width: 216
+  X: -325
+  Y: -369
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Icon Nodes
+  Height: 80
+  Id: 60943d87-ccf2-4607-8ef6-7ccdd48c42c1
+  Template: UseCase
+  Width: 186
+  X: -305
+  Y: 314
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Sizing support
+  Height: 83
+  Id: 1e7551b3-16b5-4c45-bf32-ffaecc927b22
+  Template: UseCase
+  Width: 213
+  X: -319
+  Y: 179
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Equal Height
+  Height: 80
+  Id: 9909d1c2-3228-4485-8aee-c648b3486478
+  Template: UseCase
+  Width: 180
+  X: 86
+  Y: 295
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Equal Width
+  Height: 80
+  Id: d4a5faee-f113-4427-ba45-5ae4fcd9747f
+  Template: UseCase
+  Width: 180
+  X: 83
+  Y: 140
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Node Z Ordering
+  Height: 80
+  Id: 79deb52c-b1a6-4fb7-b80e-bd13813ab0bd
+  Template: UseCase
+  Width: 220
+  X: -597
+  Y: 238
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Cornered Edges
+  Height: 80
+  Id: 77d3f04d-42c1-4612-9987-f0b83d1b19cd
+  Template: UseCase
+  Width: 180
+  X: -614
+  Y: -381
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Multi Selection
+  Height: 80
+  Id: 56b7e43e-a38f-4d22-aa51-fdad8cfe7627
+  Template: UseCase
+  Width: 186
+  X: 12
+  Y: -265
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Primary Selection
+  Height: 80
+  Id: 3ca9c15a-94be-46a5-9baa-1ed8e464da70
+  Template: UseCase
+  Width: 203
+  X: 362
+  Y: -261
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Selection Rect
+  Height: 80
+  Id: dfc635aa-81a3-48d3-a06c-904874632cfc
+  Template: UseCase
+  Width: 180
+  X: 23
+  Y: 16
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Background Nodes
+  Height: 80
+  Id: f9c2cf29-bc87-4bea-9666-60467e240795
+  Template: UseCase
+  Width: 208
+  X: -590
+  Y: 361
+Edges:
+- Ending: OpenArrow
+  From: 9cf1668b-5eb5-428b-97bd-3d450b75ff43
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<includes>>
+  To: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 1e7551b3-16b5-4c45-bf32-ffaecc927b22
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<includes>>
+  To: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d4a5faee-f113-4427-ba45-5ae4fcd9747f
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: d4a5faee-f113-4427-ba45-5ae4fcd9747f
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 9909d1c2-3228-4485-8aee-c648b3486478
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 1e7551b3-16b5-4c45-bf32-ffaecc927b22
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d4a5faee-f113-4427-ba45-5ae4fcd9747f
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 1e7551b3-16b5-4c45-bf32-ffaecc927b22
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 79deb52c-b1a6-4fb7-b80e-bd13813ab0bd
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 9cf1668b-5eb5-428b-97bd-3d450b75ff43
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 1e7551b3-16b5-4c45-bf32-ffaecc927b22
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d3cc8b02-e655-401f-8b60-0c35b8d21a67
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 77d3f04d-42c1-4612-9987-f0b83d1b19cd
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 56b7e43e-a38f-4d22-aa51-fdad8cfe7627
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 56b7e43e-a38f-4d22-aa51-fdad8cfe7627
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 56b7e43e-a38f-4d22-aa51-fdad8cfe7627
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  ToLabel: ''
+- Ending: OpenArrow
+  From: dfc635aa-81a3-48d3-a06c-904874632cfc
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 708b75f8-7bf7-437b-bb9d-e5a13088e55e
+  ToLabel: ''
+- Ending: OpenArrow
+  From: 56b7e43e-a38f-4d22-aa51-fdad8cfe7627
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<includes>>
+  To: 3ca9c15a-94be-46a5-9baa-1ed8e464da70
+  ToLabel: ''
+- Ending: OpenArrow
+  From: f9c2cf29-bc87-4bea-9666-60467e240795
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 79deb52c-b1a6-4fb7-b80e-bd13813ab0bd
+  ToLabel: ''

@@ -67,6 +67,24 @@ namespace Gwiz.Core
             return node;
         }
 
+        public void Remove(IEdge edge)
+        {
+            Edges.Remove(edge);
+        }
+
+        public void Remove(INode node)
+        {
+            foreach (var edge in Edges.ToArray())
+            {
+                if (edge.From == node || edge.To == node)
+                {
+                    Edges.Remove(edge);
+                }
+            }
+
+            Nodes.Remove(node);
+        }
+
         public void Update()
         {
             foreach (var node in Nodes)
@@ -110,13 +128,17 @@ namespace Gwiz.Core
                 throw new ArgumentException("Nodes passed to Graph.AddEdge are not part of the graph");
             }
 
-            return new Edge()
+            var edge = new Edge()
             {
                 FromId = from.Id,
                 FromInternal = fromInternal,
                 ToId = to.Id,
                 ToInternal = toInternal,
             };
+
+            edge.UpdateEdge();
+
+            return edge;
         }
 
         private Edge CreateEdge(INode from, INode to, Ending ending, Style style)

@@ -20,7 +20,7 @@ namespace Gwiz.Core.Contract
     /// <summary>
     /// Represents an edge in a graph
     /// </summary>
-    public interface IEdge
+    public interface IEdge : ISelectable
     {
         /// <summary>
         /// The marker at the source of the edge

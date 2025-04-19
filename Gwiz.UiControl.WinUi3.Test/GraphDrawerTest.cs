@@ -52,11 +52,11 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
 
             // Assert correct open arrow head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
 
             // Assert correct line to arrow head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == to), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == to), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
         [Test]
@@ -82,15 +82,15 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
 
             // Assert correct open arrow head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
 
             // In addition, the arrow head is closed by a line
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedEndPoint1), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
 
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
             var modifiedTo = new Point(9, 2);
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == modifiedTo), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == modifiedTo), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
         [Test]
@@ -117,13 +117,13 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
 
             // Assert correct Rhombus head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint2), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint1), It.Is<Point>(p => p == expectedModifiedFrom), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedModifiedFrom), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint1), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedEndPoint2), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint1), It.Is<Point>(p => p == expectedModifiedFrom), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedModifiedFrom), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
 
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedModifiedFrom), It.Is<Point>(p => p == to), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedModifiedFrom), It.Is<Point>(p => p == to), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
         [Test]
@@ -150,15 +150,36 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
 
             // Assert correct Rhombus head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint1), It.Is<Point>(p => p == expectedModifiedTo), Style.None));
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedModifiedTo), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint1), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == to), It.Is<Point>(p => p == expectedEndPoint2), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint1), It.Is<Point>(p => p == expectedModifiedTo), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == expectedEndPoint2), It.Is<Point>(p => p == expectedModifiedTo), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
 
             // Assert correct line to arrow head. In this case, the line is drawn to the end of the arrow head
-            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedModifiedTo), Style.None));
+            _drawMock.Verify(x => x.DrawLine(It.Is<Point>(p => p == from), It.Is<Point>(p => p == expectedModifiedTo), Style.None, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
+        [Test]
+        public void EdgeHighlight_WhenEdgeIsHighlighted_ThenHighlighterMarkIsDrawn()
+        {
+            // Arrange
+            var edgeMock = new Mock<IEdge>();
+
+            var from = new Point(0, 0);
+            var to = new Point(0, 100);
+            edgeMock.SetupGet(x => x.FromPosition).Returns(from);
+            edgeMock.SetupGet(x => x.ToPosition).Returns(to);
+
+            edgeMock.Setup(p => p.Highlight).Returns(true);
+
+            _sut.Edges = [edgeMock.Object];
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawLine(from, to, It.IsAny<Style>(), Design.HighlightColor, Design.HighlightStrokeWidth));
+        }
 
         [Test]
         public void EdgeLabels_WhenEdgeHasFromToLabelsDefined_ThenTheLabelsAreDrawn()
@@ -255,7 +276,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
@@ -287,7 +308,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
@@ -322,7 +343,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(_sut.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
@@ -337,6 +358,33 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 0, 35), Times.Once, "Expected B icon is drawn as target because it is selected as source");
             _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never, "That the method is only called once");
+        }
+
+        [Test]
+        public void NodeSelection_WhenNodeIsSelected_ThenSelectionMarkerIsDrawn()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            nodeMock.Setup(p => p.X).Returns(10);
+            nodeMock.Setup(p => p.Y).Returns(10);
+            nodeMock.Setup(p => p.Width).Returns(90);
+            nodeMock.Setup(p => p.Height).Returns(90);
+            nodeMock.Setup(p => p.Select).Returns(true);
+            nodeMock.Setup(p => p.SourceEdgeTemplates).Returns(new List<IEdgeTemplate>());
+
+            _sut.Nodes.Add(nodeMock.Object);
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            var expectedRect = new Rectangle(10 - Design.SelectionMargin - Design.SelectionStrokeWidth,
+                10 - Design.SelectionMargin - Design.SelectionStrokeWidth, 
+                90 + 2*Design.SelectionStrokeWidth + 2*Design.SelectionMargin,
+                90 + 2 * Design.SelectionStrokeWidth + 2 * Design.SelectionMargin);
+
+            _drawMock.Verify(m => m.DrawRectangle(expectedRect, It.IsAny<Color>(), 4));
         }
 
         [Test]
@@ -357,7 +405,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             var expectedStart = new Point(50, 50);
             var expectedEnd = new Point(200, 300);
-            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted), Times.Never);
+            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted, It.IsAny<Color>(), It.IsAny<float>()), Times.Never);
         }
 
         [Test]
@@ -379,7 +427,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             var expectedStart = new Point(50, 50);
             var expectedEnd = new Point(200, 300);
-            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted));
+            _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted, It.IsAny<Color>(), It.IsAny<float>()));
         }
 
         [Test]

@@ -21,6 +21,10 @@
 
         void AddEdge(INode from, INode to, string fromLabel, string toLabel, float labelOffsetPerCent);
 
+        void Remove(IEdge edge);
+        
+        void Remove(INode node);
+
         void Update();
     }
 }
