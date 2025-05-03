@@ -112,6 +112,8 @@ namespace Gwiz.UiControl.WinUi3
             this.IsTabStop = true; 
             
             this.KeyDown += OnKeyDown;
+
+            _deleteKeyAccelerator.IsEnabled = false;
         }
 
         // Graph Dependency Property
@@ -127,6 +129,21 @@ namespace Gwiz.UiControl.WinUi3
         {
             get => (IGraph)GetValue(GraphProperty);
             set => SetValue(GraphProperty, value);
+        }
+
+        private void OnDeleteInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            if (_selectedNode != null)
+            {
+                Graph.Remove(_selectedNode);
+                _selectedNode = null;
+            }
+            else if (_selectedEdge != null)
+            {
+                Graph.Remove(_selectedEdge);
+                _selectedEdge = null;
+            }
+            Invalidate();
         }
 
         private void DrawGraph(object sender, SKPaintSurfaceEventArgs e)
@@ -282,20 +299,6 @@ namespace Gwiz.UiControl.WinUi3
                     _editGridCell.Text = nextGridText;
                     _canvasControl.Invalidate();
                 }
-            }
-            else if (e.Key == VirtualKey.Delete)
-            {
-                if (_selectedNode != null)
-                {
-                    Graph.Remove(_selectedNode);
-                    _selectedNode = null;
-                }
-                else if (_selectedEdge != null)
-                {
-                    Graph.Remove(_selectedEdge);
-                    _selectedEdge = null;
-                }
-                Invalidate();
             }
         }
 
@@ -622,19 +625,21 @@ namespace Gwiz.UiControl.WinUi3
             if (_currentInteractionState != InteractionState.EditText &&
                 _currentInteractionState != InteractionState.CreateEdgeBegin)
             {
+                _deleteKeyAccelerator.IsEnabled = false;
+
                 if (_selectedNode != null)
                 {
                     _selectedNode.Select = false;
 
                 }
                 _selectedNode = null;
-                
+
+
                 if (_selectedEdge != null)
                 {
                     _selectedEdge.Select = false;
                 }
                 _selectedEdge = null;
-                this.LostFocus -= OnLostFocus;
 
                 if (_currentInteractionState == InteractionState.DraggingNode &&
                     _hoveredNode != null)
@@ -649,8 +654,6 @@ namespace Gwiz.UiControl.WinUi3
                     {
                         _selectedNode = _hoveredNode;
                         _selectedNode.Select = true;
-                        this.Focus(FocusState.Programmatic);
-                        this.LostFocus += OnLostFocus;
                     }
                 }
 
@@ -660,8 +663,11 @@ namespace Gwiz.UiControl.WinUi3
                     _hoveredEdge.Highlight = false;
                     _selectedEdge = _hoveredEdge;
                     _selectedEdge.Select = true;
-                    this.Focus(FocusState.Programmatic);
-                    this.LostFocus += OnLostFocus;
+                }
+
+                if (_selectedNode != null || _selectedEdge != null)
+                {
+                    _deleteKeyAccelerator.IsEnabled = true;
                 }
 
                 _currentInteractionState = InteractionState.None;
@@ -679,7 +685,10 @@ namespace Gwiz.UiControl.WinUi3
             {
                 throw new InvalidOperationException("Editing without seleceted node");
             }
+
             _editGridCell.EditModeEnabled = true;
+
+            _deleteKeyAccelerator.IsEnabled = false;
             this.Focus(FocusState.Programmatic);
             this.LostFocus += OnLostFocus;
 

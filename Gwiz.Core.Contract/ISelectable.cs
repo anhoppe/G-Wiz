@@ -14,6 +14,6 @@ namespace Gwiz.Core.Contract
         /// Event is raised when a node is selected
         /// </summary>
 
-        event EventHandler<bool> SelectedChanged;
+        event EventHandler<bool>? SelectedChanged;
     }
 }

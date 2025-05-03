@@ -23,7 +23,7 @@ namespace Gwiz.Core
 
         public event EventHandler<IUpdatableNode> NodeChanged = delegate { };
 
-        public event EventHandler<bool> SelectedChanged;
+        public event EventHandler<bool>? SelectedChanged;
 
         public Alignment Alignment { get; set; } = Alignment.CenterCenter;
 

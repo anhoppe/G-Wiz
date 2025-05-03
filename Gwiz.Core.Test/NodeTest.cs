@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System.Drawing;
-using YamlDotNet.RepresentationModel;
 
 namespace Gwiz.Core.Test
 {

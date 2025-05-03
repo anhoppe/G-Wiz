@@ -2,11 +2,8 @@
 using Gwiz.Core.Contract;
 using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
-using Microsoft.VisualBasic;
 using System;
-using System.ComponentModel;
 using System.Drawing;
-using System.Xml.Linq;
 
 namespace Gwiz.Core
 {
@@ -20,7 +17,7 @@ namespace Gwiz.Core
 
         private IUpdatableNode _to = new Node();
 
-        public event EventHandler<bool> SelectedChanged;
+        public event EventHandler<bool>? SelectedChanged;
 
         public Ending Beginning { get; internal set; } = Ending.None;
 
