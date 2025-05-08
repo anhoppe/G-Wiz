@@ -284,7 +284,7 @@ namespace Gwiz.Core.Test
         }
 
         [Test]
-        public void Remove_WhenNodeIsRemoved_thenNodeAndConnectedEdgesAreRemoved()
+        public void Remove_WhenNodeIsRemoved_ThenNodeAndConnectedEdgesAreRemoved()
         {
             // Arrange
             var node = new Mock<INode>();
@@ -307,6 +307,33 @@ namespace Gwiz.Core.Test
             // Assert
             Assert.That(!sut.Nodes.Any());
             Assert.That(!sut.Edges.Any());
+        }
+
+        [Test]
+        public void Remove_WhenNodeIsRemoved_ThenNodeRemovedEventIsRaised()
+        {
+            // Arrange
+            var nodeMock = new Mock<INode>();
+
+            var sut = new Graph()
+            {
+                Nodes = [nodeMock.Object],
+            };
+
+            bool nodeRemoved = false;
+            sut.NodeRemoved += (sender, node) =>
+            {
+                if (node == nodeMock.Object)
+                {
+                    nodeRemoved = true;
+                }
+            };
+
+            // Act
+            sut.Remove(nodeMock.Object);
+
+            // Assert
+            Assert.That(nodeRemoved);
         }
     }
 }

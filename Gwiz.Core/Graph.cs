@@ -7,6 +7,8 @@ namespace Gwiz.Core
 {
     public class Graph : IGraph
     {
+        public event EventHandler<INode>? NodeRemoved;
+
         public List<IEdge> Edges { get; set; } = new();
 
         public List<INode> Nodes { get; set; } = new();
@@ -83,6 +85,8 @@ namespace Gwiz.Core
             }
 
             Nodes.Remove(node);
+
+            NodeRemoved?.Invoke(this, node);
         }
 
         public void Update()

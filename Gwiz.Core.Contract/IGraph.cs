@@ -5,6 +5,8 @@
     /// </summary>
     public interface IGraph
     {
+        public event EventHandler<INode>? NodeRemoved;
+
         List<IEdge> Edges { get; }
 
         List<INode> Nodes { get; }
