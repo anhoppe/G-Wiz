@@ -11,6 +11,8 @@
 
         string Id { get; }
 
+        bool Visible { get; set; }
+
         /// <summary>
         /// Emits a click event on the button
         /// </summary>

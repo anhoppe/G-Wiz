@@ -78,9 +78,9 @@ namespace Gwiz.UiControl.WinUi3
                         }
 
                         Draw.DrawSvgIcon(Icons.Edit,
-                            new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
+                            Design.IconSize.ToWinSize(),
                             rect.X,
-                            rect.Y + rect.Height / 2 - Design.IconSize / 2);
+                            rect.Y + rect.Height / 2 - Design.IconLength / 2);
                     }
                 }
             }

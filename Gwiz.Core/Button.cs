@@ -30,9 +30,11 @@ namespace Gwiz.Core
 
         public string Id { get; private set; } = string.Empty;
 
+        public bool Visible { get; set; } = true;
+
         public void Click()
         {
-            throw new NotImplementedException();
+            Clicked?.Invoke(this, EventArgs.Empty);
         }
     }
 }

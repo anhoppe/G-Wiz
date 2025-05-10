@@ -37,6 +37,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             buttonMock.Setup(p => p.Alignment).Returns(Alignment.TopRight);
             buttonMock.Setup(p => p.Icon).Returns(IconId.AlertCircle);
             buttonMock.Setup(p => p.Id).Returns("foo");
+            buttonMock.Setup(p => p.Visible).Returns(true);
 
             var nodeMock = new Mock<INode>();
             nodeMock.Setup(p => p.Buttons).Returns([buttonMock.Object]);
@@ -52,9 +53,31 @@ namespace Gwiz.UiControl.WinUi3.Test
             _sut.DrawGraph();
 
             // Assert
-            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 200 - Design.IconSize, 100));
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 200 - Design.IconLength, 100));
         }
 
+        [Test]
+        public void Button_WhenButtonNotVisible_ThenButtonIsNotDrawn()
+        {
+            // Arrange
+            var buttonMock = new Mock<IButton>();
+            buttonMock.Setup(p => p.Alignment).Returns(Alignment.TopRight);
+            buttonMock.Setup(p => p.Icon).Returns(IconId.AlertCircle);
+            buttonMock.Setup(p => p.Id).Returns("foo");
+            buttonMock.Setup(p => p.Visible).Returns(false);
+
+            var nodeMock = new Mock<INode>();
+            nodeMock.Setup(p => p.Buttons).Returns([buttonMock.Object]);
+            nodeMock.Setup(p => p.SourceEdgeTemplates).Returns([]);
+
+            _sut.Nodes = [nodeMock.Object];
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), It.IsAny<float>(), It.IsAny<float>()), Times.Never);
+        }
         [Test]
         public void Edges_DrawEdgeWithOpenArrowEnding_ArrowDrawnAsExpected()
         {
@@ -302,7 +325,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconLength);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
@@ -334,7 +357,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconLength);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
@@ -370,7 +393,7 @@ namespace Gwiz.UiControl.WinUi3.Test
                 edgeTemplate2Mock.Object
             });
 
-            nodeMock.Setup(p => p.X).Returns(Design.IconSize);
+            nodeMock.Setup(p => p.X).Returns(Design.IconLength);
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);

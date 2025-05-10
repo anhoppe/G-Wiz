@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using System.Drawing;
+using Windows.Devices.Geolocation;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -13,7 +14,9 @@ namespace Gwiz.UiControl.WinUi3
         
         public static readonly int HighlightStrokeWidth = 6;
 
-        public static readonly int IconSize = 30;
+        public static readonly int IconLength = 30;
+
+        public static readonly Size IconSize = new Size(IconLength, IconLength);
 
         public static readonly Color SelectionColor = Color.DarkKhaki;
 

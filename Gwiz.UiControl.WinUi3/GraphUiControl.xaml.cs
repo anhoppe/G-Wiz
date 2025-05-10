@@ -20,6 +20,7 @@ namespace Gwiz.UiControl.WinUi3
     public enum InteractionState
     {
         None,
+        ClickButton,
         CreateEdgeBegin,
         CreateEdgeFinish,
         DraggingNode,
@@ -70,6 +71,8 @@ namespace Gwiz.UiControl.WinUi3
         private static readonly int MinNodeSize = 80;
 
         private Bounds _bounds = new();
+
+        private string _buttonBelowMousweId = string.Empty;
 
         private Draw _draw = new Draw();
 
@@ -365,7 +368,29 @@ namespace Gwiz.UiControl.WinUi3
                         if (node.IsOver(worldPointerPosition))
                         {
                             _hoveredNode = node;
-                            
+
+                            // Check if the mouse if over a custom button
+                            _buttonBelowMousweId = string.Empty;
+                            foreach (var button in node.Buttons.Where(p => p.Visible))
+                            {
+                                var buttonPosition = button.Alignment.ToPosition(new System.Drawing.Rectangle(node.X, node.Y, node.Width, node.Height), Design.IconSize);
+                                if (worldPointerPosition.X >= buttonPosition.X &&
+                                    worldPointerPosition.X <= buttonPosition.X + Design.IconLength &&
+                                    worldPointerPosition.Y >= buttonPosition.Y &&
+                                    worldPointerPosition.Y <= buttonPosition.Y + Design.IconLength)
+                                {
+                                    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+                                    _potentialInteractionState = InteractionState.ClickButton;
+                                    _buttonBelowMousweId = button.Id;
+                                    break;
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(_buttonBelowMousweId))
+                            {
+                                break;
+                            }
+
                             // Check if the mouse is over an edit text button
                             for (int x = 0; x < _hoveredNode.Grid.Cols.Count; x++)
                             {
@@ -381,9 +406,9 @@ namespace Gwiz.UiControl.WinUi3
                                     var rect = cell.Rectangle;
 
                                     if (worldPointerPosition.X >= rect.X && 
-                                        worldPointerPosition.X <= rect.X + Design.IconSize &&
-                                        worldPointerPosition.Y <= rect.Y + rect.Height / 2 + Design.IconSize / 2 && 
-                                        worldPointerPosition.Y >= rect.Y + rect.Height / 2 - Design.IconSize / 2)
+                                        worldPointerPosition.X <= rect.X + Design.IconLength &&
+                                        worldPointerPosition.Y <= rect.Y + rect.Height / 2 + Design.IconLength / 2 && 
+                                        worldPointerPosition.Y >= rect.Y + rect.Height / 2 - Design.IconLength / 2)
                                     {
                                         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
                                         _potentialInteractionState = InteractionState.EditText;
@@ -408,24 +433,24 @@ namespace Gwiz.UiControl.WinUi3
 
                                 // Check if the mouse cursor is over the both resize icon
                             if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - Design.IconSize &&
-                                worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - Design.IconSize)
+                                worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - Design.IconLength &&
+                                worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - Design.IconLength)
                             {
                                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
                                 _potentialInteractionState = InteractionState.ResizeAll;
                             }
                             else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(Design.IconSize * 0.75) &&
-                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - Design.IconSize / 2 &&
-                                     worldPointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + Design.IconSize / 2)
+                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - (int)(Design.IconLength * 0.75) &&
+                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height / 2 - Design.IconLength / 2 &&
+                                     worldPointerPosition.Y <= _hoveredNode.Y + _hoveredNode.Height / 2 + Design.IconLength / 2)
                             {
                                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
                                 _potentialInteractionState = InteractionState.ResizeHorz;
                             }
                             else if ((_hoveredNode.Resize == Resize.HorzVert || _hoveredNode.Resize == Resize.HorzVertBoth) &&
-                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - Design.IconSize / 2 &&
-                                     worldPointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + Design.IconSize / 2 &&
-                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(Design.IconSize * 0.75))
+                                     worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width / 2 - Design.IconLength / 2 &&
+                                     worldPointerPosition.X <= _hoveredNode.X + _hoveredNode.Width / 2 + Design.IconLength / 2 &&
+                                     worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - (int)(Design.IconLength * 0.75))
                             {
                                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
                                 _potentialInteractionState = InteractionState.ResizeVert;
@@ -601,6 +626,15 @@ namespace Gwiz.UiControl.WinUi3
                 
                 _currentInteractionState = InteractionState.None;
                 Invalidate();
+            }
+            if (_currentInteractionState == InteractionState.ClickButton)
+            {
+                if (_hoveredNode == null)
+                {
+                    throw new InvalidOperationException("Cannot click button without hovered node");
+                }
+                var button = _hoveredNode.GetButtonById(_buttonBelowMousweId);
+                button.Click();
             }
             if (_currentInteractionState == InteractionState.CreateEdgeBegin)
             {

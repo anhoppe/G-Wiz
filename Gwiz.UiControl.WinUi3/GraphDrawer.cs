@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using WinRT;
 
 namespace Gwiz.UiControl.WinUi3
 {
@@ -95,7 +94,7 @@ namespace Gwiz.UiControl.WinUi3
             }
 
             // If the mouse x position is not in range we can also hit no source
-            if (xPos < node.X - Design.IconSize || xPos > node.X)
+            if (xPos < node.X - Design.IconLength || xPos > node.X)
             {
                 return null;
             }
@@ -106,9 +105,9 @@ namespace Gwiz.UiControl.WinUi3
 
             foreach (var edgeTemplate in node.SourceEdgeTemplates)
             {
-                int startY = node.Y + node.Height / 2 - (iconCount * Design.IconSize) / 2 + Design.IconSize * count++;
+                int startY = node.Y + node.Height / 2 - (iconCount * Design.IconLength) / 2 + Design.IconLength * count++;
 
-                if (startY < yPos && startY + Design.IconSize > yPos) 
+                if (startY < yPos && startY + Design.IconLength > yPos) 
                 {
                     return edgeTemplate;
                 }
@@ -142,23 +141,23 @@ namespace Gwiz.UiControl.WinUi3
                     // Icon count is increased by one because the additional connection icon is drawn when source icons are available
                     iconCount++;
 
-                    int startY = node.Y + node.Height / 2 - (iconCount * Design.IconSize) / 2;
+                    int startY = node.Y + node.Height / 2 - (iconCount * Design.IconLength) / 2;
 
                     // First icon is always the connection icon to demonstrate that the alpha buttons can be used to select a connection type
-                    Draw.DrawSvgIcon(_icons.Connection, new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
-                    startY += Design.IconSize;
+                    Draw.DrawSvgIcon(_icons.Connection, Design.IconSize.ToWinSize(), node.X - Design.IconLength, startY);
+                    startY += Design.IconLength;
 
                     foreach (var edgeTemplate in node.SourceEdgeTemplates)
                     {
-                        Draw.DrawSvgIcon(_icons.GetAlpha(edgeTemplate.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
-                        startY += Design.IconSize;
+                        Draw.DrawSvgIcon(_icons.GetAlpha(edgeTemplate.Icon), Design.IconSize.ToWinSize(), node.X - Design.IconLength, startY);
+                        startY += Design.IconLength;
                     }
                 }
             }
             else if (node.TargetEdgeTemplates.Contains(EdgeCreationActiveSourceTemplate))
             {
-                int startY = node.Y + node.Height / 2 - Design.IconSize / 2;
-                Draw.DrawSvgIcon(_icons.GetAlpha(EdgeCreationActiveSourceTemplate.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X - Design.IconSize, startY);
+                int startY = node.Y + node.Height / 2 - Design.IconLength / 2;
+                Draw.DrawSvgIcon(_icons.GetAlpha(EdgeCreationActiveSourceTemplate.Icon), Design.IconSize.ToWinSize(), node.X - Design.IconLength, startY);
             }
         }
 
@@ -252,22 +251,22 @@ namespace Gwiz.UiControl.WinUi3
             // Draw the resize all icon
             if (node.Resize == Resize.Both || node.Resize == Resize.HorzVertBoth)
             {
-                Draw.DrawSvgIcon(_icons.ResizeBottomRight, new Windows.Foundation.Size(Design.IconSize, Design.IconSize), node.X + node.Width - Design.IconSize, node.Y + node.Height - Design.IconSize);
+                Draw.DrawSvgIcon(_icons.ResizeBottomRight, Design.IconSize.ToWinSize(), node.X + node.Width - Design.IconLength, node.Y + node.Height - Design.IconLength);
             }
 
             if (node.Resize == Resize.HorzVert || node.Resize == Resize.HorzVertBoth)
             {
                 // Draw the resize horz icon
                 Draw.DrawSvgIcon(_icons.ResizeHorz,
-                    new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
-                    node.X + node.Width - (int)(Design.IconSize * 0.75),
-                    node.Y + node.Height / 2 - Design.IconSize / 2);
+                    Design.IconSize.ToWinSize(),
+                    node.X + node.Width - (int)(Design.IconLength * 0.75),
+                    node.Y + node.Height / 2 - Design.IconLength / 2);
 
                 // Draw the resize vert icon
                 Draw.DrawSvgIcon(_icons.ResizeVert,
-                    new Windows.Foundation.Size(Design.IconSize, Design.IconSize),
-                    node.X + node.Width / 2 - Design.IconSize / 2,
-                    node.Y + node.Height - (int)(Design.IconSize * 0.75));
+                    Design.IconSize.ToWinSize(),
+                    node.X + node.Width / 2 - Design.IconLength / 2,
+                    node.Y + node.Height - (int)(Design.IconLength * 0.75));
             }
         }
 
@@ -288,10 +287,10 @@ namespace Gwiz.UiControl.WinUi3
 
         private void DrawButtons(INode node)
         {
-            foreach (var button in node.Buttons)
+            foreach (var button in node.Buttons.Where(p => p.Visible))
             {
-                var pos = button.Alignment.ToPosition(new Rectangle(node.X, node.Y, node.Width, node.Height), new Size(Design.IconSize, Design.IconSize));
-                Draw.DrawSvgIcon(_icons.FromId(button.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), pos.X, pos.Y);
+                var pos = button.Alignment.ToPosition(new Rectangle(node.X, node.Y, node.Width, node.Height), new Size(Design.IconLength, Design.IconLength));
+                Draw.DrawSvgIcon(_icons.FromId(button.Icon), Design.IconSize.ToWinSize(), pos.X, pos.Y);
             }
         }
 
