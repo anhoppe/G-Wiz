@@ -281,7 +281,17 @@ namespace Gwiz.UiControl.WinUi3
                     DrawSizingIcons(node);
                     DrawEdgeCreationIcons(node);
                     DrawNodeSlection(node);
+                    DrawButtons(node);
                 }
+            }
+        }
+
+        private void DrawButtons(INode node)
+        {
+            foreach (var button in node.Buttons)
+            {
+                var pos = button.Alignment.ToPosition(new Rectangle(node.X, node.Y, node.Width, node.Height), new Size(Design.IconSize, Design.IconSize));
+                Draw.DrawSvgIcon(_icons.FromId(button.Icon), new Windows.Foundation.Size(Design.IconSize, Design.IconSize), pos.X, pos.Y);
             }
         }
 

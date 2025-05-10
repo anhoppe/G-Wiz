@@ -8,6 +8,8 @@ namespace Gwiz.Core.Contract
 
         Color BackgroundColor { get; }
 
+        IList<IButton> Buttons { get; set; }
+
         IGrid Grid { get; }
 
         int Height { get; set; }
@@ -29,5 +31,7 @@ namespace Gwiz.Core.Contract
         int X { get; set; }
 
         int Y { get; set; }
+
+        IButton GetButtonById(string id);
     }
 }

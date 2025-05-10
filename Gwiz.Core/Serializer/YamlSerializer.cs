@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
-using System;
 
 namespace Gwiz.Core.Serializer
 {
@@ -87,7 +86,7 @@ namespace Gwiz.Core.Serializer
                 var nodeInternal = node as Node;
                 if (nodeInternal != null)
                 {
-                    foreach (var content in nodeInternal.Content)
+                    foreach (var content in nodeInternal.ContentDto)
                     {
                         node.Grid.Cells[content.Col][content.Row].Text = content.Text;
                     }

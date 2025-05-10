@@ -10,7 +10,7 @@ namespace Gwiz.Core.Serializer
     /// Represents the content of a grid cell. 
     /// Used to deserialize the content information from the yaml file
     /// </summary>
-    public class Content
+    public class ContentDto
     {
         public int Col { get; set; } 
 

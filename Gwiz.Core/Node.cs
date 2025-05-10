@@ -3,7 +3,7 @@ using Gwiz.Core.Serializer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Xml.Linq;
+using System.Linq;
 
 namespace Gwiz.Core
 {
@@ -28,6 +28,8 @@ namespace Gwiz.Core
         public Alignment Alignment { get; set; } = Alignment.CenterCenter;
 
         public Color BackgroundColor { get; set; } = Color.White;
+
+        public IList<IButton> Buttons { get; set; } = new List<IButton>();
 
         public IGrid Grid => UpdateableGrid;
 
@@ -98,7 +100,8 @@ namespace Gwiz.Core
                 NodeChanged?.Invoke(this, this);
             }
         }
-        internal List<Content> Content { get; set; } = new List<Content>();
+
+        internal List<ContentDto> ContentDto { get; set; } = new List<ContentDto>();
 
         internal string TemplateName { get; set; } = string.Empty;
 
@@ -111,6 +114,19 @@ namespace Gwiz.Core
                 _grid.RegisterParentNodeChanged(this);
             }
         }
+
+        public IButton GetButtonById(string id)
+        {
+            var button = Buttons.FirstOrDefault(b => b.Id == id);
+
+            if (button == null)
+            {
+                throw new ArgumentException($"Button with id {id} not found");
+            }
+
+            return button;
+        }
+
         public bool IsOver(Point position)
         {
             return (position.X >= X &&
@@ -128,6 +144,12 @@ namespace Gwiz.Core
             Shape = template.Shape;
             TemplateName = template.Name;
             UpdateableGrid = Core.Grid.CreateFromTemplateGrid(template.Grid);
+
+            foreach (var button in template.Buttons)
+            {
+                var newButton = new Button(button);
+                Buttons.Add(newButton);
+            }
         }
 
         internal void Update()

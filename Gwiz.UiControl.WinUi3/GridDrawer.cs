@@ -52,7 +52,7 @@ namespace Gwiz.UiControl.WinUi3
 
                     var text = cell.Text;
 
-                    var textPos = GetTextPosition(text, rect, node.Alignment);
+                    var textPos = node.Alignment.ToPosition(rect, TextSizeCalculator(cell.Text));
 
                     if (!string.IsNullOrEmpty(text))
                     {
@@ -85,59 +85,5 @@ namespace Gwiz.UiControl.WinUi3
                 }
             }
         }
-
-        private Point GetTextPosition(string placedText, Rectangle rect, Alignment alignment)
-        {
-            var textSize = TextSizeCalculator(placedText);
-
-            float xText = 0f;
-            float yText = 0f;
-
-            switch (alignment)
-            {
-                case Alignment.TopLeft:
-                    xText = rect.Left;
-                    yText = rect.Top;
-                    break;
-                case Alignment.TopCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Top;
-                    break;
-                case Alignment.TopRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Top;
-                    break;
-                case Alignment.CenterLeft:
-                    xText = rect.Left;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.CenterCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.CenterRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Y + (rect.Height - textSize.Height) / 2;
-                    break;
-                case Alignment.BottomLeft:
-                    xText = 0;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-                case Alignment.BottomCenter:
-                    xText = rect.X + (rect.Width - textSize.Width) / 2;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-                case Alignment.BottomRight:
-                    xText = rect.Right - textSize.Width;
-                    yText = rect.Bottom - textSize.Height;
-                    break;
-            }
-
-            xText = Math.Max(xText, rect.X);
-            yText = Math.Max(yText, rect.Y);
-
-            return new Point((int)xText, (int)yText);
-        }
-
     }
 }

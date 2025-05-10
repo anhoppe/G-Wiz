@@ -1,0 +1,66 @@
+Nodes:
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Comments on nodes / edges
+  Height: 120
+  Id: 6b9b0524-0cdc-42fe-9065-09ae96916615
+  Template: UseCase
+  Width: 336
+  X: -344
+  Y: -251
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Custom Buttons
+  Height: 120
+  Id: 77cbbdd4-72b2-4aaa-8ff4-1c066e58a4ec
+  Template: UseCase
+  Width: 180
+  X: -272
+  Y: 140
+- Content:
+  - Col: 0
+    Row: 0
+    Text: ''
+  Height: 80
+  Id: cbefc640-1348-4b41-b32c-c2fb3deee49a
+  Template: Actor
+  Width: 80
+  X: -680
+  Y: -56
+- Content:
+  - Col: 0
+    Row: 0
+    Text: Set button visibility
+  Height: 120
+  Id: d4fd9997-5055-46af-948c-76637e98cc50
+  Template: UseCase
+  Width: 240
+  X: 111
+  Y: 138
+Edges:
+- Ending: OpenArrow
+  From: cbefc640-1348-4b41-b32c-c2fb3deee49a
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 6b9b0524-0cdc-42fe-9065-09ae96916615
+  ToLabel: ''
+- Ending: OpenArrow
+  From: cbefc640-1348-4b41-b32c-c2fb3deee49a
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: ''
+  To: 77cbbdd4-72b2-4aaa-8ff4-1c066e58a4ec
+  ToLabel: ''
+- Ending: OpenArrow
+  From: d4fd9997-5055-46af-948c-76637e98cc50
+  FromLabel: ''
+  LabelOffsetPerCent: 0
+  Style: Dotted
+  Text: <<extends>>
+  To: 77cbbdd4-72b2-4aaa-8ff4-1c066e58a4ec
+  ToLabel: ''

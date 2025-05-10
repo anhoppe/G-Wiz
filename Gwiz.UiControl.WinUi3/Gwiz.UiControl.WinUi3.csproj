@@ -9,6 +9,7 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="icons\alert-circle.png" />
     <Content Remove="icons\alpha-a.png" />
     <Content Remove="icons\alpha-b.png" />
     <Content Remove="icons\alpha-c.png" />
@@ -19,6 +20,10 @@
     <Content Remove="icons\alpha-h.png" />
     <Content Remove="icons\alpha-i.png" />
     <Content Remove="icons\alpha-j.png" />
+    <Content Remove="icons\alpha-k.png" />
+    <Content Remove="icons\alpha-l.png" />
+    <Content Remove="icons\alpha-m.png" />
+    <Content Remove="icons\alpha-n.png" />
     <Content Remove="icons\alpha-u.png" />
     <Content Remove="icons\alpha-v.png" />
     <Content Remove="icons\alpha-w.png" />
@@ -39,6 +44,7 @@
     <None Remove="icons\resize-bottom-right.svg" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="icons\alert-circle.png" />
     <EmbeddedResource Include="icons\alpha-a.png" />
     <EmbeddedResource Include="icons\alpha-b.png" />
     <EmbeddedResource Include="icons\alpha-c.png" />
@@ -49,6 +55,10 @@
     <EmbeddedResource Include="icons\alpha-h.png" />
     <EmbeddedResource Include="icons\alpha-i.png" />
     <EmbeddedResource Include="icons\alpha-j.png" />
+    <EmbeddedResource Include="icons\alpha-k.png" />
+    <EmbeddedResource Include="icons\alpha-l.png" />
+    <EmbeddedResource Include="icons\alpha-m.png" />
+    <EmbeddedResource Include="icons\alpha-n.png" />
     <EmbeddedResource Include="icons\alpha-u.png" />
     <EmbeddedResource Include="icons\alpha-v.png" />
     <EmbeddedResource Include="icons\alpha-w.png" />

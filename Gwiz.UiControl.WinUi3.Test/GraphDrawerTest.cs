@@ -30,6 +30,32 @@ namespace Gwiz.UiControl.WinUi3.Test
         }
 
         [Test]
+        public void Button_WhenButtonDefinedInNode_ThenButtonIsDrawn()
+        {
+            // Arrange
+            var buttonMock = new Mock<IButton>();
+            buttonMock.Setup(p => p.Alignment).Returns(Alignment.TopRight);
+            buttonMock.Setup(p => p.Icon).Returns(IconId.AlertCircle);
+            buttonMock.Setup(p => p.Id).Returns("foo");
+
+            var nodeMock = new Mock<INode>();
+            nodeMock.Setup(p => p.Buttons).Returns([buttonMock.Object]);
+            nodeMock.Setup(p => p.SourceEdgeTemplates).Returns([]);
+            nodeMock.Setup(p => p.X).Returns(100);
+            nodeMock.Setup(p => p.Y).Returns(100);
+            nodeMock.Setup(p => p.Width).Returns(100);
+            nodeMock.Setup(p => p.Height).Returns(100);
+
+            _sut.Nodes = [nodeMock.Object];
+
+            // Act
+            _sut.DrawGraph();
+
+            // Assert
+            _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), 200 - Design.IconSize, 100));
+        }
+
+        [Test]
         public void Edges_DrawEdgeWithOpenArrowEnding_ArrowDrawnAsExpected()
         {
             // Arrange
@@ -312,6 +338,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
+            nodeMock.Setup(p => p.Buttons).Returns([]);
 
             _sut.Nodes.Add(nodeMock.Object);
 
@@ -347,6 +374,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             nodeMock.Setup(p => p.Y).Returns(0);
             nodeMock.Setup(p => p.Width).Returns(100);
             nodeMock.Setup(p => p.Height).Returns(100);
+            nodeMock.Setup(p => p.Buttons).Returns([]);
 
             _sut.Nodes.Add(nodeMock.Object);
 
@@ -372,6 +400,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             nodeMock.Setup(p => p.Height).Returns(90);
             nodeMock.Setup(p => p.Select).Returns(true);
             nodeMock.Setup(p => p.SourceEdgeTemplates).Returns(new List<IEdgeTemplate>());
+            nodeMock.Setup(p => p.Buttons).Returns([]);
 
             _sut.Nodes.Add(nodeMock.Object);
 

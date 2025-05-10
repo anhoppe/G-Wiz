@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Gwiz.Core.Contract
 {
     public enum Resize
@@ -18,5 +13,18 @@ namespace Gwiz.Core.Contract
 
         // Controls for all resizing actions
         HorzVertBoth
+    }
+
+    public static class ResizeExtensions
+    {
+        public static Resize ToResize(this string asString) => asString.ToLower() switch
+        {
+            "" => Resize.None,
+            "horzvert" => Resize.HorzVert,
+            "both" => Resize.Both,
+            "horzvertboth" => Resize.HorzVertBoth,
+
+            _ => throw new UnknownTemplateParameterValue($"Invalid resize string: {asString}")
+        };
     }
 }

@@ -8,6 +8,8 @@ namespace Gwiz.Core.Contract
 
         Color BackgroundColor { get; }
 
+        IList<IButton> Buttons { get; }
+
         IGrid Grid { get; }
 
         Color LineColor { get; }

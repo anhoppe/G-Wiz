@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Gwiz.Core.Contract;
+using SkiaSharp;
 using SkiaSharp.Extended.Svg;
 using System;
 using System.IO;
@@ -13,6 +14,8 @@ namespace Gwiz.UiControl.WinUi3
             LoadSvgAsync();
         }
 
+        public SKBitmap? AlertCircle { get; private set; }
+        
         public SKBitmap? AlphaA { get; private set; }
         
         public SKBitmap? AlphaB { get; private set; }
@@ -32,6 +35,14 @@ namespace Gwiz.UiControl.WinUi3
         public SKBitmap? AlphaI { get; private set; }
         
         public SKBitmap? AlphaJ { get; private set; }
+        
+        public SKBitmap? AlphaK { get; private set; }
+        
+        public SKBitmap? AlphaL { get; private set; }
+        
+        public SKBitmap? AlphaM { get; private set; }
+        
+        public SKBitmap? AlphaN { get; private set; }
         
         public SKBitmap? AlphaU { get; private set; }
         
@@ -84,6 +95,14 @@ namespace Gwiz.UiControl.WinUi3
                     return AlphaI;
                 case 'J':
                     return AlphaJ;
+                case 'K':
+                    return AlphaJ;
+                case 'L':
+                    return AlphaJ;
+                case 'M':
+                    return AlphaJ;
+                case 'N':
+                    return AlphaJ;
                 case 'U':
                     return AlphaU;
                 case 'V':
@@ -100,6 +119,13 @@ namespace Gwiz.UiControl.WinUi3
 
             throw new ArgumentException($"Could not determine the alpha icon for {icon}");
         }
+
+        internal SKBitmap FromId(IconId iconId) => iconId switch
+        {
+            IconId.None => throw new ArgumentException($"Tried to request IconId.None"),
+            IconId.AlertCircle => AlertCircle,
+            _ => throw new ArgumentException($"No such icon available {iconId}"),
+        };
 
         private static Stream GetEmbeddedStream(string iconName)
         {
@@ -118,6 +144,10 @@ namespace Gwiz.UiControl.WinUi3
 
         private void LoadSvgAsync()
         {
+            using (var stream = GetEmbeddedStream("alert-circle.png"))
+            {
+                AlertCircle = SKBitmap.Decode(stream);
+            }
             using (var stream = GetEmbeddedStream("alpha-a.png"))
             {
                 AlphaA = SKBitmap.Decode(stream);
@@ -157,6 +187,22 @@ namespace Gwiz.UiControl.WinUi3
             using (var stream = GetEmbeddedStream("alpha-j.png"))
             {
                 AlphaJ = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-k.png"))
+            {
+                AlphaK = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-l.png"))
+            {
+                AlphaL = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-m.png"))
+            {
+                AlphaM = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("alpha-n.png"))
+            {
+                AlphaN = SKBitmap.Decode(stream);
             }
             using (var stream = GetEmbeddedStream("alpha-u.png"))
             {

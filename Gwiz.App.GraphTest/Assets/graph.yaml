@@ -53,6 +53,11 @@ Templates:
     Grid:
       Editable:
         - all
+    Buttons:
+      - Id: TestButton
+        Alignment: TopRight
+        Icon: AlertCircle
+
 
 EdgeTemplates:
   - Source: UseCase

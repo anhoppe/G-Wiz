@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Gwiz.Core.Contract;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Xml.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -21,10 +25,13 @@ namespace Gwiz.Core.Serializer
                 switch (key.Value)
                 {
                     case "Alignment":
-                        template.AlignmentStr = parser.Consume<Scalar>().Value;
+                        template.Alignment = (parser.Consume<Scalar>().Value).ToAlignment();
                         break;
                     case "BackgroundColor":
                         template.BackgroundColor = ColorTranslator.FromHtml(parser.Consume<Scalar>().Value);
+                        break;
+                    case "Buttons":
+                        template.ButtonDto = ((List<ButtonDto>)(deserializer(typeof(List<ButtonDto>)) ?? new List<ButtonDto>()));
                         break;
                     case "Grid":
                         template.Grid = (Grid)(deserializer(typeof(Grid)) ?? new Grid());
@@ -36,24 +43,32 @@ namespace Gwiz.Core.Serializer
                         template.Name = parser.Consume<Scalar>().Value;
                         break;
                     case "Resize":
-                        template.ResizeStr = parser.Consume<Scalar>().Value;
+                        template.Resize = (parser.Consume<Scalar>().Value).ToResize();
                         break;
                     case "Shape":
-                        template.ShapeStr = parser.Consume<Scalar>().Value;
+                        template.Shape = (parser.Consume<Scalar>().Value).ToShape();
                         break;
                     default:
                         // Skip unknown properties (including Template if present)
                         parser.SkipThisAndNestedEvents();
                         break;
+
                 }
+
+                ResolveButtons(template);
             }
-            
+
             parser.Consume<MappingEnd>();
 
-            template.ResolveEnums();
-            
-
             return template;
+        }
+
+        private void ResolveButtons(Template template)
+        {
+            foreach(var buttonDto in template.ButtonDto)
+            {
+                template.Buttons.Add(new Button(buttonDto));
+            }
         }
 
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)

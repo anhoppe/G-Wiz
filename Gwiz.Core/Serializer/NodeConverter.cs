@@ -1,7 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -24,7 +23,7 @@ namespace Gwiz.Core.Serializer
                 switch (key.Value)
                 {
                     case "Content":
-                        node.Content = ((List<Content>)(deserializer(typeof(List<Content>)) ?? new List<Content>()));
+                        node.ContentDto = ((List<ContentDto>)(deserializer(typeof(List<ContentDto>)) ?? new List<ContentDto>()));
                         break;
                     case "Height":
                         node.Height = int.Parse(parser.Consume<Scalar>().Value);
@@ -56,6 +55,7 @@ namespace Gwiz.Core.Serializer
             return node;
         }
 
+
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
             if (value is not Node node)
@@ -66,7 +66,7 @@ namespace Gwiz.Core.Serializer
             emitter.Emit(new MappingStart());
 
             // Convert the grid to content
-            List<Content> content = ConvertGridToContent(node);
+            List<ContentDto> content = ConvertGridToContent(node);
 
             emitter.Emit(new Scalar("Content"));
             serializer(content);
@@ -92,9 +92,9 @@ namespace Gwiz.Core.Serializer
             emitter.Emit(new MappingEnd());
         }
 
-        private static List<Content> ConvertGridToContent(Node node)
+        private static List<ContentDto> ConvertGridToContent(Node node)
         {
-            var content = new List<Content>();
+            var content = new List<ContentDto>();
             for (int y = 0; y < node.Grid.Rows.Count; y++)
             {
                 for (int x = 0; x < node.Grid.Cols.Count; x++)
@@ -103,7 +103,7 @@ namespace Gwiz.Core.Serializer
 
                     if (cell != null)
                     {
-                        content.Add(new Content
+                        content.Add(new ContentDto
                         {
                             Col = x,
                             Row = y,
