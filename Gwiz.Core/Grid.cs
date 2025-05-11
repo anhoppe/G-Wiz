@@ -9,12 +9,11 @@ namespace Gwiz.Core
     {
         public Grid()
         {
-            GridCellInternal = new GridCell[1][];
-            Cells[0] = new GridCell[1];
-            Cells[0][0] = new GridCell(false);
+            GridCellInternal = new GridCell[1, 1];
+            Cells[0, 0] = new GridCell(false);
         }
 
-        public IGridCell[][] Cells
+        public IGridCell[,] Cells
         {
             get
             {
@@ -30,7 +29,7 @@ namespace Gwiz.Core
 
         public List<string> Rows { get; set; } = new();
 
-        internal GridCell[][] GridCellInternal { get; set; }
+        internal GridCell[,] GridCellInternal { get; set; }
 
         public static Grid CreateFromTemplateGrid(IGrid grid)
         {
@@ -39,7 +38,7 @@ namespace Gwiz.Core
             createdGrid.Cols = new(grid.Cols);
             createdGrid.Rows = new(grid.Rows);
 
-            createdGrid.GridCellInternal = new GridCell[grid.Cols.Count][];
+            createdGrid.GridCellInternal = new GridCell[grid.Cols.Count, grid.Rows.Count];
 
             bool editable = false;
             var internalGrid = grid as Grid;
@@ -54,7 +53,6 @@ namespace Gwiz.Core
 
             for (int x = 0; x < grid.Cols.Count; x++)
             {
-                createdGrid.Cells[x] = new GridCell[grid.Rows.Count];
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
                     bool individualCellEditable = false;
@@ -65,10 +63,9 @@ namespace Gwiz.Core
                             individualCellEditable = true;
                         }
                     }
-                    createdGrid.Cells[x][y] = new GridCell(editable ? true : individualCellEditable);
+                    createdGrid.Cells[x, y] = new GridCell(editable ? true : individualCellEditable);
                 }
             }
-
 
             return createdGrid;
         }
@@ -88,7 +85,7 @@ namespace Gwiz.Core
                 for (int y = 0; y < Rows.Count; y++)
                 {
                     int height = (int)(parentNode.Height * yRatio[y]);
-                    GridCellInternal[x][y].Rectangle = new Rectangle(xPos, yPos, width, height);
+                    GridCellInternal[x, y].Rectangle = new Rectangle(xPos, yPos, width, height);
 
                     yPos += height;
                 }

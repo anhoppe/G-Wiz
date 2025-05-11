@@ -151,11 +151,10 @@ namespace Gwiz.UiControl.WinUi3.Test
             gridMock.SetupGet(p => p.Rows).Returns(["1"]);
 
             // This is the expected field size for a class node (1 column with 3 rows for title, props and methods)
-            var cells = new IGridCell[1][];
-            cells[0] = new IGridCell[1];
+            var cells = new IGridCell[1, 1];
 
             var cellMock = new Mock<IGridCell>();
-            cells[0][0] = cellMock.Object;
+            cells[0, 0] = cellMock.Object;
             cellMock.Setup(p => p.Text).Returns(text);
             cellMock.Setup(p => p.Rectangle).Returns(new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
 
@@ -170,6 +169,5 @@ namespace Gwiz.UiControl.WinUi3.Test
 
             return gridMock;
         }
-
     }
 }

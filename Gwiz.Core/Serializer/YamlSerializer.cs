@@ -88,7 +88,7 @@ namespace Gwiz.Core.Serializer
                 {
                     foreach (var content in nodeInternal.ContentDto)
                     {
-                        node.Grid.Cells[content.Col][content.Row].Text = content.Text;
+                        node.Grid.Cells[content.Col, content.Row].Text = content.Text;
                     }
                 }
             }

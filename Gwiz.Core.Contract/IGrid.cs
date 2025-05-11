@@ -7,7 +7,7 @@ namespace Gwiz.Core.Contract
         /// <summary>
         /// The individual cells in the grud
         /// </summary>
-        IGridCell[][] Cells { get; }
+        IGridCell[,] Cells { get; }
 
         /// <summary>
         /// Defines the columns in the grid

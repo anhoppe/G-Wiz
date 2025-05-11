@@ -30,7 +30,7 @@ namespace Gwiz.Core
 
         public string Id { get; private set; } = string.Empty;
 
-        public bool Visible { get; set; } = true;
+        public bool Visible { get; set; } = false;
 
         public void Click()
         {

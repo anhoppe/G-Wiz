@@ -27,7 +27,7 @@ namespace Gwiz.UiControl.WinUi3
                 {
                     for (int y = 0; y < grid.Rows.Count; y++)
                     {
-                        var rect = grid.Cells[x][y].Rectangle;
+                        var rect = grid.Cells[x, y].Rectangle;
 
                         totalRect = totalRect.Add(rect);
                     }
@@ -41,7 +41,7 @@ namespace Gwiz.UiControl.WinUi3
             {
                 for (int y = 0; y < grid.Rows.Count; y++)
                 {
-                    var cell = grid.Cells[x][y];
+                    var cell = grid.Cells[x, y];
                     var rect = cell.Rectangle;
 
                     if (node.Shape == Shape.Rectangle)

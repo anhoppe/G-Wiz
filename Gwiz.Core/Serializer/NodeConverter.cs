@@ -99,7 +99,7 @@ namespace Gwiz.Core.Serializer
             {
                 for (int x = 0; x < node.Grid.Cols.Count; x++)
                 {
-                    var cell = node.Grid.Cells[x][y];
+                    var cell = node.Grid.Cells[x, y];
 
                     if (cell != null)
                     {

@@ -450,7 +450,7 @@ namespace Gwiz.Core.Test.Serializer
             {
                 for (int y = 0; y < node.Grid.Rows.Count; y++)
                 {
-                    Assert.That(node.Grid.Cells[x][y].Text, Is.EqualTo(string.Empty));
+                    Assert.That(node.Grid.Cells[x, y].Text, Is.EqualTo(string.Empty));
                 }
             }
         }
@@ -532,15 +532,15 @@ namespace Gwiz.Core.Test.Serializer
             var template = graph.Templates[0];
             var grid = Grid.CreateFromTemplateGrid(template.Grid);
 
-            Assert.That(!grid.Cells[0][0].Editable);
-            Assert.That(!grid.Cells[0][1].Editable);
-            Assert.That(!grid.Cells[0][2].Editable);
-            Assert.That(!grid.Cells[1][0].Editable);
-            Assert.That(!grid.Cells[1][1].Editable);
-            Assert.That(!grid.Cells[1][2].Editable);
-            Assert.That(!grid.Cells[2][0].Editable);
-            Assert.That(!grid.Cells[2][1].Editable);
-            Assert.That(!grid.Cells[2][2].Editable);
+            Assert.That(!grid.Cells[0, 0].Editable);
+            Assert.That(!grid.Cells[0, 1].Editable);
+            Assert.That(!grid.Cells[0, 2].Editable);
+            Assert.That(!grid.Cells[1, 0].Editable);
+            Assert.That(!grid.Cells[1, 1].Editable);
+            Assert.That(!grid.Cells[1, 2].Editable);
+            Assert.That(!grid.Cells[2, 0].Editable);
+            Assert.That(!grid.Cells[2, 1].Editable);
+            Assert.That(!grid.Cells[2, 2].Editable);
         }
         
         [Test]
@@ -571,15 +571,15 @@ namespace Gwiz.Core.Test.Serializer
             var template = graph.Templates[0];
             var grid = Grid.CreateFromTemplateGrid(template.Grid);
 
-            Assert.That(grid.Cells[0][0].Editable);
-            Assert.That(grid.Cells[0][1].Editable);
-            Assert.That(grid.Cells[0][2].Editable);
-            Assert.That(grid.Cells[1][0].Editable);
-            Assert.That(grid.Cells[1][1].Editable);
-            Assert.That(grid.Cells[1][2].Editable);
-            Assert.That(grid.Cells[2][0].Editable);
-            Assert.That(grid.Cells[2][1].Editable);
-            Assert.That(grid.Cells[2][2].Editable);
+            Assert.That(grid.Cells[0, 0].Editable);
+            Assert.That(grid.Cells[0, 1].Editable);
+            Assert.That(grid.Cells[0, 2].Editable);
+            Assert.That(grid.Cells[1, 0].Editable);
+            Assert.That(grid.Cells[1, 1].Editable);
+            Assert.That(grid.Cells[1, 2].Editable);
+            Assert.That(grid.Cells[2, 0].Editable);
+            Assert.That(grid.Cells[2, 1].Editable);
+            Assert.That(grid.Cells[2, 2].Editable);
         }        
 
         [Test]
@@ -611,15 +611,15 @@ namespace Gwiz.Core.Test.Serializer
             var template = graph.Templates[0];
             var grid = Grid.CreateFromTemplateGrid(template.Grid);
 
-            Assert.That(!grid.Cells[0][0].Editable);
-            Assert.That(grid.Cells[0][1].Editable);
-            Assert.That(!grid.Cells[0][2].Editable);
-            Assert.That(!grid.Cells[1][0].Editable);
-            Assert.That(!grid.Cells[1][1].Editable);
-            Assert.That(grid.Cells[1][2].Editable);
-            Assert.That(!grid.Cells[2][0].Editable);
-            Assert.That(!grid.Cells[2][1].Editable);
-            Assert.That(!grid.Cells[2][2].Editable);
+            Assert.That(!grid.Cells[0, 0].Editable);
+            Assert.That(grid.Cells[0, 1].Editable);
+            Assert.That(!grid.Cells[0, 2].Editable);
+            Assert.That(!grid.Cells[1, 0].Editable);
+            Assert.That(!grid.Cells[1, 1].Editable);
+            Assert.That(grid.Cells[1, 2].Editable);
+            Assert.That(!grid.Cells[2, 0].Editable);
+            Assert.That(!grid.Cells[2, 1].Editable);
+            Assert.That(!grid.Cells[2, 2].Editable);
         }
 
         [Test]
@@ -699,7 +699,7 @@ namespace Gwiz.Core.Test.Serializer
 
             // Assert
             var node = graph.Nodes[0];
-            Assert.That(node.Grid.Cells[1][1].Text, Is.EqualTo("FooBar"));
+            Assert.That(node.Grid.Cells[1, 1].Text, Is.EqualTo("FooBar"));
         }
 
         [Test]

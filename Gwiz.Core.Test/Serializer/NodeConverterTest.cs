@@ -53,23 +53,21 @@ namespace Gwiz.Core.Test.Serializer
             // Arrange
             var gridMock = new Mock<IUpdatableGrid>();
 
-            IGridCell[][] gridCells = new GridCell[2][];
-            gridCells[0] = new GridCell[2];
-            gridCells[1] = new GridCell[2];
+            IGridCell[,] gridCells = new GridCell[2, 2];
 
-            gridCells[0][0] = new GridCell(false)
+            gridCells[0, 0] = new GridCell(false)
             {
                 Text = "foo",
             };
-            gridCells[0][1] = new GridCell(false)
+            gridCells[0, 1] = new GridCell(false)
             {
                 Text = "bar",
             };
-            gridCells[1][0] = new GridCell(false)
+            gridCells[1, 0] = new GridCell(false)
             {
                 Text = "buz",
             };
-            gridCells[1][1] = new GridCell(false)
+            gridCells[1, 1] = new GridCell(false)
             {
                 Text = "qux",
             };

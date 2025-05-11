@@ -396,7 +396,7 @@ namespace Gwiz.UiControl.WinUi3
                             {
                                 for (int y = 0; y < _hoveredNode.Grid.Rows.Count; y++)
                                 {
-                                    var cell = _hoveredNode.Grid.Cells[x][y];
+                                    var cell = _hoveredNode.Grid.Cells[x, y];
 
                                     if (!cell.Editable)
                                     {
@@ -413,7 +413,7 @@ namespace Gwiz.UiControl.WinUi3
                                         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
                                         _potentialInteractionState = InteractionState.EditText;
 
-                                        _editGridCell = _hoveredNode.Grid.Cells[x][y];
+                                        _editGridCell = _hoveredNode.Grid.Cells[x, y];
 
                                         isOverEditButton = true;
                                         break;

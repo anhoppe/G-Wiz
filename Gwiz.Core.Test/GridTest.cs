@@ -34,10 +34,10 @@ namespace Gwiz.Core.Test
             nodeMock.Raise(p => p.NodeChanged += null, EventArgs.Empty, nodeMock.Object);
 
             // Assert
-            Assert.That(sut.Cells[0][0].Rectangle.X, Is.EqualTo(100));
-            Assert.That(sut.Cells[0][0].Rectangle.Y, Is.EqualTo(200));
-            Assert.That(sut.Cells[0][0].Rectangle.Width, Is.EqualTo(100));
-            Assert.That(sut.Cells[0][0].Rectangle.Height, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.X, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.Y, Is.EqualTo(200));
+            Assert.That(sut.Cells[0, 0].Rectangle.Width, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.Height, Is.EqualTo(100));
         }
 
         [Test]
@@ -60,10 +60,10 @@ namespace Gwiz.Core.Test
             sut.UpdateFieldRects(_parentNode);
 
             // Assert
-            Assert.That(sut.Cells[0][0].Rectangle.X, Is.EqualTo(100));
-            Assert.That(sut.Cells[0][0].Rectangle.Y, Is.EqualTo(200));
-            Assert.That(sut.Cells[0][0].Rectangle.Width, Is.EqualTo(100));
-            Assert.That(sut.Cells[0][0].Rectangle.Height, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.X, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.Y, Is.EqualTo(200));
+            Assert.That(sut.Cells[0, 0].Rectangle.Width, Is.EqualTo(100));
+            Assert.That(sut.Cells[0, 0].Rectangle.Height, Is.EqualTo(100));
         }
 
         [Test]
@@ -86,25 +86,25 @@ namespace Gwiz.Core.Test
             sut.UpdateFieldRects(_parentNode);
 
             // Assert
-            Assert.That(sut.Cells[0][0].Rectangle.X, Is.EqualTo(20));
-            Assert.That(sut.Cells[0][0].Rectangle.Y, Is.EqualTo(10));
-            Assert.That(sut.Cells[0][0].Rectangle.Width, Is.EqualTo(30));
-            Assert.That(sut.Cells[0][0].Rectangle.Height, Is.EqualTo(40));
+            Assert.That(sut.Cells[0, 0].Rectangle.X, Is.EqualTo(20));
+            Assert.That(sut.Cells[0, 0].Rectangle.Y, Is.EqualTo(10));
+            Assert.That(sut.Cells[0, 0].Rectangle.Width, Is.EqualTo(30));
+            Assert.That(sut.Cells[0, 0].Rectangle.Height, Is.EqualTo(40));
 
-            Assert.That(sut.Cells[1][0].Rectangle.X, Is.EqualTo(50));
-            Assert.That(sut.Cells[1][0].Rectangle.Y, Is.EqualTo(10));
-            Assert.That(sut.Cells[1][0].Rectangle.Width, Is.EqualTo(70));
-            Assert.That(sut.Cells[1][0].Rectangle.Height, Is.EqualTo(40));
+            Assert.That(sut.Cells[1, 0].Rectangle.X, Is.EqualTo(50));
+            Assert.That(sut.Cells[1, 0].Rectangle.Y, Is.EqualTo(10));
+            Assert.That(sut.Cells[1, 0].Rectangle.Width, Is.EqualTo(70));
+            Assert.That(sut.Cells[1, 0].Rectangle.Height, Is.EqualTo(40));
 
-            Assert.That(sut.Cells[0][1].Rectangle.X, Is.EqualTo(20));
-            Assert.That(sut.Cells[0][1].Rectangle.Y, Is.EqualTo(50));
-            Assert.That(sut.Cells[0][1].Rectangle.Width, Is.EqualTo(30));
-            Assert.That(sut.Cells[0][1].Rectangle.Height, Is.EqualTo(60));
+            Assert.That(sut.Cells[0, 1].Rectangle.X, Is.EqualTo(20));
+            Assert.That(sut.Cells[0, 1].Rectangle.Y, Is.EqualTo(50));
+            Assert.That(sut.Cells[0, 1].Rectangle.Width, Is.EqualTo(30));
+            Assert.That(sut.Cells[0, 1].Rectangle.Height, Is.EqualTo(60));
 
-            Assert.That(sut.Cells[1][1].Rectangle.X, Is.EqualTo(50));
-            Assert.That(sut.Cells[1][1].Rectangle.Y, Is.EqualTo(50));
-            Assert.That(sut.Cells[1][1].Rectangle.Width, Is.EqualTo(70));
-            Assert.That(sut.Cells[1][1].Rectangle.Height, Is.EqualTo(60));
+            Assert.That(sut.Cells[1, 1].Rectangle.X, Is.EqualTo(50));
+            Assert.That(sut.Cells[1, 1].Rectangle.Y, Is.EqualTo(50));
+            Assert.That(sut.Cells[1, 1].Rectangle.Width, Is.EqualTo(70));
+            Assert.That(sut.Cells[1, 1].Rectangle.Height, Is.EqualTo(60));
         }
     }
 }
