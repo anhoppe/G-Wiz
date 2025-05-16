@@ -9,6 +9,36 @@ namespace Gwiz.Core.Test
     public class EdgeTest
     {
         [Test]
+        public void DockingPosition_WhenDockingPositionIsSet_ThenFromToPositionsCorrect()
+        {
+            // Arrange
+            var node1Mock = new Mock<IUpdatableNode>();
+            var node2Mock = new Mock<IUpdatableNode>();
+
+            node1Mock.Setup(p => p.X).Returns(0);
+            node1Mock.Setup(p => p.Y).Returns(0);
+            node1Mock.Setup(p => p.Width).Returns(100);
+            node1Mock.Setup(p => p.Height).Returns(100);
+
+            node2Mock.Setup(p => p.X).Returns(200);
+            node2Mock.Setup(p => p.Y).Returns(0);
+            node2Mock.Setup(p => p.Width).Returns(100);
+            node2Mock.Setup(p => p.Height).Returns(100);
+
+            var edges = new List<IEdge>();
+            var sut = new EdgeBuilder(node1Mock.Object, node2Mock.Object, edges);
+            sut.WithFromDockingPosition(Direction.Right, 25).
+                WithToDockingPosition(Direction.Left, 75).
+                Build();
+
+            // Act
+            // Assert
+            var edge = edges[0];
+            Assert.That(edge.FromPosition, Is.EqualTo(new Point(100, 25)));
+            Assert.That(edge.ToPosition, Is.EqualTo(new Point(200, 75)));
+        }
+
+        [Test]
         public void IsOver_WhenPointOverLine_ThenIsOverReturnsTrue()
         {
             // Arrange

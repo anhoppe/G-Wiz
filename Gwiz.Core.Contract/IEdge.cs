@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
+using System.Drawing;
 
 namespace Gwiz.Core.Contract
 {
@@ -10,11 +11,49 @@ namespace Gwiz.Core.Contract
         Rhombus,
     }
 
+    public static class EndingExtensions
+    {
+        public static string FromEnding(this Ending value) => value switch
+        {
+            Ending.None => "None",
+            Ending.OpenArrow => "OpenArrow",
+            Ending.ClosedArrow => "ClosedArrow",
+            Ending.Rhombus => "Rhombus",
+            _ => throw new InvalidEnumArgumentException($"No such ending <{value}>"),
+        };
+
+        public static Ending ToEnding(this string asString) => asString.ToLower() switch
+        {
+            "openarrow" => Ending.OpenArrow,
+            "closedarrow" => Ending.ClosedArrow,
+            "rhombus" => Ending.Rhombus,
+            _ => throw new ArgumentException($"Not such ending {asString}"),
+        };
+    }
+    
     public enum Style
     {
         None,
         Dashed,
         Dotted
+    }
+
+    public static class StyleExtensions
+    {
+        public static string FromStyle(this Style value) => value switch
+        {
+            Style.None => "None",
+            Style.Dashed => "Dashed",
+            Style.Dotted => "Dotted",
+            _ => throw new InvalidEnumArgumentException($"No such style <{value}>"),
+        };
+
+        public static Style ToStyle(this string asString) => asString.ToLower() switch
+        {
+            "dashed" => Style.Dashed,
+            "dotted" => Style.Dotted,
+            _ => throw new ArgumentException($"No such style: {asString}"),
+        };
     }
 
     /// <summary>

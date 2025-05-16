@@ -114,6 +114,13 @@ Nodes:
     Width: 200
     Height: 100
     Template: Note
+    Id: Note1
+  - X: 400
+    Y: 300
+    Width: 200
+    Height: 100
+    Template: Note
+    Id: Note2
   - X: 400
     Y: 170
     Width: 200
@@ -191,3 +198,15 @@ Edges:
     Ending: OpenArrow
     Style: Dotted
     Text: <<extends>>
+  - From: Note1
+    To: Note2
+    FromDocking: Right
+    FromDockingPos: 10
+    ToDocking: Left
+    ToDockingPos: 80
+  - From: Note1
+    To: Note2
+    FromDocking: Right
+    FromDockingPos: 20
+    ToDocking: Left
+    ToDockingPos: 70

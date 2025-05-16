@@ -129,6 +129,41 @@ namespace Gwiz.Core.Test.Serializer
         }
 
         [Test]
+        public void EdgeDocking_WhenFromDockingDefined_ThenEdgeHasExpectedFromPosition()
+        {
+            var yaml =
+                "Nodes:\n" +
+                "  - Id: foo\n" +
+                "    X: 10\n" +
+                "    Y: 10\n" +
+                "    Width: 100\n" +
+                "    Height: 100\n" +
+                "  - Id: bar\n" +
+                "    X: 200\n" +
+                "    Y: 20\n" +
+                "    Width: 100\n" +
+                "    Height: 100\n" +
+                "Edges:\n" +
+                "  - From: foo\n" +
+                "    To: bar\n" +
+                "    FromDocking: Right\n" +
+                "    FromDockingPos: 10\n" +
+                "    To: bar\n" +
+                "    ToDocking: Left\n" +
+                "    ToDockingPos: 30\n";
+
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(yaml));
+
+            // Act
+            var graph = _sut.Deserialize(stream);
+
+            // Assert
+            var edge = graph.Edges[0];
+            Assert.That(edge.FromPosition, Is.EqualTo(new Point(110, 20)));
+            Assert.That(edge.ToPosition, Is.EqualTo(new Point(200, 50)));
+        }
+
+        [Test]
         public void EdgeEnding_WhenEdgeEndingHasUnknwonSpecifier_ThenExceptionIsThrown()
         {
             // Arrange

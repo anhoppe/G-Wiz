@@ -13,15 +13,9 @@
 
         List<ITemplate> Templates { get; }
 
+        IEdgeBuilder AddEdge(INode from, INode to);
+
         INode AddNode(string templateName);
-        
-        void AddEdge(INode from, INode to);
-
-        void AddEdge(INode from, INode to, IEdgeTemplate edgeTemplate);
-
-        void AddEdge(INode from, INode to, Ending ending, Style style);
-
-        void AddEdge(INode from, INode to, string fromLabel, string toLabel, float labelOffsetPerCent);
 
         void Remove(IEdge edge);
         

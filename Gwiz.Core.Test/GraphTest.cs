@@ -9,91 +9,35 @@ namespace Gwiz.Core.Test
     public class GraphTest
     {
         [Test]
-        public void AddEdge_WhenAddingEdgeUsingTemplate_ThenTheEdgeHasParametersFromTemplate()
+        public void AddEdge_WhenAddingEdge_ThenEdgeBuilderIsReturned()
         {
             // Arrange
             var node1Mock = new Mock<IUpdatableNode>();
             var node2Mock = new Mock<IUpdatableNode>();
 
+            var edgeBuilderMock = new Mock<IEdgeBuilder>();
+
+            bool edgeBuilderCreated = false;
             var sut = new Graph()
             {
-                Nodes = [node1Mock.Object, node2Mock.Object],
-            };
-
-            var edgeTemplateMock = new Mock<IEdgeTemplate>();
-            edgeTemplateMock.Setup(p => p.Beginning).Returns(Ending.ClosedArrow);
-            edgeTemplateMock.Setup(p => p.Ending).Returns(Ending.Rhombus);
-            edgeTemplateMock.Setup(p => p.Style).Returns(Style.Dashed);
-            edgeTemplateMock.Setup(p => p.Text).Returns("buz");
-
-            // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object, edgeTemplateMock.Object);
-
-            // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0];
-            Assert.That(edge.Beginning, Is.EqualTo(Ending.ClosedArrow));
-            Assert.That(edge.Ending, Is.EqualTo(Ending.Rhombus));
-            Assert.That(edge.Style, Is.EqualTo(Style.Dashed));
-            Assert.That(edge.Text, Is.EqualTo("buz"));
-
-        }
-
-        [Test]
-        public void AddEdge_WhenAddingEdgeWithFromToLabelsAndOffset_ThenEdgeHasFromAndToLabelsSet()
-        {
-            // Arrange
-            var node1Mock = new Mock<IUpdatableNode>();
-            var node2Mock = new Mock<IUpdatableNode>();
-
-            var sut = new Graph()
-            {
-                Nodes = [node1Mock.Object, node2Mock.Object],
+                EdgeBuilderFactory = (IUpdatableNode from, IUpdatableNode to, IList<IEdge> edges) => 
+                {
+                    if (from == node1Mock.Object && to == node2Mock.Object)
+                    {
+                        edgeBuilderCreated = true;
+                    }
+                    return edgeBuilderMock.Object;
+                },
+                Nodes = [node1Mock.Object, node2Mock.Object]
             };
 
             // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object, "foo", "bar", 7);
+            var result = sut.AddEdge(node1Mock.Object, node2Mock.Object);
+            result.Build();
 
             // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0];
-            Assert.That(edge.FromLabel, Is.EqualTo("foo"));
-            Assert.That(edge.ToLabel, Is.EqualTo("bar"));
-            Assert.That(edge.LabelOffsetPerCent, Is.EqualTo(7));
-        }
-
-        [Test]
-        public void AddEdge_WhenAddingEdgeWithNodes_ThenEdgeHasFromAndToSet()
-        {
-            // Arrange
-            var node1Mock = new Mock<IUpdatableNode>();
-            var node2Mock = new Mock<IUpdatableNode>();
-
-            node1Mock.Setup(p => p.Id).Returns("node1");
-            node2Mock.Setup(p => p.Id).Returns("node2");
-
-            var sut = new Graph()
-            {
-                Nodes = [node1Mock.Object, node2Mock.Object],
-            };
-
-            // Act
-            sut.AddEdge(node1Mock.Object, node2Mock.Object);
-
-            // Assert
-            Assert.That(sut.Edges.Count, Is.EqualTo(1));
-
-            var edge = sut.Edges[0] as Edge;
-            if (edge == null)
-            {
-                throw new NullReferenceException();
-            }
-            Assert.That(edge.From, Is.EqualTo(node1Mock.Object));
-            Assert.That(edge.To, Is.EqualTo(node2Mock.Object));
-            Assert.That(edge.FromId, Is.EqualTo("node1"));
-            Assert.That(edge.ToId, Is.EqualTo("node2"));
+            Assert.That(edgeBuilderCreated);
+            Assert.That(result, Is.EqualTo(edgeBuilderMock.Object));
         }
 
         [Test]

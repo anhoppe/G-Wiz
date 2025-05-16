@@ -27,6 +27,10 @@ namespace Gwiz.Core
 
         public INode To => ToInternal;
 
+        internal Direction FromDocking { get; set; } = Direction.None;
+
+        internal int FromDockingPosition { get; set; } = 0;
+
         internal string FromId { get; set; } = string.Empty;
 
         internal IUpdatableNode FromInternal
@@ -56,6 +60,10 @@ namespace Gwiz.Core
         public Style Style { get; set; } = Style.None;
 
         public string Text { get; set; } = string.Empty;
+
+        internal Direction ToDocking { get; set; } = Direction.None;
+
+        internal int ToDockingPosition { get; set; } = 0;
 
         internal string ToId { get; set; } = string.Empty;
 
@@ -107,8 +115,23 @@ namespace Gwiz.Core
             {
                 var centerLine = new LineSegment2D(centerFromNode, centerToNode);
 
-                FromPosition = CalculateIntersection(From, centerLine);
-                ToPosition = CalculateIntersection(To, centerLine);
+                FromPosition = FromDocking switch
+                {
+                    Direction.Left => new Point(From.X, From.Y + FromDockingPosition),
+                    Direction.Right => new Point(From.X + From.Width, From.Y + FromDockingPosition),
+                    Direction.Top => new Point(FromDockingPosition, From.Y),
+                    Direction.Bottom => new Point(FromDockingPosition, From.Y + From.Height),
+                    _ => CalculateIntersection(From, centerLine)
+                };
+
+                ToPosition = ToDocking switch
+                {
+                    Direction.Left => new Point(To.X, To.Y + ToDockingPosition),
+                    Direction.Right => new Point(To.X + To.Width, To.Y + ToDockingPosition),
+                    Direction.Top => new Point(ToDockingPosition, To.Y),
+                    Direction.Bottom => new Point(ToDockingPosition, To.Y + To.Height),
+                    _ => CalculateIntersection(To, centerLine)
+                };
             }
         }
 

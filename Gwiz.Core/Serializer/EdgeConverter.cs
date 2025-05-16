@@ -1,6 +1,5 @@
 ﻿using Gwiz.Core.Contract;
 using System;
-using System.ComponentModel;
 using System.Globalization;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -8,7 +7,7 @@ using YamlDotNet.Serialization;
 
 namespace Gwiz.Core.Serializer
 {
-    internal class EdgeConverter : EdgeConverterBase, IYamlTypeConverter
+    internal class EdgeConverter : IYamlTypeConverter
     {
         public bool Accepts(Type type) => typeof(IEdge).IsAssignableFrom(type);
 
@@ -22,13 +21,19 @@ namespace Gwiz.Core.Serializer
                 switch (key.Value)
                 {
                     case "Beginning":
-                        edge.Beginning = StringToEnding(parser.Consume<Scalar>().Value);
+                        edge.Beginning = (parser.Consume<Scalar>().Value).ToEnding();
                         break;
                     case "Ending":
-                        edge.Ending = StringToEnding(parser.Consume<Scalar>().Value);
+                        edge.Ending = (parser.Consume<Scalar>().Value).ToEnding();
                         break;
                     case "From":
                         edge.FromId = parser.Consume<Scalar>().Value;
+                        break;
+                    case "FromDocking":
+                        edge.FromDocking = (parser.Consume<Scalar>().Value).ToDirection();
+                        break;
+                    case "FromDockingPos":
+                        edge.FromDockingPosition = int.Parse(parser.Consume<Scalar>().Value);
                         break;
                     case "FromLabel":
                         edge.FromLabel = parser.Consume<Scalar>().Value;
@@ -37,13 +42,19 @@ namespace Gwiz.Core.Serializer
                         edge.LabelOffsetPerCent = float.Parse(parser.Consume<Scalar>().Value, CultureInfo.InvariantCulture);
                         break;
                     case "Style":
-                        edge.Style = StringToStyle(parser.Consume<Scalar>().Value);
+                        edge.Style = (parser.Consume<Scalar>().Value).ToStyle();
                         break;
                     case "Text":
                         edge.Text = parser.Consume<Scalar>().Value;
                         break;
                     case "To":
                         edge.ToId = parser.Consume<Scalar>().Value;
+                        break;
+                    case "ToDocking":
+                        edge.ToDocking = (parser.Consume<Scalar>().Value).ToDirection();
+                        break;
+                    case "ToDockingPos":
+                        edge.ToDockingPosition = int.Parse(parser.Consume<Scalar>().Value);
                         break;
                     case "ToLabel":
                         edge.ToLabel = parser.Consume<Scalar>().Value;
@@ -69,10 +80,16 @@ namespace Gwiz.Core.Serializer
             emitter.Emit(new MappingStart());
 
             emitter.Emit(new Scalar("Ending"));
-            serializer(EndingToString(edge.Ending));
+            serializer(edge.Ending.FromEnding());
 
             emitter.Emit(new Scalar("From"));
             serializer(edge.FromId);
+
+            emitter.Emit(new Scalar("FromDocking"));
+            serializer(edge.FromDocking.FromDirection());
+
+            emitter.Emit(new Scalar("FromDockingPos"));
+            serializer(edge.FromDockingPosition.ToString(CultureInfo.InvariantCulture));
 
             emitter.Emit(new Scalar("FromLabel"));
             serializer(edge.FromLabel);
@@ -81,7 +98,7 @@ namespace Gwiz.Core.Serializer
             serializer(edge.LabelOffsetPerCent.ToString(CultureInfo.InvariantCulture));
 
             emitter.Emit(new Scalar("Style"));
-            serializer(StyleToString(edge.Style));
+            serializer(edge.Style.FromStyle());
 
             emitter.Emit(new Scalar("Text"));
             serializer(edge.Text);
@@ -89,51 +106,16 @@ namespace Gwiz.Core.Serializer
             emitter.Emit(new Scalar("To"));
             serializer(edge.ToId);
 
+            emitter.Emit(new Scalar("ToDocking"));
+            serializer(edge.ToDocking.FromDirection());
+
+            emitter.Emit(new Scalar("ToDockingPos"));
+            serializer(edge.ToDockingPosition.ToString(CultureInfo.InvariantCulture));
+
             emitter.Emit(new Scalar("ToLabel"));
             serializer(edge.ToLabel);
 
             emitter.Emit(new MappingEnd());
-        }
-
-        private string EndingToString(Ending value)
-        {
-            return value switch
-            {
-                Ending.None => "None",
-                Ending.OpenArrow => "OpenArrow",
-                Ending.ClosedArrow => "ClosedArrow",
-                Ending.Rhombus => "Rhombus",
-                _ => throw new InvalidEnumArgumentException($"No such ending <{value}>"),
-            };
-        }
-
-        private Style StringToStyle(string value)
-        {
-            if (value == "None")
-            {
-                return Style.None;
-            }
-            if (value == "Dashed")
-            {
-                return Style.Dashed;
-            }
-            if (value == "Dotted")
-            {
-                return Style.Dotted;
-            }
-
-            throw new InvalidEnumArgumentException($"No such style <{value}>");
-        }
-
-        private string StyleToString(Style value)
-        {
-            return value switch
-            {
-                Style.None => "None",
-                Style.Dashed => "Dashed",
-                Style.Dotted => "Dotted",
-                _ => throw new InvalidEnumArgumentException($"No such style <{value}>"),
-            };
         }
     }
 }

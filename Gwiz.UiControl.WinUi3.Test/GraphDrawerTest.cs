@@ -78,6 +78,7 @@ namespace Gwiz.UiControl.WinUi3.Test
             // Assert
             _drawMock.Verify(m => m.DrawSvgIcon(It.IsAny<SKBitmap>(), It.IsAny<Windows.Foundation.Size>(), It.IsAny<float>(), It.IsAny<float>()), Times.Never);
         }
+
         [Test]
         public void Edges_DrawEdgeWithOpenArrowEnding_ArrowDrawnAsExpected()
         {

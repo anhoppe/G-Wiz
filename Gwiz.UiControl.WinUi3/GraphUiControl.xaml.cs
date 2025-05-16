@@ -622,8 +622,9 @@ namespace Gwiz.UiControl.WinUi3
                     throw new InvalidOperationException("Cannot create edge because target node is not set");
                 }
 
-                Graph.AddEdge(_hoveredNode, _edgeCreationTargetNode, _edgeCreationSourceTemplate);
-                
+                var edgeBuilder = Graph.AddEdge(_hoveredNode, _edgeCreationTargetNode);
+                edgeBuilder.WithTemplate(_edgeCreationSourceTemplate).Build();
+
                 _currentInteractionState = InteractionState.None;
                 Invalidate();
             }
