@@ -70,6 +70,12 @@ namespace Gwiz.Core
             return this;
         }
 
+        public IEdgeBuilder WithText(string text)
+        {
+            _edge.Text = text;
+            return this;
+        }
+
         public IEdgeBuilder WithToDockingPosition(Direction direction, int pos)
         {
             _edge.ToDocking = direction;

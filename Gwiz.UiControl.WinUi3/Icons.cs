@@ -55,6 +55,8 @@ namespace Gwiz.UiControl.WinUi3
         public SKBitmap? AlphaY { get; private set; }
         
         public SKBitmap? AlphaZ { get; private set; }
+        
+        public SKBitmap? ArrowRight { get; private set; }
 
         public SKBitmap? Connection { get; private set; }
 
@@ -123,7 +125,8 @@ namespace Gwiz.UiControl.WinUi3
         internal SKBitmap FromId(IconId iconId) => iconId switch
         {
             IconId.None => throw new ArgumentException($"Tried to request IconId.None"),
-            IconId.AlertCircle => AlertCircle,
+            IconId.AlertCircle => AlertCircle != null ? AlertCircle : throw new NullReferenceException("AlertCircle icon not initialized"),
+            IconId.ArrowRight => ArrowRight != null ? ArrowRight : throw new NullReferenceException("ArrowRight icon not initialized"),
             _ => throw new ArgumentException($"No such icon available {iconId}"),
         };
 
@@ -227,6 +230,10 @@ namespace Gwiz.UiControl.WinUi3
             using (var stream = GetEmbeddedStream("alpha-z.png"))
             {
                 AlphaZ = SKBitmap.Decode(stream);
+            }
+            using (var stream = GetEmbeddedStream("arrow-right.png"))
+            {
+                ArrowRight = SKBitmap.Decode(stream);
             }
             using (var stream = GetEmbeddedStream("transit-connection-variant.png"))
             {

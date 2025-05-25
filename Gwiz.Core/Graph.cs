@@ -8,6 +8,8 @@ namespace Gwiz.Core
     public class Graph : IGraph
     {
         public event EventHandler<INode>? NodeRemoved;
+        
+        public event EventHandler<IList<ContextMenuItem>>? ContextMenuShown;
 
         public List<IEdge> Edges { get; set; } = new();
 
@@ -80,6 +82,11 @@ namespace Gwiz.Core
             Nodes.Remove(node);
 
             NodeRemoved?.Invoke(this, node);
+        }
+
+        public void ShowContextMenu(IList<ContextMenuItem> contextMenuItems)
+        {
+            ContextMenuShown?.Invoke(this, contextMenuItems);
         }
 
         public void Update()

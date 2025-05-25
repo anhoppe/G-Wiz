@@ -30,6 +30,7 @@
     <Content Remove="icons\alpha-x.png" />
     <Content Remove="icons\alpha-y.png" />
     <Content Remove="icons\alpha-z.png" />
+    <Content Remove="icons\arrow-right.png" />
     <Content Remove="icons\drag-horizontal-variant.png" />
     <Content Remove="icons\drag-vertical-variant.png" />
     <Content Remove="icons\resize-bottom-right.png" />
@@ -65,6 +66,7 @@
     <EmbeddedResource Include="icons\alpha-x.png" />
     <EmbeddedResource Include="icons\alpha-y.png" />
     <EmbeddedResource Include="icons\alpha-z.png" />
+    <EmbeddedResource Include="icons\arrow-right.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.png" />
     <EmbeddedResource Include="icons\drag-horizontal-variant.svg" />
     <EmbeddedResource Include="icons\drag-vertical-variant.png" />

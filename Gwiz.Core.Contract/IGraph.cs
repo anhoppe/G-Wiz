@@ -5,6 +5,8 @@
     /// </summary>
     public interface IGraph
     {
+        public event EventHandler<IList<ContextMenuItem>>? ContextMenuShown;
+
         public event EventHandler<INode>? NodeRemoved;
 
         List<IEdge> Edges { get; }
@@ -20,6 +22,8 @@
         void Remove(IEdge edge);
         
         void Remove(INode node);
+
+        void ShowContextMenu(IList<ContextMenuItem> contextMenuItems);
 
         void Update();
     }

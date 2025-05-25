@@ -5,6 +5,7 @@ namespace Gwiz.Core.Contract
     {
         None,
         AlertCircle,
+        ArrowRight,
     }
 
     public static class IconIdExtensions
@@ -13,6 +14,7 @@ namespace Gwiz.Core.Contract
         {
             "none" => IconId.None,
             "alertcircle" => IconId.AlertCircle,
+            "arrowright" => IconId.ArrowRight,
             _ => throw new ArgumentOutOfRangeException(nameof(iconName), iconName, null)
         };
     }

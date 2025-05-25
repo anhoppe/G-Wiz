@@ -24,6 +24,7 @@ namespace Gwiz.Core.Contract
 
         public static Ending ToEnding(this string asString) => asString.ToLower() switch
         {
+            "none" => Ending.None,
             "openarrow" => Ending.OpenArrow,
             "closedarrow" => Ending.ClosedArrow,
             "rhombus" => Ending.Rhombus,
@@ -50,6 +51,7 @@ namespace Gwiz.Core.Contract
 
         public static Style ToStyle(this string asString) => asString.ToLower() switch
         {
+            "none" => Style.None,
             "dashed" => Style.Dashed,
             "dotted" => Style.Dotted,
             _ => throw new ArgumentException($"No such style: {asString}"),

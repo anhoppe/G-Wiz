@@ -58,6 +58,9 @@ Templates:
         Alignment: TopRight
         Icon: AlertCircle
 
+  - Name: Sequence
+    BackgroundColor: 255, 255, 255, 255
+    LineColor: 0, 0, 0, 255    
 
 EdgeTemplates:
   - Source: UseCase
@@ -175,6 +178,18 @@ Nodes:
     Height: 120
     Template: UseCase
     Id: UC4
+  - X: 100
+    Y: 100
+    Width: 100
+    Height: 45
+    Template: Sequence
+    Children:
+      - X: 130
+        Y: 100
+        Width: 40
+        Height: 200
+        Template: Sequence
+        Id: Seq1
 
 Edges:
   - From: Foo

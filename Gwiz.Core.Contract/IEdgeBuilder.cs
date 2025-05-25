@@ -37,6 +37,8 @@
 
         IEdgeBuilder WithTemplate(IEdgeTemplate edgeTemplate);
 
+        IEdgeBuilder WithText(string text);
+
         /// <summary>
         /// Defines the to docking position on the node
         /// </summary>

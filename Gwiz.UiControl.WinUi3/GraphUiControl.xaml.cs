@@ -74,6 +74,10 @@ namespace Gwiz.UiControl.WinUi3
 
         private string _buttonBelowMousweId = string.Empty;
 
+        private MenuFlyout _contextMenu;
+
+        private Point _currentScreenPointerPosition = new Point();
+
         private Draw _draw = new Draw();
 
         private IEdgeTemplate? _edgeCreationSourceTemplate;
@@ -104,8 +108,7 @@ namespace Gwiz.UiControl.WinUi3
 
         private Point _scrollPosition = new Point(0, 0);
 
-        private Point _scrollStartPosition = new Point(0, 0);
-
+        private Point _scrollStartPosition = new Point(0, 0);        
 
         public GraphUiControl()
         {
@@ -117,6 +120,8 @@ namespace Gwiz.UiControl.WinUi3
             this.KeyDown += OnKeyDown;
 
             _deleteKeyAccelerator.IsEnabled = false;
+
+            _contextMenu = new MenuFlyout();
         }
 
         // Graph Dependency Property
@@ -305,6 +310,11 @@ namespace Gwiz.UiControl.WinUi3
             }
         }
 
+        /// <summary>
+        /// Called when the Graph dependency property is set
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
         private static void OnGraphDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiControl = d as GraphUiControl;
@@ -312,6 +322,8 @@ namespace Gwiz.UiControl.WinUi3
             if (uiControl != null)
             {
                 uiControl.UpdateGraphDrawer();
+
+                uiControl.RegisterContextMenu();
 
                 if (uiControl._canvasControl != null)
                 {
@@ -332,8 +344,8 @@ namespace Gwiz.UiControl.WinUi3
                 return;
             }
 
-            var screenPointerPosition = e.GetCurrentPoint(this).Position;
-            System.Drawing.Point worldPointerPosition = new System.Drawing.Point((int)screenPointerPosition.X, (int)screenPointerPosition.Y);
+            _currentScreenPointerPosition = e.GetCurrentPoint(this).Position;
+            System.Drawing.Point worldPointerPosition = new System.Drawing.Point((int)_currentScreenPointerPosition.X, (int)_currentScreenPointerPosition.Y);
             worldPointerPosition.X += (int)_scrollPosition.X;
             worldPointerPosition.Y += (int)_scrollPosition.Y;
 
@@ -581,8 +593,8 @@ namespace Gwiz.UiControl.WinUi3
                     break;
 
                 case InteractionState.DraggingView:
-                    _scrollPosition.X = _scrollStartPosition.X - screenPointerPosition.X;
-                    _scrollPosition.Y = _scrollStartPosition.Y - screenPointerPosition.Y;
+                    _scrollPosition.X = _scrollStartPosition.X - _currentScreenPointerPosition.X;
+                    _scrollPosition.Y = _scrollStartPosition.Y - _currentScreenPointerPosition.Y;
 
                     Invalidate();
                     break;
@@ -712,6 +724,38 @@ namespace Gwiz.UiControl.WinUi3
             {
                 StartEditing();
             }
+        }
+
+        private void RegisterContextMenu()
+        {
+            Graph.ContextMenuShown += (sender, contextMenuItems) =>
+            {
+                _contextMenu = new MenuFlyout();
+
+                foreach (var menuItem in contextMenuItems)
+                {
+                    if (menuItem.SubMenuItems.Any())
+                    {
+                        var item = new MenuFlyoutSubItem { Text = menuItem.Name };
+
+                        foreach (var subItem in menuItem.SubMenuItems)
+                        {
+                            var subMenuItem = new MenuFlyoutItem { Text = subItem.Name };
+                            subMenuItem.Click += (s, e) => subItem.Callback.Invoke();
+                            item.Items.Add(subMenuItem);
+                        }
+                        _contextMenu.Items.Add(item);
+                    }
+                    else
+                    {
+                        var item = new MenuFlyoutItem { Text = menuItem.Name };
+                        item.Click += (s, e) => menuItem.Callback.Invoke();
+                        _contextMenu.Items.Add(item);
+                    }
+                }
+
+                _contextMenu.ShowAt(_canvasControl, _currentScreenPointerPosition);
+            };
         }
 
         private void StartEditing()

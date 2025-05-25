@@ -25,6 +25,7 @@ namespace Gwiz.Core.Contract
 
         public static Direction ToDirection(this string asString) => asString.ToLower() switch
         {
+            "none" => Direction.None,
             "left" => Direction.Left,
             "right" => Direction.Right,
             "top" => Direction.Top,
