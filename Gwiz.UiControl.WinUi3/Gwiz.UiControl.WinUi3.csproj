@@ -30,6 +30,7 @@
     <Content Remove="icons\alpha-x.png" />
     <Content Remove="icons\alpha-y.png" />
     <Content Remove="icons\alpha-z.png" />
+    <Content Remove="icons\arrow-left.png" />
     <Content Remove="icons\arrow-right.png" />
     <Content Remove="icons\drag-horizontal-variant.png" />
     <Content Remove="icons\drag-vertical-variant.png" />
@@ -103,6 +104,12 @@
 
   <ItemGroup>
     <EmbeddedResource Include="icons\transit-connection-variant.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icons\arrow-left.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   
 </Project>

@@ -1,0 +1,22 @@
+
+SystemBoundary: G-Wiz
+
+Actors:
+ - User
+
+UseCases:
+  - Change View
+  - Zoom
+  - Pan
+  
+Relations:
+ - Source: Zoom
+   Target: Change View
+   Relation: Derives
+ - Source: Pan
+   Target: Change View
+   Relation: Derives
+ - Source: User
+   Target: Change View
+   Relation: Uses
+   

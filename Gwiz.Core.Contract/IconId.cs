@@ -5,6 +5,7 @@ namespace Gwiz.Core.Contract
     {
         None,
         AlertCircle,
+        ArrowLeft,
         ArrowRight,
     }
 
@@ -14,6 +15,7 @@ namespace Gwiz.Core.Contract
         {
             "none" => IconId.None,
             "alertcircle" => IconId.AlertCircle,
+            "arrowleft" => IconId.ArrowLeft,
             "arrowright" => IconId.ArrowRight,
             _ => throw new ArgumentOutOfRangeException(nameof(iconName), iconName, null)
         };

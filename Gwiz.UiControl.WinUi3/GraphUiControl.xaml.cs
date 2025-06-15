@@ -72,11 +72,12 @@ namespace Gwiz.UiControl.WinUi3
 
         private Bounds _bounds = new();
 
-        private string _buttonBelowMousweId = string.Empty;
 
         private MenuFlyout _contextMenu;
 
         private Point _currentScreenPointerPosition = new Point();
+
+        private IButton? _customButtonBelowMouse;
 
         private Draw _draw = new Draw();
 
@@ -374,34 +375,34 @@ namespace Gwiz.UiControl.WinUi3
                             break;
                         }
 
+                        // Check if the mouse if over a custom button
+                        _customButtonBelowMouse = null;
+                        foreach (var button in node.Buttons.Where(p => p.Visible))
+                        {
+                            var buttonPosition = button.Alignment.ToPosition(new System.Drawing.Rectangle(node.X, node.Y, node.Width, node.Height), Design.IconSize);
+                            if (worldPointerPosition.X >= buttonPosition.X &&
+                                worldPointerPosition.X <= buttonPosition.X + Design.IconLength &&
+                                worldPointerPosition.Y >= buttonPosition.Y &&
+                                worldPointerPosition.Y <= buttonPosition.Y + Design.IconLength)
+                            {
+                                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+                                _potentialInteractionState = InteractionState.ClickButton;
+                                _customButtonBelowMouse = button;
+                                break;
+                            }
+                        }
+
+                        if (_customButtonBelowMouse != null)
+                        {
+                            break;
+                        }
+
 
                         bool isOverEditButton = false;
 
                         if (node.IsOver(worldPointerPosition))
                         {
                             _hoveredNode = node;
-
-                            // Check if the mouse if over a custom button
-                            _buttonBelowMousweId = string.Empty;
-                            foreach (var button in node.Buttons.Where(p => p.Visible))
-                            {
-                                var buttonPosition = button.Alignment.ToPosition(new System.Drawing.Rectangle(node.X, node.Y, node.Width, node.Height), Design.IconSize);
-                                if (worldPointerPosition.X >= buttonPosition.X &&
-                                    worldPointerPosition.X <= buttonPosition.X + Design.IconLength &&
-                                    worldPointerPosition.Y >= buttonPosition.Y &&
-                                    worldPointerPosition.Y <= buttonPosition.Y + Design.IconLength)
-                                {
-                                    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-                                    _potentialInteractionState = InteractionState.ClickButton;
-                                    _buttonBelowMousweId = button.Id;
-                                    break;
-                                }
-                            }
-
-                            if (!string.IsNullOrEmpty(_buttonBelowMousweId))
-                            {
-                                break;
-                            }
 
                             // Check if the mouse is over an edit text button
                             for (int x = 0; x < _hoveredNode.Grid.Cols.Count; x++)
@@ -443,7 +444,7 @@ namespace Gwiz.UiControl.WinUi3
                                 break;
                             }
 
-                                // Check if the mouse cursor is over the both resize icon
+                            // Check if the mouse cursor is over the both resize icon
                             if ((_hoveredNode.Resize == Resize.Both || _hoveredNode.Resize == Resize.HorzVertBoth) &&
                                 worldPointerPosition.X >= _hoveredNode.X + _hoveredNode.Width - Design.IconLength &&
                                 worldPointerPosition.Y >= _hoveredNode.Y + _hoveredNode.Height - Design.IconLength)
@@ -642,12 +643,11 @@ namespace Gwiz.UiControl.WinUi3
             }
             if (_currentInteractionState == InteractionState.ClickButton)
             {
-                if (_hoveredNode == null)
+                if (_customButtonBelowMouse == null)
                 {
-                    throw new InvalidOperationException("Cannot click button without hovered node");
+                    throw new InvalidOperationException("Cannot click button when not over custom ");
                 }
-                var button = _hoveredNode.GetButtonById(_buttonBelowMousweId);
-                button.Click();
+                _customButtonBelowMouse.Click();
             }
             if (_currentInteractionState == InteractionState.CreateEdgeBegin)
             {
