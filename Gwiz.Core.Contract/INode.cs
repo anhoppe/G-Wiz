@@ -33,5 +33,11 @@ namespace Gwiz.Core.Contract
         int Y { get; set; }
 
         IButton GetButtonById(string id);
+
+        /// <summary>
+        /// Allows the client to set the ID of the node.
+        /// </summary>
+        /// <param name="id">New ID of the node</param>
+        void SetId(string id);
     }
 }

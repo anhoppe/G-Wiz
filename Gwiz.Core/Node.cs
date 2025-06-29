@@ -135,6 +135,11 @@ namespace Gwiz.Core
                 position.Y <= Y + Height);
         }
 
+        public void SetId(string id)
+        {
+            Id = id;
+        }
+
         internal void AssignTemplate(ITemplate template)
         {
             Alignment = template.Alignment;
