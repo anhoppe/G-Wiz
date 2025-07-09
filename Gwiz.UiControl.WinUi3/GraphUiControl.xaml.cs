@@ -87,7 +87,7 @@ namespace Gwiz.UiControl.WinUi3
 
         private IGridCell? _editGridCell;
 
-        private GraphDrawer _graphDrawer = new();
+        private GraphDrawer _graphDrawer = new((text) => TextSizeCalculator.GetTextSize(text));
 
         private IEdge? _hoveredEdge;
 

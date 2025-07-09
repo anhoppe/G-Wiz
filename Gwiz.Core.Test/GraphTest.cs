@@ -31,6 +31,8 @@ namespace Gwiz.Core.Test
                 Nodes = [node1Mock.Object, node2Mock.Object]
             };
 
+            sut.SetTextSizeCalculator((text) => (0, 0));
+
             // Act
             var result = sut.AddEdge(node1Mock.Object, node2Mock.Object);
             result.Build();
@@ -44,6 +46,8 @@ namespace Gwiz.Core.Test
         public void AddNode_WhenAddingNode_ThenSourceAndTargetTemplatesAreAssigned()
         {
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
+
             sut.Templates.Add(new Template()
             {
                 Name = "foo",
@@ -62,8 +66,8 @@ namespace Gwiz.Core.Test
             sut.EdgeTemplates.Add(edgeTemplate);
 
             // Act
-            var fooNode = sut.AddNode("foo");
-            var barNode = sut.AddNode("bar");
+            var fooNode = sut.AddNode("foo").Build();
+            var barNode = sut.AddNode("bar").Build();
 
             Assert.That(fooNode.SourceEdgeTemplates.Contains(edgeTemplate));
             Assert.That(fooNode.TargetEdgeTemplates.Count == 0);
@@ -75,6 +79,8 @@ namespace Gwiz.Core.Test
         public void AddNode_WhenAddingNode_ThenTheNodeHasAnId()
         {
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
+
             sut.Templates.Add(new Template()
             {
                 Name = "foo",
@@ -84,7 +90,7 @@ namespace Gwiz.Core.Test
             });
 
             // Act
-            var node = sut.AddNode("foo");
+            var node = sut.AddNode("foo").Build();
 
             // Assert
             Assert.That(!string.IsNullOrEmpty(node.Id));
@@ -95,6 +101,8 @@ namespace Gwiz.Core.Test
         {
             // Arrange
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
+            
             sut.Templates.Add(new Template()
             {
                 Name = "foo",
@@ -107,7 +115,7 @@ namespace Gwiz.Core.Test
             });
 
             // Act
-            var node = sut.AddNode("foo");
+            var node = sut.AddNode("foo").Build();
 
             // Assert
             Assert.That(node.Grid.Cols.Count, Is.EqualTo(2));
@@ -118,6 +126,8 @@ namespace Gwiz.Core.Test
         public void AddNode_WhenAddingNodeWithTemplate_ThenTemplateIsAssignedToNode()
         {
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
+            
             sut.Templates.Add(new Template()
             {
                 Name = "foo",
@@ -127,7 +137,7 @@ namespace Gwiz.Core.Test
             });
 
             // Act
-            var node = sut.AddNode("foo") as Node;
+            var node = sut.AddNode("foo").Build() as Node;
 
             // Assert
             if (node == null)
@@ -145,6 +155,7 @@ namespace Gwiz.Core.Test
         {
             // Arrange
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
 
             sut.Templates.Add(new Template()
             {
@@ -152,7 +163,7 @@ namespace Gwiz.Core.Test
             });
 
             // Act
-            var node = sut.AddNode("foo");
+            var node = sut.AddNode("foo").Build();
 
             // Assert
             Assert.That(sut.Nodes.Count, Is.EqualTo(1));
@@ -167,6 +178,7 @@ namespace Gwiz.Core.Test
             };
 
             var sut = new Graph();
+            sut.SetTextSizeCalculator((text) => (0, 0));
 
             sut.Templates.Add(new Template()
             {
@@ -197,8 +209,8 @@ namespace Gwiz.Core.Test
             });
 
             // Act
-            var node1 = sut.AddNode("foo");
-            var node2 = sut.AddNode("bar");
+            var node1 = sut.AddNode("foo").Build();
+            var node2 = sut.AddNode("bar").Build();
 
             // Assert
             Assert.That(node1.SourceEdgeTemplates.Count, Is.EqualTo(1));

@@ -7,9 +7,11 @@ namespace Gwiz.Core
 {
     public class Graph : IGraph
     {
-        public event EventHandler<INode>? NodeRemoved;
-        
+        private Func<string, (int, int)> _textSizeCalculator = (text) => throw new NotImplementedException("Text size calculator is not set in graph.");
+
         public event EventHandler<IList<ContextMenuItem>>? ContextMenuShown;
+
+        public event EventHandler<INode>? NodeRemoved;
 
         public List<IEdge> Edges { get; set; } = new();
 
@@ -19,7 +21,7 @@ namespace Gwiz.Core
 
         internal Func<IUpdatableNode, IUpdatableNode, IList<IEdge>, IEdgeBuilder> EdgeBuilderFactory { private get; set; } = (IUpdatableNode from, IUpdatableNode to, IList<IEdge> edges) => new EdgeBuilder(from, to, edges);
 
-        internal List<EdgeTemplate> EdgeTemplates { get; set; } = new ();
+        internal List<EdgeTemplate> EdgeTemplates { get; set; } = new();
 
         public IEdgeBuilder AddEdge(INode from, INode to)
         {
@@ -39,7 +41,7 @@ namespace Gwiz.Core
             return EdgeBuilderFactory(fromInternal, toInternal, Edges);
         }
 
-        public INode AddNode(string templateName)
+        public INodeBuilder AddNode(string templateName)
         {
             var template = Templates.Find(t => t.Name == templateName);
 
@@ -48,20 +50,11 @@ namespace Gwiz.Core
                 throw new KeyNotFoundException($"Template {templateName} not found");
             }
 
-            var node = new Node()
-            {
-                Id = Guid.NewGuid().ToString(),
-            };
+            var nodeBuilder = new NodeBuilder(Nodes, template, _textSizeCalculator);
 
-            node.AssignTemplate(template);
+            AssignEdgeTemplates(templateName, nodeBuilder.Node);
 
-            node.UpdateableGrid = Grid.CreateFromTemplateGrid(template.Grid);
-
-            AssignEdgeTemplates(templateName, node);
-
-            Nodes.Add(node);
-
-            return node;
+            return nodeBuilder;
         }
 
         public void Remove(IEdge edge)
@@ -83,6 +76,8 @@ namespace Gwiz.Core
 
             NodeRemoved?.Invoke(this, node);
         }
+
+        public void SetTextSizeCalculator(Func<string, (int, int)> textSizeCalculator) => _textSizeCalculator = textSizeCalculator;
 
         public void ShowContextMenu(IList<ContextMenuItem> contextMenuItems)
         {

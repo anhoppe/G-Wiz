@@ -1,7 +1,6 @@
 ﻿using Gwiz.Core.Contract;
 using MathNet.Spatial.Euclidean;
 using MathNet.Spatial.Units;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,21 +14,20 @@ namespace Gwiz.UiControl.WinUi3
 
         private static readonly float ArrowAngleDeg = 30;
 
-        private static readonly Windows.UI.Color LineColor = Windows.UI.Color.FromArgb(255, 0, 0, 0);
-
         private Point _previewLineFrom = new Point(0, 0);
 
         private Point _previewLineTo = new Point(0, 0);
 
         private Icons _icons = new Icons();
 
-        public GraphDrawer()
+        public GraphDrawer(Func<string, Size> textSizeCalculator)
         {
+            TextSizeCalculator = textSizeCalculator;
             GridDrawer = new GridDrawer()
             {
                 Draw = Draw,
                 Icons = _icons,
-                TextSizeCalculator = TextSizeCalculator,
+                TextSizeCalculator = textSizeCalculator,
             };
         }
 
@@ -39,37 +37,9 @@ namespace Gwiz.UiControl.WinUi3
 
         public List<INode> Nodes { get; set; } = new();
 
-        public Func<string, Size> TextSizeCalculator { get; set; } = (text) =>
-        {
-            var size = new Size(0, 0);
-
-            using (var font = new SKFont
-            {
-                Size = 16,
-                Typeface = SKTypeface.FromFamilyName("Segoe UI") // Use Segoe UI
-            })
-            {
-                var metrics = font.Metrics;
-                float lineHeight = metrics.Descent - metrics.Ascent; // Correct height per line
-                float baselineAdjustment = lineHeight / 2; // Fix baseline offset
-
-                string[] lines = text.Split('\n'); // Handle multi-line text
-
-                float maxWidth = 0;
-                foreach (string line in lines)
-                {
-                    float lineWidth = font.MeasureText(line);
-                    maxWidth = Math.Max(maxWidth, lineWidth);
-                }
-
-                size.Width = (int)Math.Ceiling(maxWidth);
-                size.Height = (int)Math.Ceiling(lineHeight * (lines.Length - 1) - baselineAdjustment); // Adjust for baseline
-            }
-
-            return size;
-        };
-
         internal IGridDrawer GridDrawer { get; set; }
+
+        internal Func<string, Size> TextSizeCalculator { get; set; } = (text) => new Size(0, 0);
 
         public void DrawGraph()
         {
@@ -185,7 +155,7 @@ namespace Gwiz.UiControl.WinUi3
 
                     if (!string.IsNullOrEmpty(edge.Text))
                     {
-                        var size = TextSizeCalculator(edge.Text);
+                        var size = TextSizeCalculator.Invoke(edge.Text);
                         var center = GeoConv.Center(edge.FromPosition, edge.ToPosition);
 
                         Draw.DrawText(edge.Text, new Point(center.X - size.Width / 2, center.Y - size.Height / 2), Color.Black);

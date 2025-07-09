@@ -13,7 +13,7 @@ namespace Gwiz.UiControl.WinUi3.Test
 
         private Mock<IGridDrawer> _drawGridMock = new();
 
-        private GraphDrawer _sut = new GraphDrawer();
+        private GraphDrawer _sut = new GraphDrawer((text) => new Size(0, 0));
 
         [SetUp]
         public void SetUp()
@@ -22,7 +22,7 @@ namespace Gwiz.UiControl.WinUi3.Test
 
             _drawGridMock = new Mock<IGridDrawer>();
 
-            _sut = new GraphDrawer()
+            _sut = new GraphDrawer((text) => new Size(0, 0))
             {
                 Draw = _drawMock.Object,
                 GridDrawer = _drawGridMock.Object,
@@ -481,21 +481,6 @@ namespace Gwiz.UiControl.WinUi3.Test
             var expectedStart = new Point(50, 50);
             var expectedEnd = new Point(200, 300);
             _drawMock.Verify(m => m.DrawLine(expectedStart, expectedEnd, Style.Dotted, It.IsAny<Color>(), It.IsAny<float>()));
-        }
-
-        [Test]
-        public void TextSizeCalculator_WhenMultipleLinesOfSameText_ThenTextWidthIsEqual()
-        {
-            // Arrange
-            var text1 = "HelloWorld\n";
-            var text2 = "HelloWorld\nHelloWorld\nHelloWorld\nHelloWorld\nHelloWorld\n";
-
-            // Act
-            var size1 = _sut.TextSizeCalculator.Invoke(text1);
-            var size2 = _sut.TextSizeCalculator.Invoke(text2);
-
-            // Assert
-            Assert.That(size1.Width, Is.EqualTo(size2.Width));
         }
     }
 }

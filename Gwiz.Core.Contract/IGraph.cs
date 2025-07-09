@@ -17,11 +17,13 @@
 
         IEdgeBuilder AddEdge(INode from, INode to);
 
-        INode AddNode(string templateName);
+        INodeBuilder AddNode(string templateName);
 
         void Remove(IEdge edge);
         
         void Remove(INode node);
+
+        void SetTextSizeCalculator(Func<string, (int, int)> textSizeCalculator);
 
         void ShowContextMenu(IList<ContextMenuItem> contextMenuItems);
 

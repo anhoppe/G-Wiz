@@ -6,9 +6,9 @@ namespace Gwiz.UiControl.WinUi3
 {
     internal class GridDrawer : Drawer, IGridDrawer
     {
-        internal Func<string, Size> TextSizeCalculator { get; set; } = (text) => new Size(0, 0);
-
         internal Icons Icons { private get; set; } = new Icons();
+
+        internal Func<string, Size> TextSizeCalculator { private get; set; } = (text) => new Size(0, 0);
 
         public void DrawGrid(INode node)
         {
@@ -52,7 +52,7 @@ namespace Gwiz.UiControl.WinUi3
 
                     var text = cell.Text;
 
-                    var textPos = node.Alignment.ToPosition(rect, TextSizeCalculator(cell.Text));
+                    var textPos = node.Alignment.ToPosition(rect, TextSizeCalculator.Invoke(cell.Text));
 
                     if (!string.IsNullOrEmpty(text))
                     {
@@ -68,7 +68,7 @@ namespace Gwiz.UiControl.WinUi3
                         {
                             var textBeforeCursor = text.Substring(0, cell.EditTextPosition);
 
-                            var size = TextSizeCalculator(textBeforeCursor);
+                            var size = TextSizeCalculator.Invoke(textBeforeCursor);
 
                             Draw.DrawLine(new Point(textPos.X + size.Width, textPos.Y + 3),
                                 new Point(textPos.X + size.Width, textPos.Y + size.Height - 3),
