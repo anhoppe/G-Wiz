@@ -40,6 +40,15 @@
         IEdgeBuilder WithText(string text);
 
         /// <summary>
+        /// Allows to define a distance of the edge's center to the text position.
+        /// The distance is always orthogonal to the edge.
+        /// </summary>
+        /// <param name="deltaX">Horizontal distance from the edge center to the text position</param>
+        /// <param name="deltaY">Vertical distance from the edge center to the text position</param>
+        /// <returns>Edge builder object</returns>
+        IEdgeBuilder WithTextDistance(int deltaX, int deltaY);
+
+        /// <summary>
         /// Defines the to docking position on the node
         /// </summary>
         /// <param name="direction">The direction of the edge </param>

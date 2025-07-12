@@ -49,9 +49,9 @@ namespace Gwiz.Core.Contract
             Alignment.CenterLeft => new Point(targetRect.Left, targetRect.Y + (targetRect.Height - contentSize.Height) / 2),
             Alignment.CenterCenter => new Point(targetRect.X + (targetRect.Width - contentSize.Width) / 2, targetRect.Y + (targetRect.Height - contentSize.Height) / 2),
             Alignment.CenterRight => new Point(targetRect.Right - contentSize.Width, targetRect.Y + (targetRect.Height - contentSize.Height) / 2),
-            Alignment.BottomLeft => new Point(targetRect.X - contentSize.Width, targetRect.Bottom - contentSize.Height),
+            Alignment.BottomLeft => new Point(targetRect.X, targetRect.Bottom - contentSize.Height),
             Alignment.BottomCenter => new Point(targetRect.X + (targetRect.Width - contentSize.Width) / 2, targetRect.Bottom - contentSize.Height),
-            Alignment.BottomRight => new Point(targetRect.Right, targetRect.Bottom - contentSize.Height),
+            Alignment.BottomRight => new Point(targetRect.Right - contentSize.Width, targetRect.Bottom - contentSize.Height),
             _ => throw new UnknownTemplateParameterValue($"Alignment {alignment} cannot be converted to position"),
         };
     }

@@ -61,6 +61,8 @@ namespace Gwiz.Core
 
         public string Text { get; set; } = string.Empty;
 
+        public (int, int) TextDistance { get; internal set; } = (0, 0);
+
         internal Direction ToDocking { get; set; } = Direction.None;
 
         internal int ToDockingPosition { get; set; } = 0;

@@ -155,10 +155,8 @@ namespace Gwiz.UiControl.WinUi3
 
                     if (!string.IsNullOrEmpty(edge.Text))
                     {
-                        var size = TextSizeCalculator.Invoke(edge.Text);
-                        var center = GeoConv.Center(edge.FromPosition, edge.ToPosition);
-
-                        Draw.DrawText(edge.Text, new Point(center.X - size.Width / 2, center.Y - size.Height / 2), Color.Black);
+                        var textPos = GetEdgeTextPos(edge);
+                        Draw.DrawText(edge.Text, textPos, Color.Black);
                     }
                 }
             }
@@ -275,6 +273,28 @@ namespace Gwiz.UiControl.WinUi3
 
                 Draw.DrawRectangle(rect, Design.SelectionColor, Design.SelectionStrokeWidth);
             }
+        }
+
+        private Point GetEdgeTextPos(IEdge edge)
+        {
+            var textSize = TextSizeCalculator.Invoke(edge.Text);
+            var center = GeoConv.Center(edge.FromPosition, edge.ToPosition);
+
+            var directionVec = new Vector2D(edge.ToPosition.X - edge.FromPosition.X, edge.ToPosition.Y - edge.FromPosition.Y);
+            directionVec = directionVec.Normalize();
+            var angle = directionVec.AngleTo(Vector2D.XAxis);
+
+            var textDistance = new Vector2D(edge.TextDistance.Item1, edge.TextDistance.Item2);
+            var len = textDistance.Length;
+
+            if (Math.Abs(len) > float.Epsilon)
+            {            
+                var textDistanceNormalized = textDistance.Normalize();
+                textDistanceNormalized = textDistanceNormalized.Rotate(angle);
+
+                textDistance = textDistanceNormalized.ScaleBy(textDistance.Length);
+            }
+            return new Point(center.X - textSize.Width / 2 + (int)textDistance.X, center.Y - textSize.Height / 2 + (int)textDistance.Y);
         }
 
         private (Point fromPos, Point toPos) GetFromToLabelPos(IEdge edge)

@@ -89,6 +89,12 @@ namespace Gwiz.Core.Contract
         Point FromPosition { get; }
 
         /// <summary>
+        /// Distance between center of the edge and the text.
+        /// The distance is always orthogonal to the edge.
+        /// </summary>
+        (int, int) TextDistance { get; }
+
+        /// <summary>
         /// Offset of the from / to labels in per cent of the
         /// absolute edge length. 0.5 means both labels are in the middle.
         /// </summary>

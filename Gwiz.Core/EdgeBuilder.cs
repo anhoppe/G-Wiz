@@ -75,6 +75,11 @@ namespace Gwiz.Core
             _edge.Text = text;
             return this;
         }
+        public IEdgeBuilder WithTextDistance(int deltaX, int deltaY)
+        {
+            _edge.TextDistance = (deltaX, deltaY);
+            return this;
+        }
 
         public IEdgeBuilder WithToDockingPosition(Direction direction, int pos)
         {
